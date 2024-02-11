@@ -26,7 +26,7 @@ const Act2 = () => {
 
         
         if (id) {
-            axios.get(`http://localhost:3001/activitytwo/byId/${id}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`).then((response) => {
                 //console.log(response)
                 if (response.data !== null) {
                     setTranscriptHighlighting(response.data.predefinedHighlighting)
@@ -46,7 +46,7 @@ const Act2 = () => {
             })
         } else if (id !== "null") {
             console.log("Activity one id" + sessionStorage.getItem("ActivityOneId"))
-            axios.get(`http://localhost:3001/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`).then((response) => {
                 if (response.data !== null) {
                     setUserData(response.data)
                     let activity_mvc_data = {}
@@ -66,7 +66,7 @@ const Act2 = () => {
             alert("Please go back to the previous activity and submit it to continue.")
         }
 
-        // axios.get(`http://localhost:3001/activitytwo/byId/${id}`).then((response)=>{
+        // axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`).then((response)=>{
         //     console.log(response)
         //     if (response.data !== null) {
         //         setUserData(response.data)
@@ -80,7 +80,7 @@ const Act2 = () => {
         //         }
         //         setActivityMVCContent(activity_mvc_data)
         //     } else {
-        //         axios.get(`http://localhost:3001/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`).then((response)=>{
+        //         axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`).then((response)=>{
         //             if (response.data !== null) {
         //                 setUserData(response.data)
         //                 let activity_mvc_data = {}
@@ -206,9 +206,9 @@ const Act2 = () => {
         let data = {id:sessionStorage.getItem("ActivitiesId"),content:userContent}
         console.log(data)
         if (id) {
-            await axios.post(`http://localhost:3001/activitytwo/byId/${id}`, data)
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data)
         } else {
-            await axios.post("http://localhost:3001/activitytwo", data).then((response) => {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data).then((response) => {
                 const ActivityTwoId = response.data.id;
                 sessionStorage.setItem("ActivityTwoId",ActivityTwoId)
             })

@@ -28,7 +28,7 @@ const Act5 = () => {
         //let width = localStorage.getItem("mainContainerWidth")
 
         if (id) {
-            axios.get(`http://localhost:3001/activityfive/byId/${id}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`).then((response) => {
                 if (response.data !== null) {
 
                     if (response.data.MLClusters) {
@@ -40,11 +40,11 @@ const Act5 = () => {
                     if (response.data.content) {
                         setClustData(response.data.content)
                     } else {
-                        axios.get(`http://localhost:3001/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`).then((response) => {
+                        axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`).then((response) => {
                             if (response.data !== null) {
                                 setClustData(response.data.content)
 
-                                axios.get(`http://localhost:3001/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
+                                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                                     if (response.data != null) {
                                         setOriData(response.data)
                                     }
@@ -56,17 +56,17 @@ const Act5 = () => {
                     if (height != null) { setContainerHeight(parseInt(height) + 50) }
                 }
             })
-            axios.get(`http://localhost:3001/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                 if (response.data != null) {
                     setOriData(response.data)
                 }
             })
         } else {
-            axios.get(`http://localhost:3001/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`).then((response) => {
                 if (response.data !== null) {
                     setClustData(response.data.content)
 
-                    axios.get(`http://localhost:3001/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
+                    axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                         if (response.data != null) {
                             setOriData(response.data)
                         }
@@ -408,12 +408,12 @@ const Act5 = () => {
 
         if (id) {
             console.log("yay1")
-            await axios.post(`http://localhost:3001/activityfive/byId/${id}`, data).then((response) => {
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`, data).then((response) => {
                 console.log(response)
             })
         } else {
             console.log("yay2")
-            await axios.post("http://localhost:3001/activityfive", data).then((response) => {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive", data).then((response) => {
                 const ActivityFiveId = response.data.id;
                 sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
             })
@@ -425,7 +425,7 @@ const Act5 = () => {
             navigate('/activitysix')
         }
 
-        // axios.post("http://localhost:3001/activityfive", data).then((response) => {
+        // axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive", data).then((response) => {
         //    // const ActivityFiveId = response.data.id;
         //    // sessionStorage.setItem("ActivityFiveId",ActivityFiveId)
         // })

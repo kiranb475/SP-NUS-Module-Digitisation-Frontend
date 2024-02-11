@@ -60,7 +60,7 @@ const Act1 = () => {
   useEffect(() => {
 
     if (id) {
-      axios.get(`http://localhost:3001/activityone/byId/${id}`).then((response) => {
+      axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`).then((response) => {
         if (response.data !== null) {
           setActivityDescription(response.data.activity_description)
           setTranscriptTitle(response.data.transcript_source_id.split(' ')[0])
@@ -180,10 +180,10 @@ const Act1 = () => {
     // });
 
       if (id) {
-        await axios.post(`http://localhost:3001/activityone/byId/${id}`, final_data)
+        await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data)
         //sessionStorage.setItem("ActivityOneId",id)
       } else {
-        await axios.post("http://localhost:3001/activityone", final_data).then((response) => {
+        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", final_data).then((response) => {
           console.log(response)
           const ActivitiesID = response.data.ActivitiesId.id
           const ActivityOneId = response.data.ActivityOneId

@@ -32,7 +32,7 @@ const Act4 = () => {
         let y = 70
 
         if (id) {
-            axios.get(`http://localhost:3001/activityfour/byId/${id}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`).then((response) => {
                 if (response.data !== null) {
                     setSelectedData(response.data.content)
                     if (height != null) { setContainerHeight(height) }
@@ -40,7 +40,7 @@ const Act4 = () => {
                 }
             })
         } else {
-            axios.get(`http://localhost:3001/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                 if (response.data !== null) {
                     let userData = response.data
                     const check = new RegExp('background-color: yellow', 'g');
@@ -65,7 +65,7 @@ const Act4 = () => {
         }
 
 
-        // axios.get(`http://localhost:3001/activityfour/byId/${id}`).then((response) => {
+        // axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`).then((response) => {
         //     if (response.data !== null) {
         //         setSelectedData(response.data.content)
         //         setContainerHeight(height)
@@ -397,9 +397,9 @@ const Act4 = () => {
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: finalData }
 
         if (id) {
-            await axios.post(`http://localhost:3001/activityfour/byId/${id}`, data)
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`, data)
         } else {
-            await axios.post("http://localhost:3001/activityfour", data).then((response) => {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data).then((response) => {
                 const ActivityFourId = response.data.id;
                 sessionStorage.setItem("ActivityFourId", ActivityFourId)
             })
@@ -411,7 +411,7 @@ const Act4 = () => {
             navigate('/activityfive')
         }
 
-        // axios.post("http://localhost:3001/activityfour", data).then((response) => {
+        // axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data).then((response) => {
         //     // const ActivityFourId = response.data.id;
         //     // sessionStorage.setItem("ActivityFourId",ActivityFourId)
         // })

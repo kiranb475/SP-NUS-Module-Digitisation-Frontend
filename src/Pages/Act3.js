@@ -30,7 +30,7 @@ const Act3 = () => {
         }
 
         if (id) {
-            axios.get(`http://localhost:3001/activitythree/byId/${id}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`).then((response) => {
                 if (response.data !== null) {
 
                     if (response.data.AllowMLModel) {
@@ -66,7 +66,7 @@ const Act3 = () => {
                         }
                         setActivityMVCContent(activity_mvc_data)
                     } else {
-                        axios.get(`http://localhost:3001/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
+                        axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
                         if (response.data !== null) {
                             if (AllowMLModel) {
                                  setUserData(RandomlyAssign(response.data, response.data))
@@ -91,7 +91,7 @@ const Act3 = () => {
                 }
             })
         } else {
-            axios.get(`http://localhost:3001/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
                 if (response.data !== null) {
                     setUserData(RandomlyAssign(response.data, response.data))
                     setUserData_ori(response.data)
@@ -283,15 +283,15 @@ const Act3 = () => {
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: userContent_ori }
 
         if (id) {
-            await axios.post(`http://localhost:3001/activitythree/byId/${id}`, data)
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data)
         } else {
-            await axios.post("http://localhost:3001/activitythree", data).then((response) => {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
                 const ActivityThreeId = response.data.id;
                 sessionStorage.setItem("ActivityThreeId",ActivityThreeId)
             })
         }
 
-        // axios.post("http://localhost:3001/activitythree", data).then((response) => {
+        // axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
         //     //const ActivityThreeId = response.data.id;
         //     //sessionStorage.setItem("ActivityThreeId",ActivityThreeId)
         // })

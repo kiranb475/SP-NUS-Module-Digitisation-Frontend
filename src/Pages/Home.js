@@ -30,10 +30,10 @@ function Home() {
         if (sessionStorage.getItem("Occupation") === "Instructor") {
             setInstructor(true)
             // gets a list of all activities created by students
-            axios.get("http://localhost:3001/home/students").then((response) => {
+            axios.get("https://activities-alset-aef528d2fd94.herokuapp.com/home/students").then((response) => {
                 if (response.data != null) {
                     Object.entries(response.data).map((data) => {
-                        axios.post("http://localhost:3001/home", { UserId: parseInt(data[1].id) }).then((response) => {
+                        axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home", { UserId: parseInt(data[1].id) }).then((response) => {
                             if (response.data != null) {
                                 const final = response.data
                                 setListOfActivitiesStudents((prevValues) => ({ ...prevValues, [data[1].id]: final }))
@@ -44,10 +44,10 @@ function Home() {
             })
         } else {
             // gets a list of all activities created by instructors
-            axios.get("http://localhost:3001/home/instructors").then((response) => {
+            axios.get("https://activities-alset-aef528d2fd94.herokuapp.com/home/instructors").then((response) => {
                 if (response.data !== null) {
                     Object.entries(response.data).map((data) => {
-                        axios.post("http://localhost:3001/home", { UserId: parseInt(data[1].id) }).then((response) => {
+                        axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home", { UserId: parseInt(data[1].id) }).then((response) => {
                             if (response.data != null) {
                                 const final = response.data
                                 setListOfActivitiesInstructor((prevValues) => ({ ...prevValues, [data[1].id]: final }))
@@ -60,11 +60,11 @@ function Home() {
 
         // gets a list of activities created by the user
         const UserId = sessionStorage.getItem("UserId")
-        axios.post("http://localhost:3001/home", { UserId: UserId }).then((response) => {
+        axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home", { UserId: UserId }).then((response) => {
             setListOfActivities(response.data);
             Object.entries(response.data).map((data) => {
                 if (data[1].ActivityOneId) {
-                    axios.get(`http://localhost:3001/activityone/byId/${parseInt(data[1].ActivityOneId)}`).then((response) => {
+                    axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(data[1].ActivityOneId)}`).then((response) => {
                         if (sessionStorage.getItem("Occupation") === "Instructor") {
                             let transcriptText = ''
                             Object.entries(response.data.content).map(([key, value]) => {
@@ -89,19 +89,19 @@ function Home() {
                     })
                 }
                 if (data[1].ActivityTwoId && sessionStorage.getItem("Occupation") === "Instructor") {
-                    axios.get(`http://localhost:3001/activitytwo/byId/${parseInt(data[1].ActivityTwoId)}`).then((response) => {
+                    axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${parseInt(data[1].ActivityTwoId)}`).then((response) => {
                         setPredefinedHighlighting((prevValues) => ({ ...prevValues, [data[1].ActivityTwoId]: response.data.predefinedHighlighting }))
                     })
                 }
                 if (data[1].ActivityThreeId && sessionStorage.getItem("Occupation") === "Instructor") {
-                    axios.get(`http://localhost:3001/activitythree/byId/${parseInt(data[1].ActivityThreeId)}`).then((response) => {
+                    axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${parseInt(data[1].ActivityThreeId)}`).then((response) => {
                         setMLModel((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: response.data.MLModel }))
                         setAllowMLModel((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: response.data.AllowMLModel }))
                         setPredefinedMLSelection((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: response.data.predefinedMLSelection }))
                     })
                 }
                 if (data[1].ActivityFiveId && sessionStorage.getItem("Occupation") === "Instructor") {
-                    axios.get(`http://localhost:3001/activityfive/byId/${parseInt(data[1].ActivityFiveId)}`).then((response) => {
+                    axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${parseInt(data[1].ActivityFiveId)}`).then((response) => {
                         setMLClusters((prevValues) => ({ ...prevValues, [data[1].ActivityFiveId]: response.data.MLClusters }))
                     })
                 }
@@ -131,7 +131,7 @@ function Home() {
         const UserId = sessionStorage.getItem("UserId")
 
         if (data.ActivityOneId) {
-            const response = await axios.get(`http://localhost:3001/activityone/byId/${data.ActivityOneId}`)
+            const response = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${data.ActivityOneId}`)
             const ActivityOneData = response.data
             delete ActivityOneData['id']
             delete ActivityOneData['createdAt']
@@ -139,7 +139,7 @@ function Home() {
 
             if (ActivityOneData !== null) {
                 let data = { id: sessionStorage.getItem("UserId"), content: ActivityOneData }
-                const ActivityOneIdResponse = await axios.post("http://localhost:3001/activityone/fromtemplate", data)
+                const ActivityOneIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/fromtemplate", data)
                 const ActivitiesID = ActivityOneIdResponse.data.ActivitiesId.id
                 const ActivityOneId = ActivityOneIdResponse.data.ActivityOneId
                 sessionStorage.setItem("ActivitiesId", ActivitiesID)
@@ -148,7 +148,7 @@ function Home() {
         }
 
         if (data.ActivityTwoId) {
-            const response2 = await axios.get(`http://localhost:3001/activitytwo/byId/${data.ActivityTwoId}`)
+            const response2 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${data.ActivityTwoId}`)
             const ActivityTwoData = response2.data
             delete ActivityTwoData['id']
             delete ActivityTwoData['createdAt']
@@ -156,14 +156,14 @@ function Home() {
 
             if (ActivityTwoData !== null) {
                 let data = { id: sessionStorage.getItem("ActivitiesId"), content: ActivityTwoData }
-                const ActivityTwoIdResponse = await axios.post("http://localhost:3001/activitytwo", data)
+                const ActivityTwoIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data)
                 const ActivityTwoId = ActivityTwoIdResponse.data.id;
                 sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
             }
         }
 
         if (data.ActivityThreeId) {
-            const response3 = await axios.get(`http://localhost:3001/activitythree/byId/${data.ActivityThreeId}`)
+            const response3 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${data.ActivityThreeId}`)
             const ActivityThreeData = response3.data
             delete ActivityThreeData['id']
             delete ActivityThreeData['createdAt']
@@ -171,14 +171,14 @@ function Home() {
 
             if (ActivityThreeData !== null) {
                 let data = { id: sessionStorage.getItem("ActivitiesId"), content: ActivityThreeData }
-                const ActivityThreeIdResponse = await axios.post("http://localhost:3001/activitythree", data)
+                const ActivityThreeIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data)
                 const ActivityThreeId = ActivityThreeIdResponse.data.id;
                 sessionStorage.setItem("ActivityThreeId", ActivityThreeId)
             }
         }
 
         if (data.ActivityFourId) {
-            const response4 = await axios.get(`http://localhost:3001/activityfour/byId/${data.ActivityFourId}`)
+            const response4 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${data.ActivityFourId}`)
             const ActivityFourData = response4.data
             delete ActivityFourData['id']
             delete ActivityFourData['createdAt']
@@ -186,14 +186,14 @@ function Home() {
 
             if (ActivityFourData !== null) {
                 let data = { id: sessionStorage.getItem("ActivitiesId"), content: ActivityFourData }
-                const ActivityFourIdResponse = await axios.post("http://localhost:3001/activityfour", data)
+                const ActivityFourIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data)
                 const ActivityFourId = ActivityFourIdResponse.data.id;
                 sessionStorage.setItem("ActivityFourId", ActivityFourId)
             }
         }
 
         if (data.ActivityFiveId) {
-            const response5 = await axios.get(`http://localhost:3001/activityfive/byId/${data.ActivityFiveId}`)
+            const response5 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${data.ActivityFiveId}`)
             const ActivityFiveData = response5.data
             delete ActivityFiveData['id']
             delete ActivityFiveData['createdAt']
@@ -201,14 +201,14 @@ function Home() {
 
             if (ActivityFiveData !== null) {
                 let data = { id: sessionStorage.getItem("ActivitiesId"), content: ActivityFiveData }
-                const ActivityFiveIdResponse = await axios.post("http://localhost:3001/activityfive", data)
+                const ActivityFiveIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive", data)
                 const ActivityFiveId = ActivityFiveIdResponse.data.id;
                 sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
             }
         }
 
         if (data.ActivitySixId) {
-            const response6 = await axios.get(`http://localhost:3001/activitysix/byId/${data.ActivitySixId}`)
+            const response6 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${data.ActivitySixId}`)
             const ActivitySixData = response6.data
             delete ActivitySixData['id']
             delete ActivitySixData['createdAt']
@@ -216,7 +216,7 @@ function Home() {
 
             if (ActivitySixData !== null) {
                 let data = { id: sessionStorage.getItem("ActivitiesId"), content: ActivitySixData }
-                const ActivitySixIdResponse = await axios.post("http://localhost:3001/activitysix", data)
+                const ActivitySixIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data)
                 const ActivitySixId = ActivitySixIdResponse.data.id;
                 sessionStorage.setItem("ActivityFourId", ActivitySixId)
             }
@@ -263,27 +263,27 @@ function Home() {
         const activityThreeId = data[1].ActivityThreeId
         const activityFiveId = data[1].ActivityFiveId
         if (activityOneId) {
-            axios.post(`http://localhost:3001/activityone/home/${activityOneId}`, { transcriptEditable: switchValues[data[1].ActivityOneId] })
+            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activityOneId}`, { transcriptEditable: switchValues[data[1].ActivityOneId] })
         } else {
-            axios.post("http://localhost:3001/activityone",{ transcriptEditable: switchValues[data[1].ActivityOneId] })
+            axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone",{ transcriptEditable: switchValues[data[1].ActivityOneId] })
         }
 
         if (activityTwoId) {
-            axios.post(`http://localhost:3001/activitytwo/home/${activityTwoId}`, { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId] })
+            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activityTwoId}`, { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId] })
         } else {
-            axios.post('http://localhost:3001/activitytwo/', {id:activityId,content:{ predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId] }})
+            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/', {id:activityId,content:{ predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId] }})
         }
 
         if (activityThreeId) {
-            axios.post(`http://localhost:3001/activitythree/home/${activityThreeId}`, { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId] })
+            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activityThreeId}`, { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId] })
         } else {
-            axios.post('http://localhost:3001/activitythree', {id:activityId,content:{ MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId] }})
+            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitythree', {id:activityId,content:{ MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId] }})
         }
 
         if (activityFiveId) {
-            axios.post(`http://localhost:3001/activityfive/home/${activityFiveId}`, { MLClusters: MLClusters[data[1].ActivityFiveId] })
+            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activityFiveId}`, { MLClusters: MLClusters[data[1].ActivityFiveId] })
         } else {
-            axios.post(`http://localhost:3001/activityfive/`, {id:activityId,content:{ MLClusters: MLClusters[data[1].ActivityFiveId] }})
+            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`, {id:activityId,content:{ MLClusters: MLClusters[data[1].ActivityFiveId] }})
         }
     }
 

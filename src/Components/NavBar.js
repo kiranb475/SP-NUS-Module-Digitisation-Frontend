@@ -36,7 +36,7 @@ function NavBar() {
         }
 
         const data = { username: username, password: password, occupation: occupation }
-        axios.post("http://localhost:3001/activityone/auth/register", data).then((response) => {
+        axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/auth/register", data).then((response) => {
             if (response.data.error) alert(response.data.error)
             sessionStorage.setItem("UserId", response.data)
             sessionStorage.setItem("Username", username)
@@ -69,7 +69,7 @@ function NavBar() {
         }
 
         const data = { username: username, password: password, occupation: occupation }
-        axios.post("http://localhost:3001/activityone/auth/login", data).then((response) => {
+        axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/auth/login", data).then((response) => {
             if (response.data.error) alert(response.data.error)
             sessionStorage.setItem("UserId", response.data)
             sessionStorage.setItem("Username", username)

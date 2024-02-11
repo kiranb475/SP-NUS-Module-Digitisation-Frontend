@@ -23,13 +23,13 @@ const Act6 = () => {
         }
         
         if (id) {
-            axios.get(`http://localhost:3001/activitysix/byId/${id}`).then((response)=>{
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`).then((response)=>{
                 if (response.data !== null) {
                     setClustData(response.data.content)
                 } 
             })
         } else {
-            axios.get(`http://localhost:3001/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`).then((response)=>{
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`).then((response)=>{
                 if (response.data !== null) {
 
                     // Object.entries(response.data.content).map(([key,value])=>{
@@ -58,7 +58,7 @@ const Act6 = () => {
             })
         }
     
-        // axios.get(`http://localhost:3001/activitysix/byId/${id}`).then((response)=>{
+        // axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`).then((response)=>{
         //     if (response.data !== null) {
         //         setClustData(response.data.content)
         //     } else {
@@ -193,9 +193,9 @@ const Act6 = () => {
 
 
         if (id) {
-            await axios.post(`http://localhost:3001/activitysix/byId/${id}`, data)
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`, data)
         } else {
-            await axios.post("http://localhost:3001/activitysix", data).then((response) => {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data).then((response) => {
                 const ActivitySixId = response.data.id;
                 sessionStorage.setItem("ActivitySixId",ActivitySixId)
             })
@@ -205,7 +205,7 @@ const Act6 = () => {
 
         
 
-        // axios.post("http://localhost:3001/activitysix", data).then((response) => {
+        // axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data).then((response) => {
         //    // const ActivitySixId = response.data.id;
         //    // sessionStorage.setItem("ActivitySixId",ActivitySixId)
         // })
