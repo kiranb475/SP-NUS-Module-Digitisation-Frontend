@@ -22,6 +22,10 @@ function Home() {
     const [activityTitle, setActivityTitle] = useState({})
     const [activityDescription, setActivityDescription] = useState({})
     const [predefinedHighlighting, setPredefinedHighlighting] = useState({})
+    const [activityTitleInstructor, setActivityTitleInstructor] = useState({})
+    const [activityDescriptionInstructor, setActivityDescriptionInstructor] = useState({})
+    const [activityTitleStudent, setActivityTitleStudent] = useState({})
+    const [activityDescriptionStudent, setActivityDescriptionStudent] = useState({})
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -37,6 +41,14 @@ function Home() {
                             if (response.data != null) {
                                 const final = response.data
                                 setListOfActivitiesStudents((prevValues) => ({ ...prevValues, [data[1].id]: final }))
+                                Object.entries(response.data).map((data) => {
+                                    if (data[1].ActivityOneId) {
+                                        axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(data[1].ActivityOneId)}`).then((response) => {
+                                            setActivityTitleStudent((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.transcript_source_id }))
+                                            setActivityDescriptionStudent((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.activity_description }))
+                                        })
+                                    }
+                                })
                             }
                         })
                     })
@@ -51,6 +63,14 @@ function Home() {
                             if (response.data != null) {
                                 const final = response.data
                                 setListOfActivitiesInstructor((prevValues) => ({ ...prevValues, [data[1].id]: final }))
+                                Object.entries(response.data).map((data) => {
+                                    if (data[1].ActivityOneId) {
+                                        axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(data[1].ActivityOneId)}`).then((response) => {
+                                            setActivityTitleInstructor((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.transcript_source_id }))
+                                            setActivityDescriptionInstructor((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.activity_description }))
+                                        })
+                                    }
+                                })
                             }
                         })
                     })
@@ -265,29 +285,29 @@ function Home() {
         if (activityOneId) {
             axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activityOneId}`, { transcriptEditable: switchValues[data[1].ActivityOneId] })
         } else {
-            axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone",{ transcriptEditable: switchValues[data[1].ActivityOneId] })
+            axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", { transcriptEditable: switchValues[data[1].ActivityOneId] })
         }
 
         if (activityTwoId) {
             axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activityTwoId}`, { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId] })
         } else {
-            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/', {id:activityId,content:{ predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId] }})
+            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/', { id: activityId, content: { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId] } })
         }
 
         if (activityThreeId) {
             axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activityThreeId}`, { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId] })
         } else {
-            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitythree', {id:activityId,content:{ MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId] }})
+            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitythree', { id: activityId, content: { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId] } })
         }
 
         if (activityFiveId) {
             axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activityFiveId}`, { MLClusters: MLClusters[data[1].ActivityFiveId] })
         } else {
-            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`, {id:activityId,content:{ MLClusters: MLClusters[data[1].ActivityFiveId] }})
+            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`, { id: activityId, content: { MLClusters: MLClusters[data[1].ActivityFiveId] } })
         }
     }
 
-    // redirectes the user when they upon start of activity
+    // redirectes the user depending on whether activity one is predefined when they start the activity
     const startActivity = (data) => {
         removeDetails()
         storeDetails(data)
@@ -331,7 +351,6 @@ function Home() {
                                     <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activitytwo/${data[1].ActivityTwoId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityTwoId ? "green" : "red" }} variant='contained'>
                                         Activity 2
                                     </Button>
-                                    {/* {instructor && <FormControlLabel style={{marginTop:10,marginBottom:10}} control={<Switch checked={switchValuesActivityTwo[data[1].ActivityTwoId] || false} onChange={() => handleSwitchChangeActivityTwo(data[1].ActivityTwoId)} />} label="Use Predefined Interview Text from Activity One" />} */}
                                     {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: 10 }} control={<Switch checked={predefinedHighlighting[data[1].ActivityTwoId] || false} onChange={() => handleSwitchChangeHighlighting(data[1].ActivityTwoId)} />} label="Use Predefined Interview Highlighting" />}
                                 </div>
                                 <div>
@@ -391,8 +410,11 @@ function Home() {
                         if (data != null) {
                             return (
                                 <Accordion style={{ marginTop: 10, marginBottom: 10 }}>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data.id}><Typography>Template {templateCount}</Typography></AccordionSummary>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data.id}><Typography>{activityTitleInstructor[data.ActivityOneId]}</Typography></AccordionSummary>
                                     <AccordionDetails>
+                                        <div style={{ marginTop: 0, marginBottom: 5 }}>
+                                            <Typography>Activity Description: {activityDescriptionInstructor[data.ActivityOneId]}</Typography>
+                                        </div>
                                         <Button onClick={() => { newActivity(data) }} fullWidth style={{ marginTop: 10 }} variant='contained'>Copy Template</Button>
                                     </AccordionDetails>
                                 </Accordion>
@@ -409,8 +431,11 @@ function Home() {
                         if (data != null) {
                             return (
                                 <Accordion style={{ marginTop: 10, marginBottom: 10 }}>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data.id}><Typography>Set {StudentActivityCount}</Typography></AccordionSummary>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data.id}><Typography>{activityTitleStudent[data.ActivityOneId]}</Typography></AccordionSummary>
                                     <AccordionDetails>
+                                        <div style={{ marginTop: 0, marginBottom: 10 }}>
+                                            <Typography>Activity Description: {activityDescriptionStudent[data.ActivityOneId]}</Typography>
+                                        </div>
                                         <div>
                                             <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data.id); storeDetailsStudents(data); navigate(`/activityone/${data.ActivityOneId}`) }} style={{ backgroundColor: data.ActivityOneId ? "green" : "red" }} fullWidth variant='contained'>
                                                 Activity 1

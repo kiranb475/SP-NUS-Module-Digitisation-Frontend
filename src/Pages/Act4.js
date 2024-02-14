@@ -12,8 +12,6 @@ const Act4 = () => {
     const [containerHeight, setContainerHeight] = useState(0)
     const navigate = useNavigate()
     const { id } = useParams()
-    const [colorCount,setColorCount] = useState(0)
-    const [colorsUsed,setColorsUsed] = useState({})
 
 
     useEffect(() => {

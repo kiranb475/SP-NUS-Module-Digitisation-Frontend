@@ -14,6 +14,7 @@ function NavBar() {
     const [openRegister, setOpenRegister] = useState(false)
     const navigate = useNavigate()
 
+    // when the user registers a new account
     const onSubmitRegister = () => {
         setUsernameError(false);
         setPasswordError(false);
@@ -37,7 +38,10 @@ function NavBar() {
 
         const data = { username: username, password: password, occupation: occupation }
         axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/auth/register", data).then((response) => {
-            if (response.data.error) alert(response.data.error)
+            if (response.data.error) {
+                alert(response.data.error)
+                return
+            }
             sessionStorage.setItem("UserId", response.data)
             sessionStorage.setItem("Username", username)
             sessionStorage.setItem("Occupation", occupation)
@@ -47,6 +51,7 @@ function NavBar() {
 
     }
 
+    // when the user logs in to an exisitng account
     const onSubmitLogin = () => {
         setUsernameError(false);
         setPasswordError(false);
@@ -70,7 +75,10 @@ function NavBar() {
 
         const data = { username: username, password: password, occupation: occupation }
         axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/auth/login", data).then((response) => {
-            if (response.data.error) alert(response.data.error)
+            if (response.data.error) {
+                alert(response.data.error)
+                return
+            }
             sessionStorage.setItem("UserId", response.data)
             sessionStorage.setItem("Username", username)
             sessionStorage.setItem("Occupation", occupation)
@@ -82,6 +90,8 @@ function NavBar() {
 
     return (
         <AppBar position="static">
+
+            {/*Dialog for user login*/}
             <Dialog open={openLogin} onClose={() => setOpenLogin(false)}>
                 <DialogTitle>Login</DialogTitle>
                 <DialogContent>
@@ -98,6 +108,7 @@ function NavBar() {
                 </DialogActions>
             </Dialog>
 
+            {/*Dialog for user registration*/}
             <Dialog open={openRegister} onClose={() => setOpenRegister(false)}>
                 <DialogTitle>Register</DialogTitle>
                 <DialogContent>
@@ -115,7 +126,7 @@ function NavBar() {
             </Dialog>
 
             <Toolbar>
-                <Typography onClick={() => {navigate('/home') }} variant="h6" sx={{ flexGrow: 1 }}>
+                <Typography onClick={() => { navigate('/home') }} variant="h6" sx={{ flexGrow: 1 }}>
                     NUS ALSET
                 </Typography>
                 {sessionStorage.getItem('Username') &&
@@ -123,7 +134,7 @@ function NavBar() {
                 }
                 <Button onClick={() => setOpenLogin(true)} color="inherit">Login</Button>
                 <Button onClick={() => setOpenRegister(true)} color="inherit">Register</Button>
-                <Button onClick={() => {sessionStorage.clear();window.location.reload()}} color='inherit'>Logout</Button>
+                <Button onClick={() => { sessionStorage.clear(); localStorage.clear(); window.location.reload() }} color='inherit'>Logout</Button>
             </Toolbar>
         </AppBar>
     )

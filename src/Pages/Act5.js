@@ -13,6 +13,9 @@ const Act5 = () => {
     const [containerHeight, setContainerHeight] = useState(0)
     const [containerWidth, setContainerWidth] = useState(0)
     const [MLClusters, setMLClusters] = useState(false)
+    const [alternateView,setAlternateView] = useState(false)
+    const [AISetting,setAISetting] = useState(false)
+    const [AIClusters,setAIClusters] = useState({})
     const navigate = useNavigate()
     const { id } = useParams()
 
@@ -78,6 +81,9 @@ const Act5 = () => {
                 }
             })
         }
+    
+        
+
 
         //let clusteredDataActivity5 = JSON.parse(localStorage.getItem("clusteredDataActivity5"))
         //let height = localStorage.getItem("mainContainerHeight")
@@ -92,6 +98,89 @@ const Act5 = () => {
         // setContainerHeight(parseInt(height) + 50)
         // setContainerWidth(parseInt(width))
     }, [])
+
+    const createAIClustering = () => {
+
+        let clusters = {}
+        console.log("to clusters")
+            if (!AISetting) {
+                console.log("should be once")
+                clusters = AI_clusters()
+                setAISetting(true)
+                setAIClusters(clusters)
+            } else {
+                clusters = AIClusters
+                console.log(clusters)
+            }
+
+            const check = new RegExp('background-color: yellow', 'g');
+            // return Object.entries(oriData.content).map(([key,value]) => {
+            //     if (value.questioner_tag === undefined) {
+            //         return Object.entries(value.response_text).map(([key2,value2])=>{
+            //             //console.log(value2)
+            //             if ((value2.AI_classified !== -1 && value2.AI_classified !== undefined) || value2.activity_mvc.css.match(check)) {
+            //                 return (
+            //                     <Draggable defaultPosition={{x: value2.AI_classified === -1 ? 0 : 250 + 250*value2.AI_classified,y:0}} bounds="parent">
+            //                         <div style={{ width: 200,  height: 100, backgroundColor: 'lightgrey', padding: 10, margin:10, cursor: 'move', borderRadius: 15, border: "1px solid black", overflow: "hidden"}}>
+            //                             <Typography fontSize={13}>{value2.text}</Typography>
+            //                         </div>
+            //                     </Draggable>
+            //                     )
+            //             }
+            //         })
+            //     }
+            // })
+            console.log("AI Clusters")
+            console.log(clusters)
+            let x_coordinate = 200
+            let y_coordinate = 200
+            let count = 0
+            if (MLClusters) {
+                // return <>yay</>
+                Object.entries(clusters).map(([key, value], index) => {
+                    if (Object.entries(value.content).length != 0) {
+                        Object.entries(value.content).map(([key2, value2]) => {
+                            Object.entries(clustData).map(([key3,value3]) => {
+                                if (value2.text == value3.text) {
+                                    console.log(value2.text)
+                                    console.log(value3.text)
+                                    console.log(clusters[key].color)
+                                    clustData[key3].ai_color = clusters[key].color
+                                }
+                            })
+                        })
+                    }
+                })
+            } else {
+                return <>no</>
+            }
+            console.log(clustData)
+            // return Object.entries(clusters).map(([key, value], index) => {
+            //     const clusterComponents = Object.entries(value).map(([key2, value2]) => {
+            //         console.log("alternatives")
+            //         console.log(value2)
+            //         return (
+            //             <Draggable defaultPosition={{ x: value2.x_coordinate, y: value2.y_coordinate }} onStart={() => false} bounds="parent">
+            //                 <div style={{ width: 200, height: 100, backgroundColor: 'lightgrey', padding: 10, margin: 10, cursor: 'move', borderRadius: 15, border: "1px solid black", overflow: "hidden" }}>
+            //                     <Tooltip title={value2.text}>
+            //                         <Typography fontSize={13}>{value2.text}</Typography>
+            //                     </Tooltip>
+            //                 </div>
+            //             </Draggable>
+            //         );
+            //     });
+
+            //     if (index < Object.keys(clusters).length - 1 && Object.keys(clusters[key]).length !== 0) {
+            //         clusterComponents.push(
+            //             <div style={{ width: '100%', height: '50px' }} />
+            //         );
+            //     }
+
+            //     return clusterComponents;
+
+            // })
+
+    }
 
     const createLabel = () => {
         const newKey = Object.keys(clustData).length;
@@ -276,7 +365,7 @@ const Act5 = () => {
                         return (
                             <Draggable defaultPosition={{ x: value.new_x, y: value.new_y }} key={value.id} onDrag={(e, data) => handleDrag(e, data, key)} bounds="parent">
                                 <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move' }}>
-                                    <Typography style={{ border: '1px solid black', backgroundColor: value.color, borderRadius: 5, padding: 1 }} onBlur={() => { let text = document.getElementById(value.id).innerHTML; text === '' || text === `<br>` ? removeLabel(value.id) : console.log(text) }} id={value.id} contenteditable="true" variant="h6">{value.text}</Typography>
+                                    <Typography style={{ border: '1px solid black', backgroundColor: alternateView ? value.ai_color :value.color, borderRadius: 5, padding: 1 }} onBlur={() => { let text = document.getElementById(value.id).innerHTML; text === '' || text === `<br>` ? removeLabel(value.id) : console.log(text) }} id={value.id} contenteditable="true" variant="h6">{value.text}</Typography>
                                 </div>
                             </Draggable>
                         )
@@ -285,7 +374,7 @@ const Act5 = () => {
                 } else {
                     return (
                         <Draggable defaultPosition={{ x: value.new_x, y: value.new_y }} key={value.id} onDrag={(e, data) => handleDrag(e, data, key)} bounds="parent">
-                            <div height-id={value.id} style={{ width: 200, height: 100, backgroundColor: value.color ? value.color : 'lightgrey', padding: 10, margin: 10, cursor: 'move', borderRadius: 15, border: "1px solid black", overflow: "hidden" }}>
+                            <div height-id={value.id} style={{ width: 200, height: 100, backgroundColor: alternateView ? value.ai_color : value.color ? value.color : 'lightgrey', padding: 10, margin: 10, cursor: 'move', borderRadius: 15, border: "1px solid black", overflow: "hidden" }}>
                                 <Tooltip title={value.text}>
                                     <Typography id={value.id} fontSize={13}>{value.text}</Typography>
                                 </Tooltip>
@@ -293,55 +382,6 @@ const Act5 = () => {
                         </Draggable>
                     )
                 }
-            })
-        } else {
-            console.log("to clusters")
-            let clusters = AI_clusters()
-            const check = new RegExp('background-color: yellow', 'g');
-            // return Object.entries(oriData.content).map(([key,value]) => {
-            //     if (value.questioner_tag === undefined) {
-            //         return Object.entries(value.response_text).map(([key2,value2])=>{
-            //             //console.log(value2)
-            //             if ((value2.AI_classified !== -1 && value2.AI_classified !== undefined) || value2.activity_mvc.css.match(check)) {
-            //                 return (
-            //                     <Draggable defaultPosition={{x: value2.AI_classified === -1 ? 0 : 250 + 250*value2.AI_classified,y:0}} bounds="parent">
-            //                         <div style={{ width: 200,  height: 100, backgroundColor: 'lightgrey', padding: 10, margin:10, cursor: 'move', borderRadius: 15, border: "1px solid black", overflow: "hidden"}}>
-            //                             <Typography fontSize={13}>{value2.text}</Typography>
-            //                         </div>
-            //                     </Draggable>
-            //                     )
-            //             }
-            //         })
-            //     }
-            // })
-            console.log("AI Clusters")
-            console.log(clusters)
-            let x_coordinate = 200
-            let y_coordinate = 200
-            let count = 0
-            return Object.entries(clusters).map(([key, value], index) => {
-                const clusterComponents = Object.entries(value).map(([key2, value2]) => {
-                    console.log("alternatives")
-                    console.log(value2)
-                    return (
-                        <Draggable defaultPosition={{ x: value2.x_coordinate, y: value2.y_coordinate }} onStart={() => false} bounds="parent">
-                            <div style={{ width: 200, height: 100, backgroundColor: 'lightgrey', padding: 10, margin: 10, cursor: 'move', borderRadius: 15, border: "1px solid black", overflow: "hidden" }}>
-                                <Tooltip title={value2.text}>
-                                    <Typography fontSize={13}>{value2.text}</Typography>
-                                </Tooltip>
-                            </div>
-                        </Draggable>
-                    );
-                });
-
-                if (index < Object.keys(clusters).length - 1 && Object.keys(clusters[key]).length !== 0) {
-                    clusterComponents.push(
-                        <div style={{ width: '100%', height: '50px' }} />
-                    );
-                }
-
-                return clusterComponents;
-
             })
         }
 
@@ -358,13 +398,14 @@ const Act5 = () => {
 
 
     const AI_clusters = () => {
+
         let clusters = {
-            '-1': {},
-            '0': {},
-            '1': {},
-            '2': {},
-            '3': {},
-            '4': {}
+            '-1': {content:{},color:getColor()},
+            '0': {content:{},color:getColor()},
+            '1': {content:{},color:getColor()},
+            '2': {content:{},color:getColor()},
+            '3': {content:{},color:getColor()},
+            '4': {content:{},color:getColor()}
         }
 
         const ori_y = 0
@@ -377,11 +418,13 @@ const Act5 = () => {
                 Object.entries(value.response_text).map(([key2, value2]) => {
                     console.log(value2)
                     if ((value2.AI_classified !== -1 && value2.AI_classified !== undefined) && value2.activity_mvc.css.match(check) || value2.activity_mvc.css.match(check)) {
-                        clusters[value2.AI_classified.toString()][Object.keys(clusters[value2.AI_classified.toString()]).length] = value2
+                        clusters[value2.AI_classified.toString()].content[Object.keys(clusters[value2.AI_classified.toString()]).length - 1] = value2
                     }
                 })
             }
         })
+        console.log("returned")
+        console.log(clusters)
         return clusters
     }
 
@@ -484,15 +527,15 @@ const Act5 = () => {
                 <br />
                 <Typography>Compare the two arrangement and refine the arrangement in the User view in anyway that you feel improves it. When you are satisfied with the arrangement in the User view, click the Submit button to continue to the next activity.</Typography>
                 {displayConfig()}
-                <ButtonGroup fullWidth variant="outlined" sx={{ marginTop: 3 }}>
+                {/* <ButtonGroup fullWidth variant="outlined" sx={{ marginTop: 3 }}>
                     <Button style={{ backgroundColor: "lightyellow" }} onClick={() => setViewUser(true)}>User</Button>
                     <Button style={{ backgroundColor: "lightblue" }} onClick={() => { setViewUser(false); checkClass(); replaceLabelNames(); localStorage.setItem("clusteredDataActivity5", JSON.stringify(clustData)); }}>Alternative</Button>
-                </ButtonGroup>
+                </ButtonGroup> */}
                 {viewUser ?
                     <ButtonGroup fullWidth variant="outlined" sx={{ marginTop: 3, marginBottom: 3 }}>
                         <Button onClick={() => { localStorage.removeItem("clusteredDataActivity5"); window.location.reload(false); }} fullWidth variant="outlined" disabled>Reset</Button>
                         <Button onClick={() => { createLabel() }} fullWidth variant='outlined'>Add Label</Button>
-                        <Button onClick={() => { checkClustering() }} fullWidth variant="outlined">Check clustering</Button>
+                        <Button onClick={() => {checkClustering() }} fullWidth variant="outlined">Check clustering</Button>
                     </ButtonGroup>
                     : <div style={{ marginBottom: 20 }}></div>
                 }
@@ -500,6 +543,7 @@ const Act5 = () => {
                 {console.log(containerHeight)}
                 {/* <Button onClick={()=>{createLabel()}} sx={{marginTop:3,marginBottom:3}} fullWidth variant='outlined'>Add Label</Button> */}
                 <Box style={{ backgroundColor: viewUser ? "lightyellow" : "lightblue", borderRadius: 10, minHeight: containerHeight, width: '100%', position: 'relative', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', flexDirection: viewUser ? 'column' : 'row', alignContent: 'flex-start' }}>
+                <FormControlLabel style={{ marginTop: 10, marginLeft:10 }} control={<Switch checked={alternateView} onChange={() =>  {console.log("yay");createAIClustering();setAlternateView((prev) => !prev)}} />} label="View AI Clustering" />
                     {displayComponents()}
                 </Box>
                 <Button sx={{ marginTop: 3, marginBottom: 3 }} fullWidth type="submit" variant='outlined'>Submit</Button>
