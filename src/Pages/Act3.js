@@ -9,8 +9,21 @@ const Act3 = () => {
     const [userData, setUserData] = useState({})
     const [userData_ori, setUserData_ori] = useState({})
     const [AllowMLModel, setAllowMLModel] = useState(false)
+    const [instructor,setInstructor] = useState(false)
     const [MLModel, setMLModel] = useState("")
     const [predefinedMLSelection, setPredefinedMLSelection] = useState(false)
+    const [label, setLabel] = useState('Custom Text')
+    const [instruction,setInstruction] = useState(`<Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
+    <br /> <br/>
+    <Typography>Please review the version of your transcript with the new highlights below. You’ll likely agree with some of the sentence selections and disagree with others. As you review the transcript, feel free to refine your sentence selections. When you are satisfied with your selections, click the Submit button to continue to the next activity. Only your choices about which sentences are important (yellow and green highlights) will be used in the next activity.</Typography>
+    <br /> <br/>
+    <Typography>You can refer to the following key to remind yourself of what the three colours mean.</Typography>
+    <ul style={{ marginTop: 0 }}>
+        <li><Typography>Only the model selected - blue</Typography></li>
+        <li><Typography>Only you selected - yellow</Typography></li>
+        <li><Typography>Both you and the model selected - green</Typography></li>
+    </ul>
+`)
     const navigate = useNavigate()
     const { id } = useParams()
 
@@ -27,6 +40,10 @@ const Act3 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
+        }
+
+        if (sessionStorage.getItem("Occupation") == "Instructor") {
+            setInstructor(true)
         }
 
         if (id) {
@@ -50,6 +67,9 @@ const Act3 = () => {
                     } else { 
                         setPredefinedMLSelection(false)
                     }
+
+                    setLabel(response.data.label)
+                    setInstruction(response.data.instruction)
 
                     if (response.data.content) {
                         if (response.data.AllowMLModel) {
@@ -83,11 +103,6 @@ const Act3 = () => {
                             setActivityMVCContent(activity_mvc_data)
                         }})
                     }
-
-                    
-                    // setMLModel(response.data.MLModel)
-                    // setAllowMLModel(response.data.AllowMLModel)
-                    // setPredefinedMLSelection(response.data.predefinedMLSelection)
                 }
             })
         } else {
@@ -110,36 +125,8 @@ const Act3 = () => {
                 }
             })
         }
-
-        //let data = JSON.parse(localStorage.getItem("userData"));
-        //let data2 = JSON.parse(localStorage.getItem("userData")); //untouched
-        //localStorage.setItem("userData_original",JSON.stringify(data2));
-
-        //setUserData(RandomlyAssign(data,data2))
-        //setUserData_ori(data2)
-
-        // let activity_mvc_data = {}
-        // for (let i = 1; i < Object.keys(data.content).length + 1; i++){
-        //     if (data.content[i].questioner_tag !== undefined) {
-        //         activity_mvc_data[i] = {tag: data.content[i].questioner_tag, activity_mvc: data.content[i].activity_mvc}
-        //     } else {
-        //         activity_mvc_data[i] = {tag: data.content[i].response_tag, activity_mvc: getActivityMVCInterviewee(data.content[i].response_text)}
-        //     }
-        // }
-        // setActivityMVCContent(activity_mvc_data)
-        // setHtmlContent(htmlContent)
-        // setInterviewer(data.content[0].questioner_tag)
-        // setInterviewee(data.content[0].response_tag)
     }, [])
 
-    // const displayTranscript = () => {
-
-    //     //const container = document.getElementById('content-container');
-
-    //     if (container) {
-    //         container.innerHTML = htmlContent; 
-    //     }   
-    // }
 
     const changeContents = (key, key2, flag) => {
         let userContent = userData_ori
@@ -158,31 +145,25 @@ const Act3 = () => {
         setUserData_ori(userContent)
     }
 
+    // handles highlighting 
     const handleClick = (event, css, key, key2) => {
-        // event.target will be the clicked span element
-        //console.log("Clicked on span with content:", event.target.innerHTML);
-        // console.log(css)
-        
         if (event.target.style.backgroundColor === 'lightgreen') {
             event.target.style.backgroundColor = 'lightblue'
             changeContents(key, key2, 2)
-            //event.target.style.color = 'white'
         } else if (event.target.style.backgroundColor === 'lightblue') {
             changeContents(key, key2, 1)
             event.target.style.backgroundColor = 'lightgreen'
-            //event.target.style.color = 'white'
         } else if (event.target.style.backgroundColor === '') {
             event.target.style.backgroundColor = 'yellow'
             changeContents(key, key2, 1)
-            //event.target.style.color = 'black'
         } else {
             changeContents(key, key2, 2)
             event.target.style.backgroundColor = ''
-            //event.target.style.color = 'black'
         }
 
     };
 
+    // displays relevant configurations if you are an instructor 
     const displayConfig = () => {
         if (sessionStorage.getItem("Occupation") === "Instructor") {
             return (
@@ -211,6 +192,7 @@ const Act3 = () => {
         }
     }
 
+    // displays interviewee sentences
     const displayInterviewee = (data, key) => {
         return Object.entries(data).map(([key2, value]) => (
             <Typography display="inline" style={{ backgroundColor: value.css.split(":")[1] }} onClick={(e) => { handleClick(e, value.css, key, key2) }} dangerouslySetInnerHTML={{ __html: value.html }}></Typography>
@@ -247,27 +229,13 @@ const Act3 = () => {
     }
 
 
+    // handles submission
     const handleSubmit = async (e) => {
         e.preventDefault()
         let userContent = userData
         let userContent_ori = userData_ori
         userContent.user_ai_markup_id = "tbd"
         console.log(userContent_ori)
-        // userContent.record_datatime = Date.now()
-        // console.log(userContent)
-        // Object.entries(userContent.content).map(([key,value])=>{
-        //     if (value.questioner_tag !== undefined) {
-        //         value.activity_mvc = getActivityMVC(key)
-        //     } else {
-        //         Object.entries(value.response_text).map(([key2,value2])=>{
-        //             value2.activity_mvc = getActivityMVC(key.toString()+key2.toString())
-        //         })
-        //     }
-
-        // })
-
-        //delete userContent_ori["ActivityOneId"]
-        //userContent_ori.ActivityTwoId = sessionStorage.getItem("ActivityTwoId")
 
         console.log(userContent_ori)
         
@@ -278,6 +246,8 @@ const Act3 = () => {
         userContent_ori.MLModel = MLModel
         userContent_ori.AllowMLModel = AllowMLModel
         userContent_ori.predefinedMLSelection = predefinedMLSelection
+        userContent_ori.label = document.getElementById("activity-three-label").innerHTML
+        userContent_ori.instruction = document.getElementById("activity-three-instruction").innerHTML
 
         console.log(userContent_ori.AllowMLModel)
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: userContent_ori }
@@ -291,46 +261,17 @@ const Act3 = () => {
             })
         }
 
-        // axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
-        //     //const ActivityThreeId = response.data.id;
-        //     //sessionStorage.setItem("ActivityThreeId",ActivityThreeId)
-        // })
-
-        // localStorage.setItem("userData", JSON.stringify(userContent_ori));
-        // localStorage.removeItem("clusteredData")
-
-
-
-
         if (sessionStorage.getItem("ActivityFourId") !== "null" && sessionStorage.getItem("ActivityFourId") !== null) {
             navigate(`/activityfour/${sessionStorage.getItem("ActivityFourId")}`)
           } else {
             navigate('/activityfour')
           }
-
-
-
-        
-        //navigate('/activityfour')
     }
 
 
     const RandomlyAssign = (data, data2) => {
         let userContent = data
         let userContent_ori = data2
-        // Object.entries(userContent.content).map(([key,value])=>{
-        //     let rand = Math.random()
-        //     if (rand <= .5) {
-        //         if (value.questioner_tag !== undefined && value.activity_mvc.css === "background-color: yellow;") {
-        //             value.activity_mvc.html = value.activity_mvc.html.replace(/background-color:.*?;/gi,background-color: lightgreen;)
-        //             value.activity_mvc.css = "background-color: yellow; "
-        //         } else if (value.questioner_tag !== undefined && value.activity_mvc.css !== "background-color: yellow;") {
-        //             value.activity_mvc.html = value.activity_mvc.html.replace(/background-color:.*?;/gi,background-color: lightgreen;)
-        //             console.log("no")
-        //             value.activity_mvc.css = "background-color: lightblue"
-        //         }
-        //     }
-        // })
 
         Object.entries(userContent.content).map(([key, value]) => {
             if (value.questioner_tag === undefined) {
@@ -342,9 +283,6 @@ const Act3 = () => {
                         if (value2.activity_mvc.css === "display: inline; background-color: yellow;") {
                             value2.activity_mvc.html = value2.activity_mvc.html.replace(/background-color:.*?;/gi, 'background-color: lightgreen;')
                         } else {
-                            console.log(value2)
-                            //value2.activity_mvc.html = value2.activity_mvc.html.replace(/background-color:.*?;/gi,background-color: lightgreen;)
-                            //value2.activity_mvc.css = "background-color: lightblue"
                             value2.activity_mvc.html = value2.activity_mvc.html.replace(/style="display:\s*inline;"/g, 'style="display: inline; background-color: lightblue;"');
                         }
                     } else if (value2.text !== "." && value2.text !== " ") {
@@ -360,39 +298,18 @@ const Act3 = () => {
 
     return (
         <Container style={{ marginTop: 20 }}>
-            <h2>Activity 3</h2>
+            <div style={{ display: "flex", direction: "row" }}>
+                <h2>Activity 3:</h2>&nbsp;&nbsp;
+                <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-three-label"></h2>
+            </div>
             <form onSubmit={handleSubmit}>
-                <Typography>Instructions: </Typography>
-                <Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
-                <br />
-                <Typography>Please review the version of your transcript with the new highlights below. You’ll likely agree with some of the sentence selections and disagree with others. As you review the transcript, feel free to refine your sentence selections. When you are satisfied with your selections, click the Submit button to continue to the next activity. Only your choices about which sentences are important (yellow and green highlights) will be used in the next activity.</Typography>
-                <br />
-                <Typography>You can refer to the following key to remind yourself of what the three colours mean.</Typography>
-                <ul style={{ marginTop: 0 }}>
-                    <li><Typography>Only the model selected - blue</Typography></li>
-                    <li><Typography>Only you selected - yellow</Typography></li>
-                    <li><Typography>Both you and the model selected - green</Typography></li>
-                </ul>
+                <Typography>Instructions (Editable by Instructors): </Typography>
+                <Typography id="activity-three-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
+                {/* {sessionStorage.getItem("Occupation") == "Student" && sessionStorage.getItem("predefinedHighlighting") && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>} */}
                 {displayConfig()}
                 <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }} id="content-container">
-                    {/* <div style={{whiteSpace:pre-line}} dangerouslySetInnerHTML={{ __html: htmlContent }} /> */}
-                    {/* {htmlContent.map((line, index) => (
-                    <Typography style={{whiteSpace:pre-line}}>
-                        {getName(index)}
-                        <Typography style={{display:'inline'}}>: </Typography>   
-                        <span onClick={(e)=>{handleClick(e,index)}} key-id={index} dangerouslySetInnerHTML={{ __html: line }}></span>
-                        {'\n\n'}
-                    </Typography>
-                       ))} */}
-
                     {Object.entries(activityMVCContent).map(([key, value]) => {
                         if (key % 2 !== 0) {
-                            let styleObject = {};
-                            // const style = value.activity_mvc.css ? value.activity_mvc.css : {};
-                            // if (value.activity_mvc.css) {
-                            //     const [property, color] = value.activity_mvc.css.split(":");
-                            // }
-                            // console.log(value.activity_mvc.html)
                             return (
                                 <>
                                     <div>
@@ -403,19 +320,12 @@ const Act3 = () => {
                                         <br />
                                     </div>
                                 </>
-
-                                // <Typography style={{whiteSpace:pre-line}}>
-                                // <Typography style={{display:'inline'}}>{value.tag}: </Typography>   
-                                // {/* {console.log(value.activity_mvc.html)} */}
-                                //  <span onClick={(e)=>{handleClick(e,key)}} id={key} dangerouslySetInnerHTML={{ __html: value.activity_mvc.html }}></span>
-                                // </Typography>
                             )
                         } else {
                             return (
                                 <>
                                     <div>
                                         <Typography display="inline">{value.tag}: </Typography>
-                                        {/* <Typography display="inline" onClick={(e)=>{handleClick(e,key)}} id={key} dangerouslySetInnerHTML={{ __html: value.activity_mvc.html }}></Typography> */}
                                         {displayInterviewee(value.activity_mvc, key)}
                                     </div>
                                     <div>
@@ -423,16 +333,6 @@ const Act3 = () => {
                                     </div>
                                 </>
                             )
-                            // return Object.entries(value.activity_mvc).map(([key2,value2])=>{  
-                            //     return (
-                            //         <Typography style={{whiteSpace:pre-line}}> 
-                            //         {/* {console.log(value.activity_mvc.html)} */}
-                            //          <span onClick={(e)=>{handleClick(e,key.toString()+key2.toString())}} id={key.toString()+key2.toString()} dangerouslySetInnerHTML={{ __html: value2.html }}></span>
-                            //         {'\n'}
-                            //         </Typography>
-                            //     )
-                            // })
-
                         }
                     })}
                 </Box>

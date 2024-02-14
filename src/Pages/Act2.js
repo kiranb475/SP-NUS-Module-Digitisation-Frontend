@@ -8,7 +8,7 @@ const Act2 = () => {
     const [activityMVCContent, setActivityMVCContent] = useState({});
     const [userData, setUserData] = useState({})
     const [transcriptHighlighting, setTranscriptHighlighting] = useState(false)
-    const [label, setLabel] = useState('Label')
+    const [label, setLabel] = useState('Custom Text')
     const [instruction, setInstruction] = useState(`Read through the transcript and click on sentences from the <strong>interviewee</strong> that you think provide insights or convey important information. Clicking a sentence will highlight it in yellow. Clicking a highlighted sentence again will unhighlight it. When you are satisfied with your sentence selections, click the Submit button to continue to the next activity. Your choices of which sentences to highlight will be carried forward to the next activity.`)
     const [newChain, setNewChain] = useState(false)
     const [instructor, setInstructor] = useState(false)
@@ -156,6 +156,7 @@ const Act2 = () => {
         if (sessionStorage.getItem("Occupation") === "Instructor") {
             navigate('/')
         } else if (sessionStorage.getItem("ActivityThreeId") !== "null" && sessionStorage.getItem("ActivityThreeId") !== null) {
+            sessionStorage.setItem("predefinedHighlighting",transcriptHighlighting)
             navigate(`/activitythree/${sessionStorage.getItem("ActivityThreeId")}`)
         } else {
             navigate('/activitythree')
@@ -169,8 +170,8 @@ const Act2 = () => {
                 <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-two-label"></h2>
             </div>
             <form onSubmit={handleSubmit}>
-            <Typography>Instructions (Editable): </Typography>
-        <Typography id="activity-two-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}></Typography>
+                <Typography>Instructions (Editable by Instructors): </Typography>
+                <Typography id="activity-two-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
                 {sessionStorage.getItem("Occupation") == "Instructor" && <Typography style={{ marginTop: 10 }}>Upon submission of this activity, you will be redirected to the home page. You can go back to the home page and choose the configurations for the remaining activities.</Typography>}
                 {sessionStorage.getItem("Occupation") == "Instructor" && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={transcriptHighlighting} onChange={() => setTranscriptHighlighting((prev) => !prev)} />} label="Predefined Interview Highlighting" />}
                 {sessionStorage.getItem("Occupation") == "Student" && transcriptHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}

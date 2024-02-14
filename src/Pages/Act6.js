@@ -8,15 +8,22 @@ import { useNavigate, useParams } from "react-router-dom"
 const Act6 = () => {
 
     const [clustData,setClustData] = useState({})
+    const [instructor, setInstructor] = useState(false)
+    const [label, setLabel] = useState('Custom Text')
+    const [instruction,setInstruction] = useState(`
+    <Typography>The sentences and cluster labels you submitted for the previous activity have been arranged in the space below. For each cluster, add any number of insights that you think emerge from the selected sentences. After surfacing the insights, add a set of needs that relate to those insights one at a time. Identifying the insights and needs should be helpful when designing your prototype.</Typography>
+    <br/>
+    <Typography>When you are satisfied with your listed insights and needs, click the Submit button to complete this stage of the design thinking process. You can come back and make changes to your submissions whenever you like.</Typography>`)
     const {id} = useParams()
     const navigate = useNavigate()
 
 
     useEffect(()=>{
         let data = {}
-        //let clusteredDataActivity6 = JSON.parse(localStorage.getItem("clusteredDataActivity6"))
 
-        let clusteredData = JSON.parse(localStorage.getItem("clusteredDataActivity5"))
+        if (sessionStorage.getItem("Occupation") == "Instructor") {
+            setInstructor(true)
+        }
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
@@ -24,24 +31,30 @@ const Act6 = () => {
         
         if (id) {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`).then((response)=>{
-                if (response.data !== null) {
+                setLabel(response.data.label)
+                setInstruction(response.data.instruction)    
+                if (response.data.content !== null) {
                     setClustData(response.data.content)
-                } 
+                } else {
+                    axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`).then((response)=>{
+                        if (response.data !== null) {
+                            Object.entries(response.data.content).map(([key, value]) => {
+                                if (value.class !== undefined && value.removed !== true) {
+                                    if (data[value.class] === undefined) {
+                                        data[value.class] = { content: {}, insights: {}, needs: {} };
+                                    }
+                                    data[value.class].content[Object.keys(data[value.class].content).length] = value;
+                                }
+                            })
+        
+                            setClustData(data)
+                        } 
+                    })
+                }
             })
         } else {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`).then((response)=>{
                 if (response.data !== null) {
-
-                    // Object.entries(response.data.content).map(([key,value])=>{
-                    //     console.log(value)
-                    //     if (response.data.content[value.class] === undefined && value.removed !== true) {
-                    //         data[value.class] = {content:{},insights:{},needs:{}}
-                    //     }
-                    //     if (value.removed !== true) {
-                    //         data[value.class].content[Object.keys(data[value.class].content).length] = value
-                    //     }
-                    // })
-
                     Object.entries(response.data.content).map(([key, value]) => {
                         if (value.class !== undefined && value.removed !== true) {
                             if (data[value.class] === undefined) {
@@ -57,38 +70,6 @@ const Act6 = () => {
                 }
             })
         }
-    
-        // axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`).then((response)=>{
-        //     if (response.data !== null) {
-        //         setClustData(response.data.content)
-        //     } else {
-        //         Object.entries(clusteredData).map(([key,value])=>{
-        //             if (data[value.class] === undefined && value.removed !== true) {
-        //                 data[value.class] = {content:{},insights:{},needs:{}}
-        //             }
-        //             if (value.removed !== true) {
-        //                 data[value.class].content[Object.keys(data[value.class].content).length] = value
-        //             }
-        //         })
-        //         setClustData(data)
-        //     }
-        // })
-
-        //console.log(clusteredData)
-        // if (clusteredDataActivity6 === null) {
-        //     Object.entries(clusteredData).map(([key,value])=>{
-        //         if (data[value.class] === undefined && value.removed !== true) {
-        //             data[value.class] = {content:{},insights:{},needs:{}}
-        //         }
-        //         if (value.removed !== true) {
-        //             data[value.class].content[Object.keys(data[value.class].content).length] = value
-        //         }
-        //     })
-        //     setClustData(data)
-        // } else {
-        //     setClustData(clusteredDataActivity6)
-        // }
-        console.log(clustData)
     },[])
 
 
@@ -137,7 +118,6 @@ const Act6 = () => {
     }
 
     const getInsight = (data,baseKey) => {
-        // console.log(data)
         return Object.entries(data.insights).map(([key,value])=>{
             console.log(value)
                 return (
@@ -150,7 +130,6 @@ const Act6 = () => {
 
     const getNeed = (data,baseKey) => {
         return Object.entries(data.needs).map(([key,value])=>{
-            // console.log(value)
                 return (
                     <div style={{backgroundColor:'lightgreen',borderRadius: 15, border: "1px solid black",padding:10, margin: 10}}>
                         <Typography onBlur={()=>{let element = document.querySelector(`[Needs-id="${baseKey.toString() + key.toString()}"]`); (element.innerHTML === '' || element.innerHTML === `<br>`) ? deleteNeeds(baseKey,key) : console.log(element.innerHTML)}} Needs-id={baseKey.toString() + key.toString()} contenteditable="true">{value}</Typography>
@@ -186,6 +165,8 @@ const Act6 = () => {
 
         let finalData = {};
         finalData.content = clustData;
+        finalData.label = document.getElementById("activity-six-label").innerHTML
+        finalData.instruction = document.getElementById("activity-six-instruction").innerHTML
         finalData.UserId = sessionStorage.getItem("UserId")
         finalData.ActivityFiveId = sessionStorage.getItem("ActivityFiveId")
 
@@ -202,15 +183,6 @@ const Act6 = () => {
         }
 
         navigate('/home')
-
-        
-
-        // axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data).then((response) => {
-        //    // const ActivitySixId = response.data.id;
-        //    // sessionStorage.setItem("ActivitySixId",ActivitySixId)
-        // })
-
-        // localStorage.setItem("clusteredDataActivity6",JSON.stringify(clustData));
     }
 
     const replaceName = () => {
@@ -228,13 +200,14 @@ const Act6 = () => {
 
     return (
         <Container style={{marginTop:20}}>
-            <h2>Activity 6</h2>
+            <div style={{ display: "flex", direction: "row" }}>
+                <h2>Activity 6:</h2>&nbsp;&nbsp;
+                <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-six-label"></h2>
+            </div>
             <form onSubmit={handleSubmit}>
-                <Typography>Instructions: </Typography>
-                <Typography>The sentences and cluster labels you submitted for the previous activity have been arranged in the space below. For each cluster, add any number of insights that you think emerge from the selected sentences. After surfacing the insights, add a set of needs that relate to those insights one at a time. Identifying the insights and needs should be helpful when designing your prototype.</Typography>
-                <br/>
-                <Typography>When you are satisfied with your listed insights and needs, click the Submit button to complete this stage of the design thinking process. You can come back and make changes to your submissions whenever you like.</Typography>
-                <Button onClick={()=>{localStorage.removeItem("clusteredDataActivity6");window.location.reload(false);}} sx={{marginTop:3}} fullWidth variant="outlined" disabled>Reset</Button>
+                <Typography>Instructions (Editable by Instructors): </Typography>
+                <Typography id="activity-six-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
+                 <Button onClick={()=>{localStorage.removeItem("clusteredDataActivity6");window.location.reload(false);}} sx={{marginTop:3}} fullWidth variant="outlined" disabled>Reset</Button>
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-around', marginTop: 20, marginBottom: 10}}>
                     <Typography>Cluster</Typography>
                     <Typography>Insights</Typography>
@@ -243,7 +216,6 @@ const Act6 = () => {
                 <Divider></Divider>
                 {console.log(clustData)}
                 {Object.entries(clustData).map(([key,value])=>{
-                    // console.log(checkLabel(value).includes(true))
                     if (checkLabel(value).includes(true)) {
                         return (
                             <>

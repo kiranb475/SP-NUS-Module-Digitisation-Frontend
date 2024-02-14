@@ -12,12 +12,13 @@ const Act1 = () => {
   const [interviewerError, setInterviewerError] = useState(false)
   const [intervieweeError, setIntervieweeError] = useState(false)
   const [transcriptError, setTranscriptError] = useState(false)
+  const [activityDescriptionError,setActivityDescriptionError] = useState(false)
   const [helperText, setHelperText] = useState('')
   const [previewTranscript, setPreviewTranscript] = useState({})
   const [previewClicked, setPreviewClicked] = useState(false)
   const [transcriptTitle, setTranscriptTitle] = useState('')
-  const [label,setLabel] = useState('Label')
-  const [instruction,setInstruction] = useState('Use the text boxes below to provide the details of your interview transcript. After you fill in the boxes, click the Preview button to see how the transcript looks before proceeding to the next activity. If you would like to make any changes you can do so by editing the transcript text directly. Click the Submit button when you are satisfied with the look of your interview transcript. The final version of your transcript will be used in the next activity.')
+  const [label,setLabel] = useState('Custom Text')
+  const [instruction,setInstruction] = useState(`Use the text boxes below to provide the details of your interview transcript. After you fill in the boxes, click the Preview button to see how the transcript looks before proceeding to the next activity. If you would like to make any changes you can do so by editing the transcript text directly. Click the Submit button when you are satisfied with the look of your interview transcript. The final version of your transcript will be used in the next activity.`)
   const [transcriptTitleError, setTranscriptTitleError] = useState(false)
   const [activityDescription, setActivityDescription] = useState('')
   const [previewClickedError, setPreviewClickedError] = useState('');
@@ -62,7 +63,7 @@ const Act1 = () => {
     if (id) {
       axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`).then((response) => {
         if (response.data !== null) {
-          setActivityDescription(response.data.activity_description)
+          //setActivityDescription(response.data.activity_description)
           setTranscriptTitle(response.data.transcript_source_id.split(' ')[0])
           setInterviewer(response.data.content[1].questioner_tag)
           setInterviewee(response.data.content[2].response_tag)
@@ -100,6 +101,7 @@ const Act1 = () => {
     setInterviewerError(false)
     setIntervieweeError(false)
     setTranscriptError(false)
+    //setActivityDescriptionError(false)
     setPreviewClickedError('')
     setTranscriptTitleError(false)
     e.preventDefault()
@@ -124,6 +126,10 @@ const Act1 = () => {
       setTranscriptTitleError(true)
       flag = true
     }
+    // if (activityDescription === '') {
+    //   setActivityDescriptionError(true)
+    //   flag = true
+    // }
     if (flag) {
       return
     }
@@ -141,7 +147,7 @@ const Act1 = () => {
     })
 
     let final_data = {
-      activity_description: activityDescription,
+      // activity_description: activityDescription,
       transcript_source_id: transcript_source_id,
       content: previewTranscript,
       UserId: sessionStorage.getItem("UserId"),
@@ -151,8 +157,6 @@ const Act1 = () => {
     }
 
     if (newChain) {
-      console.log("yay")
-      console.log(final_data)
       // await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/new-chain", final_data).then((response) => {
       //   const ActivitiesID = response.data.ActivitiesId.id
       //   const ActivityOneId = response.data.ActivityOneId
@@ -345,7 +349,7 @@ const Act1 = () => {
   }
 
   const onReset = () => {
-    setActivityDescription("")
+    // setActivityDescription("")
     setTranscriptTitle("")
     {!transcriptEditable || instructor && setInterviewer("")}
     {!transcriptEditable || instructor && setInterviewee("")}
@@ -358,18 +362,18 @@ const Act1 = () => {
 
   return (
     <Container style={{ marginTop: 20 }}>
-<div style={{ display: "flex", direction: "row" }}>
+    <div style={{ display: "flex", direction: "row" }}>
   <h2>Activity 1:</h2>&nbsp;&nbsp;
   <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-one-label"></h2>
 </div>
       <form onSubmit={handleSubmit} noValidate autoComplete='off'>
-        <Typography>Instructions (Editable): </Typography>
-        <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}></Typography>
+          <Typography>Instructions (Editable by Instructors): </Typography>
+          <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}></Typography>
         {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={switchValue} onChange={() => setSwitchValue((prev) => !prev)} />} label="Predefined Interview Text" />}
         <FormControlLabel disabled style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
         {!instructor && transcriptEditable && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the transcript in this template.</Typography>}
         <Button onClick={() => {onReset()}} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
-        <TextField margin='normal' label='Activity Description' value={activityDescription} fullWidth onChange={(e) => setActivityDescription(e.target.value)}></TextField>
+        {/* <TextField margin='normal' label='Activity Description' error={activityDescriptionError} value={activityDescription} fullWidth onChange={(e) => setActivityDescription(e.target.value)}></TextField> */}
         <TextField error={transcriptTitleError} margin='normal' value={transcriptTitle} label='Transcript title' fullWidth onChange={(e) => setTranscriptTitle(e.target.value)}></TextField>
         <TextField disabled={!instructor && transcriptEditable} error={interviewerError} margin='normal' value={interviewer} fullWidth variant='outlined' label="Interviewer label (e.g. Interviewer)" onChange={(e) => setInterviewer(e.target.value)}></TextField>
         <TextField disabled={!instructor && transcriptEditable} error={intervieweeError} margin='normal' value={interviewee} fullWidth variant='outlined' label="Interviewee label (e.g. Interviewee)" onChange={(e) => setInterviewee(e.target.value)}></TextField>
