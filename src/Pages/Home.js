@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Container, Divider, FormControlLabel, InputLabel, MenuItem, Select, Switch, TextField, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Container, Divider, FormControlLabel, InputLabel, MenuItem, Select, StepLabel, Switch, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios'
@@ -26,6 +26,8 @@ function Home() {
     const [activityDescriptionInstructor, setActivityDescriptionInstructor] = useState({})
     const [activityTitleStudent, setActivityTitleStudent] = useState({})
     const [activityDescriptionStudent, setActivityDescriptionStudent] = useState({})
+    const [activityLabel, setActivityLabel] = useState('Custom Label')
+    const [activityInstruction, setActivityInstruction] = useState('')
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -106,12 +108,26 @@ function Home() {
                         setActivityTitle((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.transcript_source_id }))
                         setActivityDescription((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.activity_description }))
                         setSwitchValues((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.transcriptEditable }))
+                        setActivityLabel((prevValues) => ({ ...prevValues, [1 + data[1].ActivityOneId.toString()]: response.data.label }))
+                        if (response.data.instruction) {
+                            setActivityInstruction((prevValues) => ({ ...prevValues, [1 + data[1].ActivityOneId.toString()]: response.data.instruction }))
+                        } else {
+                            setActivityInstruction((prevValues) => ({ ...prevValues, [1 + data[1].ActivityOneId.toString()]: 'Use the text boxes below to provide the details of your interview transcript. After you fill in the boxes, click the Preview button to see how the transcript looks before proceeding to the next activity. If you would like to make any changes you can do so by editing the transcript text directly. Click the Submit button when you are satisfied with the look of your interview transcript. The final version of your transcript will be used in the next activity.' }))
+                        }
                     })
                 }
                 if (data[1].ActivityTwoId && sessionStorage.getItem("Occupation") === "Instructor") {
                     axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${parseInt(data[1].ActivityTwoId)}`).then((response) => {
                         setPredefinedHighlighting((prevValues) => ({ ...prevValues, [data[1].ActivityTwoId]: response.data.predefinedHighlighting }))
+                        setActivityLabel((prevValues) => ({ ...prevValues, [2 + data[1].ActivityTwoId.toString()]: response.data.label }))
+                    if (response.data.instruction) {
+                        setActivityInstruction((prevValues) => ({ ...prevValues, [2 + data[1].ActivityTwoId.toString()]: response.data.instruction }))
+                    } else {
+                        setActivityInstruction((prevValues) => ({ ...prevValues, [2 + data[1].ActivityTwoId.toString()]: `Read through the transcript and click on sentences from the <strong>interviewee</strong> that you think provide insights or convey important information. Clicking a sentence will highlight it in yellow. Clicking a highlighted sentence again will unhighlight it. When you are satisfied with your sentence selections, click the Submit button to continue to the next activity. Your choices of which sentences to highlight will be carried forward to the next activity.` }))
+                    }
                     })
+                    
+                    
                 }
                 if (data[1].ActivityThreeId && sessionStorage.getItem("Occupation") === "Instructor") {
                     axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${parseInt(data[1].ActivityThreeId)}`).then((response) => {
@@ -340,23 +356,40 @@ function Home() {
                                     <Typography>Activity Description: {activityDescription[data[1].ActivityOneId]}</Typography>
                                 </div>
                                 <div>
+                                    {instructor && <Typography style={{ marginBottom: 10 }} variant='h6'>Activity 1</Typography>}
                                     <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityone/${data[1].ActivityOneId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityOneId ? "green" : "red" }} variant='contained'>
                                         Activity 1
                                     </Button>
+                                    <div style={{ display: "flex", direction: "row", marginTop:10 }}>
+                                        <Typography>Label:</Typography>&nbsp;&nbsp;
+                                        <Typography dangerouslySetInnerHTML={{ __html: activityLabel[1 + data[1].ActivityOneId.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-one-label"></Typography>
+                                    </div>
+                                    <Typography style={{marginTop:10}}>Instructions: </Typography>
+                                    <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: activityInstruction[1 + data[1].ActivityOneId.toString()] }} contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}></Typography>
+                                    <Divider style={{marginTop:10}}/>
                                     {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: !switchValues[data[1].ActivityOneId] ? 10 : 0 }} control={<Switch checked={switchValues[data[1].ActivityOneId] || false} onChange={() => handleSwitchChange(data[1].ActivityOneId)} />} label="Predefined Interview Text" />}
-                                    {instructor && <Typography>In order to make changes in the transcript, please go to Activity 1 and make the relevant changes.</Typography>}
+                                    {instructor && <Typography style={{ marginBottom: 10 }}>In order to make changes in the transcript, please go to Activity 1 and make the relevant changes.</Typography>}
                                     {instructor && switchValues[data[1].ActivityOneId] && <TextField helperText={helperText[data[1].ActivityOneId] || false} error={transcriptError[data[1].ActivityOneId] || false} margin='normal' value={transcript[data[1].ActivityOneId] || ""} rows={15} fullWidth multiline variant='outlined' label="Transcript" onChange={(e) => setTranscript((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: e.target.value }))}></TextField>}
                                 </div>
                                 <div>
+                                    {instructor && <Typography style={{ marginBottom: 10 }} variant='h6'>Activity 2</Typography>}
                                     <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activitytwo/${data[1].ActivityTwoId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityTwoId ? "green" : "red" }} variant='contained'>
                                         Activity 2
                                     </Button>
+                                    <div style={{ display: "flex", direction: "row", marginTop:10 }}>
+                                        <Typography>Label:</Typography>&nbsp;&nbsp;
+                                        <Typography dangerouslySetInnerHTML={{ __html:activityLabel[2 + data[1].ActivityTwoId.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-one-label"></Typography>
+                                    </div>
+                                    <Typography style={{marginTop:10}}>Instructions: </Typography>
+                                    <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: activityInstruction[2 + data[1].ActivityTwoId.toString()] }} contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}></Typography>
+                                    <Divider style={{marginTop:10}}/>
                                     {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: 10 }} control={<Switch checked={predefinedHighlighting[data[1].ActivityTwoId] || false} onChange={() => handleSwitchChangeHighlighting(data[1].ActivityTwoId)} />} label="Use Predefined Interview Highlighting" />}
                                 </div>
                                 <div>
                                     {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activitythree/${data[1].ActivityThreeId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityThreeId ? "green" : "red" }} variant='contained'>
                                         Activity 3
                                     </Button>}
+                                    {instructor && <Typography variant='h6'>Activity 3</Typography>}
                                     {instructor && <>
                                         <Typography style={{ marginTop: 10, marginBottom: 10 }}>If no machine learning model is selected, machine learning selections will not be made.</Typography>
                                         <Typography>Selected machine learning model: {MLModel[data[1].ActivityThreeId]}</Typography>
@@ -380,18 +413,20 @@ function Home() {
                                         </div></>}
                                 </div>
                                 <div>
+                                    {instructor && <Typography variant='h6'>Activity 4</Typography>}
                                     {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityfour/${data[1].ActivityFourId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityFourId ? "green" : "red" }} variant='contained'>
                                         Activity 4
                                     </Button>}
                                 </div>
                                 <div>
-
+                                    {instructor && <Typography variant='h6'>Activity 5</Typography>}
                                     {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityfive/${data[1].ActivityFiveId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityFiveId ? "green" : "red" }} variant='contained'>
                                         Activity 5
                                     </Button>}
                                     {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: 10 }} control={<Switch checked={MLClusters[data[1].ActivityFiveId]} onChange={() => { setMLClusters((prevValues) => ({ ...prevValues, [data[1].ActivityFiveId]: !prevValues[data[1].ActivityFiveId], })); }} />} label="Allow Machine Learning Clustering" />}
                                 </div>
                                 <div>
+                                    {instructor && <Typography variant='h6'>Activity 6</Typography>}
                                     {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activitysix/${data[1].ActivitySixId}`) }} fullWidth style={{ backgroundColor: data[1].ActivitySixId ? "green" : "red" }} variant='contained'>
                                         Activity 6
                                     </Button>}

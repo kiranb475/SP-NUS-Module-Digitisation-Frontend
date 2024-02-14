@@ -165,8 +165,10 @@ const Act1 = () => {
       //   sessionStorage.removeItem("ActivitySixId")
       // })
     } else if (id) {
+      console.log("no")
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data)
     } else {
+      console.log("no")
       await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", final_data).then((response) => {
         const ActivitiesID = response.data.ActivitiesId.id
         const ActivityOneId = response.data.ActivityOneId
@@ -175,11 +177,11 @@ const Act1 = () => {
       })
     }
 
-    // if (sessionStorage.getItem("ActivityTwoId") !== "null" && sessionStorage.getItem("ActivityTwoId") !== null) {
-    //   navigate(`/activitytwo/${sessionStorage.getItem("ActivityTwoId")}`)
-    // } else {
-    //   navigate('/activitytwo')
-    // }
+    if (sessionStorage.getItem("ActivityTwoId") !== "null" && sessionStorage.getItem("ActivityTwoId") !== null) {
+      navigate(`/activitytwo/${sessionStorage.getItem("ActivityTwoId")}`)
+    } else {
+      navigate('/activitytwo')
+    }
   }
 
   // displays transcript 
@@ -364,7 +366,7 @@ const Act1 = () => {
         <Typography>Instructions (Editable): </Typography>
         <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}></Typography>
         {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={switchValue} onChange={() => setSwitchValue((prev) => !prev)} />} label="Predefined Interview Text" />}
-        <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+        <FormControlLabel disabled style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
         {!instructor && transcriptEditable && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the transcript in this template.</Typography>}
         <Button onClick={() => {onReset()}} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
         <TextField margin='normal' label='Activity Description' value={activityDescription} fullWidth onChange={(e) => setActivityDescription(e.target.value)}></TextField>

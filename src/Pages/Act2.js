@@ -8,10 +8,10 @@ const Act2 = () => {
     const [activityMVCContent, setActivityMVCContent] = useState({});
     const [userData, setUserData] = useState({})
     const [transcriptHighlighting, setTranscriptHighlighting] = useState(false)
-    const [label,setLabel] = useState('')
-    const [instruction,setInstruction] = useState('')
-    const [newChain,setNewChain] = useState(false)
-    const [instructor,setInstructor] = useState(false)
+    const [label, setLabel] = useState('Label')
+    const [instruction, setInstruction] = useState(`Read through the transcript and click on sentences from the <strong>interviewee</strong> that you think provide insights or convey important information. Clicking a sentence will highlight it in yellow. Clicking a highlighted sentence again will unhighlight it. When you are satisfied with your sentence selections, click the Submit button to continue to the next activity. Your choices of which sentences to highlight will be carried forward to the next activity.`)
+    const [newChain, setNewChain] = useState(false)
+    const [instructor, setInstructor] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams()
 
@@ -30,7 +30,7 @@ const Act2 = () => {
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
         }
-        
+
         if (id) {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`).then((response) => {
                 if (response.data !== null) {
@@ -124,13 +124,13 @@ const Act2 = () => {
         })
 
         if (!id) {
-            delete userContent['transcriptEditable']   
+            delete userContent['transcriptEditable']
         }
         userContent.predefinedHighlighting = transcriptHighlighting
         userContent.label = document.getElementById("activity-two-label").innerHTML
         userContent.instruction = document.getElementById("activity-two-instruction").innerHTML
-        let data = {id:sessionStorage.getItem("ActivitiesId"),content:userContent,UserId:sessionStorage.getItem("UserId"),ActivityOneId:sessionStorage.getItem("ActivityOneId")}
-        
+        let data = { id: sessionStorage.getItem("ActivitiesId"), content: userContent, UserId: sessionStorage.getItem("UserId"), ActivityOneId: sessionStorage.getItem("ActivityOneId") }
+
         if (newChain) {
             console.log("yay")
             console.log(data)
@@ -144,12 +144,12 @@ const Act2 = () => {
             //   sessionStorage.removeItem("ActivityFiveId")
             //   sessionStorage.removeItem("ActivitySixId")
             // })
-          } else if (id) {
+        } else if (id) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data)
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data).then((response) => {
                 const ActivityTwoId = response.data.id;
-                sessionStorage.setItem("ActivityTwoId",ActivityTwoId)
+                sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
             })
         }
 
@@ -157,22 +157,24 @@ const Act2 = () => {
             navigate('/')
         } else if (sessionStorage.getItem("ActivityThreeId") !== "null" && sessionStorage.getItem("ActivityThreeId") !== null) {
             navigate(`/activitythree/${sessionStorage.getItem("ActivityThreeId")}`)
-          } else {
+        } else {
             navigate('/activitythree')
-          }
+        }
     }
 
     return (
         <Container style={{ marginTop: 20 }}>
-      <div style={{display:"flex",direction:"row"}}>
-      <h2>Activity 2:</h2>&nbsp;&nbsp;<h2 contentEditable="true" style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}} id="activity-two-label">{label || "Label"}</h2>
-      </div>
+            <div style={{ display: "flex", direction: "row" }}>
+                <h2>Activity 2:</h2>&nbsp;&nbsp;
+                <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-two-label"></h2>
+            </div>
             <form onSubmit={handleSubmit}>
-                <Typography>Instructions: </Typography>
-                <Typography id="activity-two-instruction" contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}>{instruction || "Read through the transcript and click on sentences from the <strong>interviewee</strong> that you think provide insights or convey important information. Clicking a sentence will highlight it in yellow. Clicking a highlighted sentence again will unhighlight it. When you are satisfied with your sentence selections, click the Submit button to continue to the next activity. Your choices of which sentences to highlight will be carried forward to the next activity."}</Typography>
-                {sessionStorage.getItem("Occupation") == "Instructor" && <Typography style={{ marginTop: 10}}>Upon submission of this activity, you will be redirected to the home page. You can go back to the home page and choose the configurations for the remaining activities.</Typography>}
+            <Typography>Instructions (Editable): </Typography>
+        <Typography id="activity-two-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}></Typography>
+                {sessionStorage.getItem("Occupation") == "Instructor" && <Typography style={{ marginTop: 10 }}>Upon submission of this activity, you will be redirected to the home page. You can go back to the home page and choose the configurations for the remaining activities.</Typography>}
                 {sessionStorage.getItem("Occupation") == "Instructor" && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={transcriptHighlighting} onChange={() => setTranscriptHighlighting((prev) => !prev)} />} label="Predefined Interview Highlighting" />}
                 {sessionStorage.getItem("Occupation") == "Student" && transcriptHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
+                <FormControlLabel disabled style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
                 <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }} id="content-container">
                     {Object.entries(activityMVCContent).map(([key, value]) => {
                         if (key % 2 !== 0) {
