@@ -13,6 +13,7 @@ const Act5 = () => {
     const [containerHeight, setContainerHeight] = useState(0)
     const [containerWidth, setContainerWidth] = useState(0)
     const [MLClusters, setMLClusters] = useState(false)
+    const [newChain,setNewChain] = useState(false)
     const [alternateView, setAlternateView] = useState(false)
     const [AISetting, setAISetting] = useState(false)
     const [AIClusters, setAIClusters] = useState({})
@@ -260,6 +261,7 @@ const Act5 = () => {
         let userData = clustData
         // let ori_x = userData[key].x
         // let ori_y = userData[key].y
+        checkClustering()
         setClustData((prevData) => ({
             ...prevData,
             [key]: { ...prevData[key], new_x: data.x, new_y: data.y },
@@ -365,13 +367,22 @@ const Act5 = () => {
         final_data.content = clustData
         final_data.UserId = sessionStorage.getItem("UserId")
         final_data.MLClusters = MLClusters
+        delete final_data["id"]
         final_data.label = document.getElementById("activity-five-label").innerHTML
         final_data.instruction = document.getElementById("activity-five-instruction").innerHTML
         console.log(final_data.MLClusters)
 
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: final_data }
 
-        if (id) {
+        if (newChain) {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/new-chain", data).then((response) => {
+                const ActivitiesID = response.data.ActivitiesId.id
+                const ActivityFiveId = response.data.ActivityFiveId
+                sessionStorage.setItem("ActivitiesId", ActivitiesID)
+                sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
+                sessionStorage.removeItem("ActivitySixId")
+            })
+        } else if (id)  {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`, data).then((response) => {
                 console.log(response)
             })
@@ -422,11 +433,11 @@ const Act5 = () => {
                 <Typography>Instructions (Editable by Instructors): </Typography>
                 <Typography id="activity-five-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
                 {displayConfig()}
+                <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
                 {viewUser ?
-                    <ButtonGroup fullWidth variant="outlined" sx={{ marginTop: 3, marginBottom: 3 }}>
-                        <Button onClick={() => { localStorage.removeItem("clusteredDataActivity5"); window.location.reload(false); }} fullWidth variant="outlined" disabled>Reset</Button>
+                    <ButtonGroup fullWidth variant="outlined" sx={{ marginTop: 1, marginBottom: 3 }}>
+                        <Button onClick={() => { window.location.reload(false); }} fullWidth variant="outlined" >Reset</Button>
                         <Button onClick={() => { createLabel() }} fullWidth variant='outlined'>Add Label</Button>
-                        <Button onClick={() => { checkClustering() }} fullWidth variant="outlined">Check clustering</Button>
                     </ButtonGroup>
                     : <div style={{ marginBottom: 20 }}></div>
                 }
@@ -434,7 +445,10 @@ const Act5 = () => {
                 {console.log(containerHeight)}
                 {/* <Button onClick={()=>{createLabel()}} sx={{marginTop:3,marginBottom:3}} fullWidth variant='outlined'>Add Label</Button> */}
                 <Box style={{ backgroundColor: viewUser ? "lightyellow" : "lightblue", borderRadius: 10, minHeight: containerHeight, width: '100%', position: 'relative', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', flexDirection: viewUser ? 'column' : 'row', alignContent: 'flex-start' }}>
-                    <FormControlLabel disabled style={{ marginTop: 10, marginLeft: 10 }} control={<Switch checked={alternateView} onChange={() => { console.log("yay"); createAIClustering(); setAlternateView((prev) => !prev) }} />} label="View AI Clustering" />
+                    <div style={{display:"flex"}}>
+                    <FormControlLabel style={{ marginTop: 10, marginLeft: 10 }} control={<Switch checked={alternateView} onChange={() => { console.log("yay"); createAIClustering(); setAlternateView((prev) => !prev) }} />} label="View AI Clustering" />
+
+                    </div>
                     {displayComponents()}
                 </Box>
                 <Button sx={{ marginTop: 3, marginBottom: 3 }} fullWidth type="submit" variant='outlined'>Submit</Button>

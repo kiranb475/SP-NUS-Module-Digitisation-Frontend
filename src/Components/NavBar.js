@@ -47,6 +47,7 @@ function NavBar() {
             sessionStorage.setItem("Occupation", occupation)
             setOpenRegister(false)
             navigate('\home')
+            window.location.reload()
         })
 
     }
@@ -84,8 +85,8 @@ function NavBar() {
             sessionStorage.setItem("Occupation", occupation)
             setOpenLogin(false);
             navigate('\home')
+            window.location.reload()
         })
-
     }
 
     return (

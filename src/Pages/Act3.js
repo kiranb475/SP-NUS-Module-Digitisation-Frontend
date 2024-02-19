@@ -11,6 +11,8 @@ const Act3 = () => {
     const [AllowMLModel, setAllowMLModel] = useState(false)
     const [instructor,setInstructor] = useState(false)
     const [MLModel, setMLModel] = useState("")
+    const [predefinedHighlighting,setPredefinedHighlighting] = useState(false)
+    const [newChain,setNewChain] = useState(false)
     const [predefinedMLSelection, setPredefinedMLSelection] = useState(false)
     const [label, setLabel] = useState('Custom Text')
     const [instruction,setInstruction] = useState(`<Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
@@ -36,6 +38,13 @@ const Act3 = () => {
         return content
     }
 
+    // handles user reset
+    const onReset = () => {
+        window.location.reload()
+    }
+
+    
+
     useEffect(() => {
 
         if (id === "null") {
@@ -44,6 +53,10 @@ const Act3 = () => {
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
+        }
+
+        if (sessionStorage.getItem("predefinedHighlighting") == true) {
+            setPredefinedHighlighting(true)
         }
 
         if (id) {
@@ -147,18 +160,20 @@ const Act3 = () => {
 
     // handles highlighting 
     const handleClick = (event, css, key, key2) => {
-        if (event.target.style.backgroundColor === 'lightgreen') {
-            event.target.style.backgroundColor = 'lightblue'
-            changeContents(key, key2, 2)
-        } else if (event.target.style.backgroundColor === 'lightblue') {
-            changeContents(key, key2, 1)
-            event.target.style.backgroundColor = 'lightgreen'
-        } else if (event.target.style.backgroundColor === '') {
-            event.target.style.backgroundColor = 'yellow'
-            changeContents(key, key2, 1)
-        } else {
-            changeContents(key, key2, 2)
-            event.target.style.backgroundColor = ''
+        if (!predefinedHighlighting) {
+            if (event.target.style.backgroundColor === 'lightgreen') {
+                event.target.style.backgroundColor = 'lightblue'
+                changeContents(key, key2, 2)
+            } else if (event.target.style.backgroundColor === 'lightblue') {
+                changeContents(key, key2, 1)
+                event.target.style.backgroundColor = 'lightgreen'
+            } else if (event.target.style.backgroundColor === '') {
+                event.target.style.backgroundColor = 'yellow'
+                changeContents(key, key2, 1)
+            } else {
+                changeContents(key, key2, 2)
+                event.target.style.backgroundColor = ''
+            }
         }
 
     };
@@ -235,24 +250,35 @@ const Act3 = () => {
         let userContent = userData
         let userContent_ori = userData_ori
         userContent.user_ai_markup_id = "tbd"
-        console.log(userContent_ori)
 
-        console.log(userContent_ori)
         
         if (!id) {
             delete userContent_ori["predefinedHighlighting"]
             delete userContent_ori["predefinedTranscript"]
         }
         userContent_ori.MLModel = MLModel
+        userContent.UserId = sessionStorage.getItem("UserId")
         userContent_ori.AllowMLModel = AllowMLModel
         userContent_ori.predefinedMLSelection = predefinedMLSelection
         userContent_ori.label = document.getElementById("activity-three-label").innerHTML
         userContent_ori.instruction = document.getElementById("activity-three-instruction").innerHTML
 
-        console.log(userContent_ori.AllowMLModel)
+        delete userContent_ori["id"]
+
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: userContent_ori }
 
-        if (id) {
+        console.log(data)
+        if (newChain) {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/new-chain", data).then((response) => {
+                const ActivitiesID = response.data.ActivitiesId.id
+                const ActivityThreeId = response.data.ActivityThreeId
+                sessionStorage.setItem("ActivitiesId", ActivitiesID)
+                sessionStorage.setItem("ActivityThreeId", ActivityThreeId)
+                sessionStorage.removeItem("ActivityFourId")
+                sessionStorage.removeItem("ActivityFiveId")
+                sessionStorage.removeItem("ActivitySixId")
+            })
+        } else if (id) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data)
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
@@ -296,6 +322,8 @@ const Act3 = () => {
     }
 
 
+    {console.log(predefinedHighlighting)}
+
     return (
         <Container style={{ marginTop: 20 }}>
             <div style={{ display: "flex", direction: "row" }}>
@@ -305,7 +333,10 @@ const Act3 = () => {
             <form onSubmit={handleSubmit}>
                 <Typography>Instructions (Editable by Instructors): </Typography>
                 <Typography id="activity-three-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-                {/* {sessionStorage.getItem("Occupation") == "Student" && sessionStorage.getItem("predefinedHighlighting") && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>} */}
+                {!instructor && predefinedHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
+                {!instructor && predefinedMLSelection && <Typography style={{ marginTop: 10 }}>The Machine Learning selection for the template has been predefined.</Typography>}
+                <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
+                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
                 {displayConfig()}
                 <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }} id="content-container">
                     {Object.entries(activityMVCContent).map(([key, value]) => {

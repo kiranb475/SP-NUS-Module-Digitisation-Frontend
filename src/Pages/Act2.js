@@ -1,4 +1,4 @@
-import { Container, TextField, Typography, Box, Button, FormControlLabel, Switch } from "@mui/material"
+import { Container, TextField, Typography, Box, Button, FormControlLabel, Switch, Divider } from "@mui/material"
 import { yellow } from "@mui/material/colors";
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom";
@@ -27,6 +27,10 @@ const Act2 = () => {
 
     useEffect(() => {
 
+        if (id === "null") {
+            alert("Please go back to the previous activity and submit it to continue.")
+        }
+
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
         }
@@ -34,19 +38,40 @@ const Act2 = () => {
         if (id) {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`).then((response) => {
                 if (response.data !== null) {
-                    setTranscriptHighlighting(response.data.predefinedHighlighting)
+                    if (response.data.predefinedHighlighting !== null) {
+                        setTranscriptHighlighting(response.data.predefinedHighlighting)
+                    }
                     setLabel(response.data.label)
                     setInstruction(response.data.instruction)
                     setUserData(response.data)
-                    let activity_mvc_data = {}
-                    for (let i = 1; i < Object.keys(response.data.content).length + 1; i++) {
-                        if (response.data.content[i].questioner_tag !== undefined) {
-                            activity_mvc_data[i] = { tag: response.data.content[i].questioner_tag, activity_mvc: response.data.content[i].activity_mvc }
-                        } else {
-                            activity_mvc_data[i] = { tag: response.data.content[i].response_tag, activity_mvc: getActivityMVCInterviewee(response.data.content[i].response_text) }
+                    if (response.data.content !== null && response.data.content !== "" && Object.entries(response.data.content).length !== 0) {
+                        let activity_mvc_data = {}
+                        for (let i = 1; i < Object.keys(response.data.content).length + 1; i++) {
+                            if (response.data.content[i].questioner_tag !== undefined) {
+                                activity_mvc_data[i] = { tag: response.data.content[i].questioner_tag, activity_mvc: response.data.content[i].activity_mvc }
+                            } else {
+                                activity_mvc_data[i] = { tag: response.data.content[i].response_tag, activity_mvc: getActivityMVCInterviewee(response.data.content[i].response_text) }
+                            }
                         }
+                        setActivityMVCContent(activity_mvc_data)
+                    } else if (sessionStorage.getItem("ActivityOneId")) {
+                        axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`).then((response) => {
+                            if (response.data !== null) {
+                                setUserData(response.data)
+                                let activity_mvc_data = {}
+                                for (let i = 1; i < Object.keys(response.data.content).length + 1; i++) {
+                                    if (response.data.content[i].questioner_tag !== undefined) {
+                                        activity_mvc_data[i] = { tag: response.data.content[i].questioner_tag, activity_mvc: response.data.content[i].activity_mvc }
+                                    } else {
+                                        activity_mvc_data[i] = { tag: response.data.content[i].response_tag, activity_mvc: getActivityMVCInterviewee(response.data.content[i].response_text) }
+                                    }
+                                }
+                                setActivityMVCContent(activity_mvc_data)
+                            } else {
+                                alert("Before progressing to Activity 2, please complete Activity 1.")
+                            }
+                        })
                     }
-                    setActivityMVCContent(activity_mvc_data)
                 }
             })
         } else if (id !== "null") {
@@ -108,6 +133,11 @@ const Act2 = () => {
         }
     }
 
+    // handles user reset
+    const onReset = () => {
+        window.location.reload()
+    }
+
     // handles user submission
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -126,24 +156,24 @@ const Act2 = () => {
         if (!id) {
             delete userContent['transcriptEditable']
         }
+        delete userContent['id']
         userContent.predefinedHighlighting = transcriptHighlighting
+        userContent.UserId = sessionStorage.getItem("UserId")
         userContent.label = document.getElementById("activity-two-label").innerHTML
         userContent.instruction = document.getElementById("activity-two-instruction").innerHTML
-        let data = { id: sessionStorage.getItem("ActivitiesId"), content: userContent, UserId: sessionStorage.getItem("UserId"), ActivityOneId: sessionStorage.getItem("ActivityOneId") }
+        let data = { id: sessionStorage.getItem("ActivitiesId"), content: userContent }
 
         if (newChain) {
-            console.log("yay")
-            console.log(data)
-            // await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/new-chain", data).then((response) => {
-            //   const ActivitiesID = response.data.ActivitiesId.id
-            //   const ActivityTwoId = response.data.ActivityTwoId
-            //   sessionStorage.setItem("ActivitiesId", ActivitiesID)
-            //   sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
-            //   sessionStorage.removeItem("ActivityThreeId")
-            //   sessionStorage.removeItem("ActivityFourId")
-            //   sessionStorage.removeItem("ActivityFiveId")
-            //   sessionStorage.removeItem("ActivitySixId")
-            // })
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/new-chain", data).then((response) => {
+                const ActivitiesID = response.data.ActivitiesId.id
+                const ActivityTwoId = response.data.ActivityTwoId
+                sessionStorage.setItem("ActivitiesId", ActivitiesID)
+                sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
+                sessionStorage.removeItem("ActivityThreeId")
+                sessionStorage.removeItem("ActivityFourId")
+                sessionStorage.removeItem("ActivityFiveId")
+                sessionStorage.removeItem("ActivitySixId")
+            })
         } else if (id) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data)
         } else {
@@ -153,10 +183,10 @@ const Act2 = () => {
             })
         }
 
+        sessionStorage.setItem("predefinedHighlighting", transcriptHighlighting)
         if (sessionStorage.getItem("Occupation") === "Instructor") {
             navigate('/')
         } else if (sessionStorage.getItem("ActivityThreeId") !== "null" && sessionStorage.getItem("ActivityThreeId") !== null) {
-            sessionStorage.setItem("predefinedHighlighting",transcriptHighlighting)
             navigate(`/activitythree/${sessionStorage.getItem("ActivityThreeId")}`)
         } else {
             navigate('/activitythree')
@@ -172,10 +202,12 @@ const Act2 = () => {
             <form onSubmit={handleSubmit}>
                 <Typography>Instructions (Editable by Instructors): </Typography>
                 <Typography id="activity-two-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-                {sessionStorage.getItem("Occupation") == "Instructor" && <Typography style={{ marginTop: 10 }}>Upon submission of this activity, you will be redirected to the home page. You can go back to the home page and choose the configurations for the remaining activities.</Typography>}
-                {sessionStorage.getItem("Occupation") == "Instructor" && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={transcriptHighlighting} onChange={() => setTranscriptHighlighting((prev) => !prev)} />} label="Predefined Interview Highlighting" />}
-                {sessionStorage.getItem("Occupation") == "Student" && transcriptHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
-                <FormControlLabel disabled style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+                {instructor && <Divider style={{ marginTop: 10 }} />}
+                {instructor && <Typography style={{ marginTop: 10 }}>Upon submission of this activity, you will be redirected to the home page. You can go back to the home page and choose the configurations for the remaining activities.</Typography>}
+                {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={transcriptHighlighting} onChange={() => setTranscriptHighlighting((prev) => !prev)} />} label="Predefined Interview Highlighting" />}
+                {!instructor && transcriptHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
+                <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
+                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
                 <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }} id="content-container">
                     {Object.entries(activityMVCContent).map(([key, value]) => {
                         if (key % 2 !== 0) {

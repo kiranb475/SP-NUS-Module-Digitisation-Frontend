@@ -1,4 +1,4 @@
-import { Box, Button, Container, TextField, Tooltip, Typography, selectClasses } from "@mui/material"
+import { Box, Button, ButtonGroup, Container, FormControlLabel, Switch, TextField, Tooltip, Typography, selectClasses } from "@mui/material"
 import { useEffect, useState } from "react";
 import Draggable from "react-draggable";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,6 +11,7 @@ const Act4 = () => {
     const [selectedData, setSelectedData] = useState({})
     const [containerHeight, setContainerHeight] = useState(0)
     const [instructor, setInstructor] = useState(false)
+    const [newChain,setNewChain] = useState(false)
     const [label, setLabel] = useState('Custom Text')
     const [instruction, setInstruction] = useState(`
     <Typography>The sentences you selected in the previous activity have been arranged on the left side of the pane below. Use the space below to cluster the sentences into themes by arranging the sentences that go together near each other. It’s okay if the sentences in a cluster overlap a bit.</Typography>
@@ -20,7 +21,7 @@ const Act4 = () => {
     <br />
     <br />
     <Typography>Once you are satisfied with your clusters and their labels, you can save everything by clicking the Submit button. Once submitted, your clusters and labels will be used in the next activity.</Typography>
-` )
+    ` )
     const navigate = useNavigate()
     const { id } = useParams()
 
@@ -38,7 +39,6 @@ const Act4 = () => {
 
         let userData = JSON.parse(localStorage.getItem("userData"))
         let height = sessionStorage.getItem("mainContainerHeight")
-        console.log(height == null)
         let selected = {}
         let count = 0
         let x = 120
@@ -59,9 +59,7 @@ const Act4 = () => {
                             Object.entries(userData.content).map(([key, value]) => {
                                 if (value.questioner_tag === undefined) {
                                     Object.entries(value.response_text).map(([key2, value2]) => {
-                                        //console.log(value2)
                                         if ((value2.AI_classified !== -1 && value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) || value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) {
-                                            //console.log(value2.text)
                                             selected[count] = { id: uuidv4(), text: value2.text, x: x, y: y, new_x: 0, new_y: 0, class: -1, type: "text", height: 0 }
                                             count = count + 1
                                             y = y + 140
@@ -82,9 +80,7 @@ const Act4 = () => {
                     Object.entries(userData.content).map(([key, value]) => {
                         if (value.questioner_tag === undefined) {
                             Object.entries(value.response_text).map(([key2, value2]) => {
-                                //console.log(value2)
                                 if ((value2.AI_classified !== -1 && value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) || value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) {
-                                    //console.log(value2.text)
                                     selected[count] = { id: uuidv4(), text: value2.text, x: x, y: y, new_x: 0, new_y: 0, class: -1, type: "text", height: 0 }
                                     count = count + 1
                                     y = y + 140
@@ -92,6 +88,7 @@ const Act4 = () => {
                             })
                         }
                     })
+                    console.log(selected)
                     setSelectedData(selected)
                 } else {
                     alert("Before progressing to Activity 4, please complete Activity 3.")
@@ -112,9 +109,10 @@ const Act4 = () => {
             value.class = -1
         })
 
-
-        console.log("user data")
+        console.log("user data is") 
         console.log(userData)
+
+
         Object.entries(userData).map(([key, value]) => {
             Object.entries(userData).map(([key2, value2]) => {
 
@@ -135,12 +133,10 @@ const Act4 = () => {
                     } else {
                         userData[key2].class = currentClass
                         flag2 = false
-                        console.log(userData[key2].type)
                         if (userData[key2].type == "label") {
                             colorsUsedData[userData[key2].class] = userData[key2].color
                         }
                     }
-                    console.log(currentClass)
                 }
             })
             flag = true
@@ -152,7 +148,7 @@ const Act4 = () => {
 
     // checks whether two components are close to each other
     const checkProximity = (x1, y1, x2, y2, type1, type2, height1, height2) => {
-        if (Math.abs(x1 - x2) <= 250 && Math.abs(y1 - y2) <= (height1 / 2 + height2 / 2 + 30)) {
+        if (Math.abs(x1 - x2) <= 230 && Math.abs(y1 - y2) <= (height1 / 2 + height2 / 2 + 15)) {
             return true
         } else {
             return false
@@ -176,16 +172,18 @@ const Act4 = () => {
         replaceLabelNames()
         const updatedSelectedData = { ...selectedData };
 
+        console.log(updatedSelectedData)
+        
         Object.entries(updatedSelectedData).forEach(([key, value]) => {
             updatedSelectedData[key].color = colorsUsedData[value.class];
         });
 
-        console.log(updatedSelectedData)
         setSelectedData(updatedSelectedData);
     }
 
     const handleDrag = (e, data, key) => {
         let userData = selectedData
+        checkClustering()
         setSelectedData((prevData) => ({
             ...prevData,
             [key]: { ...prevData[key], new_x: data.x, new_y: data.y },
@@ -202,7 +200,6 @@ const Act4 = () => {
                     //newData[key].type = "null";
                     newData[key].removed = true
                     const labelElement = document.querySelector(`[height-id="${value.id}"] > h6`)
-                    console.log(labelElement)
                     if (labelElement) {
                         labelElement.contentEditable = "false"
                         labelElement.style.border = "none"
@@ -210,7 +207,6 @@ const Act4 = () => {
                     }
                     const labelElement2 = document.querySelector(`[height-id="${value.id}"]`)
                     if (labelElement2) {
-                        console.log(labelElement2)
                         labelElement2.style.cursor = "default"
                     }
                 }
@@ -221,7 +217,6 @@ const Act4 = () => {
 
     // displays the components on the screen
     const displayComponents = () => {
-        { console.log(selectedData) }
         return Object.entries(selectedData).map(([key, data]) => {
             if (data.type === "label") {
                 if (data.removed === true) {
@@ -255,7 +250,6 @@ const Act4 = () => {
         })
     }
 
-
     // scrolls the screen to where the label has been generated
     const scrollNewLabelIntoView = (key) => {
         setTimeout(() => {
@@ -282,7 +276,6 @@ const Act4 = () => {
         const currColor = getColor();
         data = { [newKey]: { id: key, text: "Click to edit label", x: 120, y: data_y, new_x: 0, new_y: 0, class: -1, type: "label", color: currColor }, ...selectedData };
         setSelectedData(data);
-
         scrollNewLabelIntoView(key);
         setSelectedData(data);
     }
@@ -324,10 +317,19 @@ const Act4 = () => {
         finalData.content = selectedData
         finalData.label = document.getElementById("activity-four-label").innerHTML
         finalData.instruction = document.getElementById("activity-four-instruction").innerHTML
-
+        delete finalData['id']
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: finalData }
-
-        if (id) {
+        
+        if (newChain) {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/new-chain", data).then((response) => {
+                const ActivitiesID = response.data.ActivitiesId.id
+                const ActivityFourId = response.data.ActivityFourId
+                sessionStorage.setItem("ActivitiesId", ActivitiesID)
+                sessionStorage.setItem("ActivityFourId", ActivityFourId)
+                sessionStorage.removeItem("ActivityFiveId")
+                sessionStorage.removeItem("ActivitySixId")
+            })
+        } else if (id) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`, data)
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data).then((response) => {
@@ -352,9 +354,13 @@ const Act4 = () => {
             <form onSubmit={handleSubmit}>
                 <Typography>Instructions (Editable by Instructors): </Typography>
                 <Typography id="activity-four-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-                <Button onClick={() => { createLabel() }} sx={{ marginTop: 3, marginBottom: 3 }} fullWidth variant='outlined'>Add Label</Button>
-                <Button onClick={() => { window.location.reload(false); }} sx={{ marginBottom: 2 }} variant='outlined' fullWidth disabled>Reset</Button>
-                <Button onClick={() => checkClustering()} variant="outlined" fullWidth>Check clustering</Button>
+                <FormControlLabel style={{marginTop:5}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+                <ButtonGroup fullWidth sx={{ marginTop: 2, marginBottom: 1 }}>
+                    <Button onClick={() => { createLabel() }} fullWidth variant='outlined'>Add Label</Button>
+                    <Button onClick={() => { window.location.reload(false); }} variant='outlined' fullWidth>Reset</Button>
+                    {/* <Button onClick={() => checkClustering()} variant="outlined" fullWidth>Check clustering</Button> */}
+                </ButtonGroup>
+
                 <Box id="main-container" style={{ minHeight: containerHeight === 0 ? 900 : containerHeight, width: '100%', position: 'relative', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', flexDirection: 'column' }}>
                     {displayComponents()}
                 </Box>

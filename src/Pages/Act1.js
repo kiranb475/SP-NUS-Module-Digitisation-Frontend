@@ -12,49 +12,26 @@ const Act1 = () => {
   const [interviewerError, setInterviewerError] = useState(false)
   const [intervieweeError, setIntervieweeError] = useState(false)
   const [transcriptError, setTranscriptError] = useState(false)
-  const [activityDescriptionError,setActivityDescriptionError] = useState(false)
   const [helperText, setHelperText] = useState('')
   const [previewTranscript, setPreviewTranscript] = useState({})
   const [previewClicked, setPreviewClicked] = useState(false)
   const [transcriptTitle, setTranscriptTitle] = useState('')
-  const [label,setLabel] = useState('Custom Text')
-  const [instruction,setInstruction] = useState(`Use the text boxes below to provide the details of your interview transcript. After you fill in the boxes, click the Preview button to see how the transcript looks before proceeding to the next activity. If you would like to make any changes you can do so by editing the transcript text directly. Click the Submit button when you are satisfied with the look of your interview transcript. The final version of your transcript will be used in the next activity.`)
+  const [label, setLabel] = useState('Custom Text')
+  const [instruction, setInstruction] = useState(`Use the text boxes below to provide the details of your interview transcript. After you fill in the boxes, click the Preview button to see how the transcript looks before proceeding to the next activity. If you would like to make any changes you can do so by editing the transcript text directly. Click the Submit button when you are satisfied with the look of your interview transcript. The final version of your transcript will be used in the next activity.`)
   const [transcriptTitleError, setTranscriptTitleError] = useState(false)
-  const [activityDescription, setActivityDescription] = useState('')
   const [previewClickedError, setPreviewClickedError] = useState('');
   const [switchValue, setSwitchValue] = useState(false)
   const [transcriptEditable, setTranscriptEditable] = useState(false)
-  const [instructor,setInstructor] = useState(false)
-  const [newChain,setNewChain] = useState(false)
+  const [instructor, setInstructor] = useState(false)
+  const [newChain, setNewChain] = useState(false)
   const navigate = useNavigate()
   const { id } = useParams()
 
-
-  // display interviewee text
-  const displayIntervieweeText = (value, name, key_ori) => {
-    {
-      return Object.entries(value).map(([key, value]) => {
-        return (
-          <Typography id={key_ori + key} style={{ display: 'inline' }}>{value.text}</Typography>
-        )
-      })
-    }
-  }
-
-  // gets activity mvc of each of the sentences
-  const getActivityMVC = (value) => {
-    const element = document.querySelector(`[id="${value}"]`);
-    if (element) {
-      const htmlContent = element.outerHTML;
-      const inlineStyles = element.getAttribute('style') || 'No inline styles';
-      return { html: htmlContent, css: inlineStyles }
-    } else {
-      alert('Element not found');
-      return undefined
-    }
-  }
-
   useEffect(() => {
+
+    if (id === "null") {
+      alert("Please create an activity chain first.")
+    }
 
     if (sessionStorage.getItem("Occupation") == "Instructor") {
       setInstructor(true)
@@ -64,30 +41,44 @@ const Act1 = () => {
       axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`).then((response) => {
         if (response.data !== null) {
           //setActivityDescription(response.data.activity_description)
-          setTranscriptTitle(response.data.transcript_source_id.split(' ')[0])
-          setInterviewer(response.data.content[1].questioner_tag)
-          setInterviewee(response.data.content[2].response_tag)
-          setTranscriptEditable(response.data.transcriptEditable)
-          setSwitchValue(response.data.transcriptEditable)
+          if (response.data.transcript_source_id !== null) {
+            setTranscriptTitle(response.data.transcript_source_id)
+          }
+          console.log(response.data.content)
+          if (response.data.content !== null && response.data.content !== "" && Object.entries(response.data.content).length !== 0) {
+            if (response.data.content[1].questioner_tag !== null) {
+              setInterviewer(response.data.content[1].questioner_tag)
+            }
+            if (response.data.content[2].response_tag !== null) {
+              setInterviewee(response.data.content[2].response_tag)
+            }
+          }
+          if (response.data.transcriptEditable !== null) {
+            setTranscriptEditable(response.data.transcriptEditable)
+            setSwitchValue(response.data.transcriptEditable)
+          }
           setLabel(response.data.label)
           setInstruction(response.data.instruction)
 
-          let transcriptText = ''
-          Object.entries(response.data.content).map(([key, value]) => {
-            if (value.questioner_tag !== undefined) {
-              if (transcriptText === '') {
-                transcriptText = transcriptText + value.questioner_tag + ': ' + value.question_text
+          if (response.data.content !== null && response.data.content !== "" && Object.entries(response.data.content).length !== 0) {
+            let transcriptText = ''
+            Object.entries(response.data.content).map(([key, value]) => {
+              if (value.questioner_tag !== undefined) {
+                if (transcriptText === '') {
+                  transcriptText = transcriptText + value.questioner_tag + ': ' + value.question_text
+                } else {
+                  transcriptText = transcriptText + '\n\n' + value.questioner_tag + ': ' + value.question_text
+                }
               } else {
-                transcriptText = transcriptText + '\n\n' + value.questioner_tag + ': ' + value.question_text
+                transcriptText = transcriptText + '\n\n' + value.response_tag + ': '
+                Object.entries(value.response_text).map(([key2, value2]) => {
+                  transcriptText = transcriptText + value2.text
+                })
               }
-            } else {
-              transcriptText = transcriptText + '\n\n' + value.response_tag + ': '
-              Object.entries(value.response_text).map(([key2, value2]) => {
-                transcriptText = transcriptText + value2.text
-              })
-            }
-          })
-          setTranscript(transcriptText)
+            })
+            setTranscript(transcriptText)          
+          }
+
         }
       })
     }
@@ -95,134 +86,6 @@ const Act1 = () => {
 
 
   }, [])
-
-  // submission of activity one 
-  const handleSubmit = async (e) => {
-    setInterviewerError(false)
-    setIntervieweeError(false)
-    setTranscriptError(false)
-    //setActivityDescriptionError(false)
-    setPreviewClickedError('')
-    setTranscriptTitleError(false)
-    e.preventDefault()
-    let flag = false
-    if (previewClicked === false) {
-      setPreviewClickedError('Please click on the preview button to view the transcript before submitting.')
-      flag = true
-    }
-    if (interviewer === '') {
-      setInterviewerError(true)
-      flag = true
-    }
-    if (interviewee === '') {
-      setIntervieweeError(true)
-      flag = true
-    }
-    if (transcript === '') {
-      setTranscriptError(true)
-      flag = true
-    }
-    if (transcriptTitle === '') {
-      setTranscriptTitleError(true)
-      flag = true
-    }
-    // if (activityDescription === '') {
-    //   setActivityDescriptionError(true)
-    //   flag = true
-    // }
-    if (flag) {
-      return
-    }
-
-    let transcript_source_id = transcriptTitle
-
-    Object.entries(previewTranscript).map(([key, value]) => {
-      if (value.questioner_tag !== undefined) {
-        previewTranscript[key].activity_mvc = getActivityMVC(key)
-      } else {
-        Object.entries(previewTranscript[key].response_text).map(([key2, value]) => {
-          previewTranscript[key].response_text[key2].activity_mvc = getActivityMVC(key.toString() + key2.toString())
-        })
-      }
-    })
-
-    let final_data = {
-      // activity_description: activityDescription,
-      transcript_source_id: transcript_source_id,
-      content: previewTranscript,
-      UserId: sessionStorage.getItem("UserId"),
-      transcriptEditable: instructor ? switchValue : null,
-      label: document.getElementById("activity-one-label").innerHTML,
-      instruction: document.getElementById("activity-one-instruction").innerHTML
-    }
-
-    if (newChain) {
-      // await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/new-chain", final_data).then((response) => {
-      //   const ActivitiesID = response.data.ActivitiesId.id
-      //   const ActivityOneId = response.data.ActivityOneId
-      //   sessionStorage.setItem("ActivitiesId", ActivitiesID)
-      //   sessionStorage.setItem("ActivityOneId", ActivityOneId)
-      //   sessionStorage.removeItem("ActivityTwoId")
-      //   sessionStorage.removeItem("ActivityThreeId")
-      //   sessionStorage.removeItem("ActivityFourId")
-      //   sessionStorage.removeItem("ActivityFiveId")
-      //   sessionStorage.removeItem("ActivitySixId")
-      // })
-    } else if (id) {
-      console.log("no")
-      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data)
-    } else {
-      console.log("no")
-      await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", final_data).then((response) => {
-        const ActivitiesID = response.data.ActivitiesId.id
-        const ActivityOneId = response.data.ActivityOneId
-        sessionStorage.setItem("ActivitiesId", ActivitiesID)
-        sessionStorage.setItem("ActivityOneId", ActivityOneId)
-      })
-    }
-
-    if (sessionStorage.getItem("ActivityTwoId") !== "null" && sessionStorage.getItem("ActivityTwoId") !== null) {
-      navigate(`/activitytwo/${sessionStorage.getItem("ActivityTwoId")}`)
-    } else {
-      navigate('/activitytwo')
-    }
-  }
-
-  // displays transcript 
-  const displayTranscript = () => {
-    if (Object.keys(previewTranscript).length === 0) {
-      return (
-        <>
-          <Typography align='center'>Please press the preview button in order to preview the transcript.</Typography>
-        </>
-      )
-    } else {
-      return Object.entries(previewTranscript).map(([key, value]) => {
-        if (value.questioner_tag !== undefined) {
-          return (
-            <div key={key}>
-              <Typography display="inline">{value.questioner_tag}: </Typography>
-              <Typography display="inline" id={key}>{value.question_text}</Typography>
-              <br />
-              <br />
-            </div>
-          )
-        } else {
-          return (
-            <>
-              <div key={key}>
-                <Typography display="inline">{value.response_tag}: </Typography>
-                {displayIntervieweeText(value.response_text, value.response_tag, key.toString())}
-              </div>
-              <div>
-                <br />
-              </div>
-            </>
-          )
-        }
-      })
-    }
-  }
 
   const WordCount = (str) => {
     return str.split(" ").length;
@@ -269,7 +132,7 @@ const Act1 = () => {
     } else {
 
       let data = {};
-      let lines = transcript.split(/([/\n.])+/)
+      let lines = transcript.split(/\s*(?<=[.!?;])\s*|\n+/g)
 
       const check1 = new RegExp(`${interviewer}`, 'g');
       const check2 = new RegExp(`${interviewee}`, 'g');
@@ -343,37 +206,197 @@ const Act1 = () => {
         }
       }
 
+      console.log(data)
+
       setPreviewClicked(true)
       setPreviewTranscript(data)
+    }
+  }
+
+  // display interviewee text
+  const displayIntervieweeText = (value, name, key_ori) => {
+    {
+      return Object.entries(value).map(([key, value]) => {
+        return (
+          <Typography id={key_ori + key} style={{ display: 'inline' }}>{value.text} </Typography>
+        )
+      })
+    }
+  }
+
+  // displays transcript 
+  const displayTranscript = () => {
+    if (Object.keys(previewTranscript).length === 0) {
+      return (
+        <>
+          <Typography align='center'>Please press the preview button in order to preview the transcript.</Typography>
+        </>
+      )
+    } else {
+      return Object.entries(previewTranscript).map(([key, value]) => {
+        if (value.questioner_tag !== undefined) {
+          {console.log(value.question_text)}
+          return (
+            <div key={key}>
+              <Typography display="inline">{value.questioner_tag}: </Typography>
+              <Typography display="inline" id={key}>{value.question_text}</Typography>
+              <br />
+              <br />
+            </div>
+          )
+        } else {
+          return (
+            <>
+              <div key={key}>
+                <Typography display="inline">{value.response_tag}: </Typography>
+                {displayIntervieweeText(value.response_text, value.response_tag, key.toString())}
+              </div>
+              <div>
+                <br />
+              </div>
+            </>
+          )
+        }
+      })
+    }
+  }
+
+
+  // submission of activity one 
+  const handleSubmit = async (e) => {
+    if (transcript) {
+      setPreviewClickedError('');
+      if (previewClicked === false) {
+        setPreviewClickedError('Please click on the preview button to view the transcript before submitting.')
+        return;
+      }
+    }
+
+    !instructor && setInterviewerError(false) &&  setPreviewClickedError('') && setTranscriptError(false) && setTranscriptTitleError(false)
+    setTranscriptTitleError(false)
+    e.preventDefault()
+    let flag = false
+    if (!instructor) {
+      if (previewClicked === false) {
+        setPreviewClickedError('Please click on the preview button to view the transcript before submitting.')
+        flag = true
+      }
+      if (interviewer === '') {
+        setInterviewerError(true)
+        flag = true
+      }
+      if (interviewee === '') {
+        setIntervieweeError(true)
+        flag = true
+      }
+      if (transcript === '') {
+        setTranscriptError(true)
+        flag = true
+      }
+    }
+    
+    if (transcriptTitle === '') {
+      setTranscriptTitleError(true)
+      flag = true
+    }
+    if (flag) {
+      return
+    }
+
+    let transcript_source_id = transcriptTitle
+
+    Object.entries(previewTranscript).map(([key, value]) => {
+      if (value.questioner_tag !== undefined) {
+        previewTranscript[key].activity_mvc = getActivityMVC(key)
+      } else {
+        Object.entries(previewTranscript[key].response_text).map(([key2, value]) => {
+          previewTranscript[key].response_text[key2].activity_mvc = getActivityMVC(key.toString() + key2.toString())
+        })
+      }
+    })
+
+    console.log(previewTranscript)
+
+    let final_data = {
+      // activity_description: activityDescription,
+      transcript_source_id: transcript_source_id,
+      content: previewTranscript,
+      UserId: sessionStorage.getItem("UserId"),
+      transcriptEditable: instructor ? switchValue : null,
+      label: document.getElementById("activity-one-label").innerHTML,
+      instruction: document.getElementById("activity-one-instruction").innerHTML
+    }
+
+    if (newChain) {
+      await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/new-chain", final_data).then((response) => {
+        const ActivitiesID = response.data.ActivitiesId.id
+        const ActivityOneId = response.data.ActivityOneId
+        sessionStorage.setItem("ActivitiesId", ActivitiesID)
+        sessionStorage.setItem("ActivityOneId", ActivityOneId)
+        sessionStorage.removeItem("ActivityTwoId")
+        sessionStorage.removeItem("ActivityThreeId")
+        sessionStorage.removeItem("ActivityFourId")
+        sessionStorage.removeItem("ActivityFiveId")
+        sessionStorage.removeItem("ActivitySixId")
+      })
+    } else if (id) {
+      console.log("no")
+      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data)
+    } else {
+      console.log("no")
+      await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", final_data).then((response) => {
+        const ActivitiesID = response.data.ActivitiesId.id
+        const ActivityOneId = response.data.ActivityOneId
+        sessionStorage.setItem("ActivitiesId", ActivitiesID)
+        sessionStorage.setItem("ActivityOneId", ActivityOneId)
+      })
+    }
+
+    if (sessionStorage.getItem("ActivityTwoId") !== "null" && sessionStorage.getItem("ActivityTwoId") !== null) {
+      navigate(`/activitytwo/${sessionStorage.getItem("ActivityTwoId")}`)
+    } else {
+      navigate('/activitytwo')
+    }
+  }
+
+  // gets activity mvc of each of the sentences
+  const getActivityMVC = (value) => {
+    const element = document.querySelector(`[id="${value}"]`);
+    if (element) {
+      const htmlContent = element.outerHTML;
+      const inlineStyles = element.getAttribute('style') || 'No inline styles';
+      return { html: htmlContent, css: inlineStyles }
+    } else {
+      alert('Element not found');
+      return undefined
     }
   }
 
   const onReset = () => {
     // setActivityDescription("")
     setTranscriptTitle("")
-    {!transcriptEditable || instructor && setInterviewer("")}
-    {!transcriptEditable || instructor && setInterviewee("")}
-    {instructor && setTranscriptEditable(false)}
-    {instructor && setSwitchValue(false)}
-    {!transcriptEditable || instructor && setTranscript("")}
+    { !transcriptEditable || instructor && setInterviewer("") }
+    { !transcriptEditable || instructor && setInterviewee("") }
+    { instructor && setTranscriptEditable(false) }
+    { instructor && setSwitchValue(false) }
+    { !transcriptEditable || instructor && setTranscript("") }
     setLabel("")
-    {instructor && setInstruction("")}
+    { instructor && setInstruction("") }
   }
 
   return (
     <Container style={{ marginTop: 20 }}>
-    <div style={{ display: "flex", direction: "row" }}>
-  <h2>Activity 1:</h2>&nbsp;&nbsp;
-  <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-one-label"></h2>
-</div>
+      <div style={{ display: "flex", direction: "row" }}>
+        <h2>Activity 1:</h2>&nbsp;&nbsp;
+        <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-one-label"></h2>
+      </div>
       <form onSubmit={handleSubmit} noValidate autoComplete='off'>
-          <Typography>Instructions (Editable by Instructors): </Typography>
-          <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{minHeight:1,borderRight:"solid rgba(0,0,0,0) 1px",outline: "none"}}></Typography>
+        <Typography>Instructions (Editable by Instructors): </Typography>
+        <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
         {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={switchValue} onChange={() => setSwitchValue((prev) => !prev)} />} label="Predefined Interview Text" />}
-        <FormControlLabel disabled style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+        <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
         {!instructor && transcriptEditable && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the transcript in this template.</Typography>}
-        <Button onClick={() => {onReset()}} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
-        {/* <TextField margin='normal' label='Activity Description' error={activityDescriptionError} value={activityDescription} fullWidth onChange={(e) => setActivityDescription(e.target.value)}></TextField> */}
+        <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
         <TextField error={transcriptTitleError} margin='normal' value={transcriptTitle} label='Transcript title' fullWidth onChange={(e) => setTranscriptTitle(e.target.value)}></TextField>
         <TextField disabled={!instructor && transcriptEditable} error={interviewerError} margin='normal' value={interviewer} fullWidth variant='outlined' label="Interviewer label (e.g. Interviewer)" onChange={(e) => setInterviewer(e.target.value)}></TextField>
         <TextField disabled={!instructor && transcriptEditable} error={intervieweeError} margin='normal' value={interviewee} fullWidth variant='outlined' label="Interviewee label (e.g. Interviewee)" onChange={(e) => setInterviewee(e.target.value)}></TextField>

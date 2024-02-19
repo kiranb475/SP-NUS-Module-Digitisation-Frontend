@@ -35,6 +35,8 @@ function Home() {
         // checks whether the occupation of the current user is instructor
         if (sessionStorage.getItem("Occupation") === "Instructor") {
             setInstructor(true)
+        }
+        if (sessionStorage.getItem("Occupation") == "Instructor") { 
             // gets a list of all activities created by students
             axios.get("https://activities-alset-aef528d2fd94.herokuapp.com/home/students").then((response) => {
                 if (response.data != null) {
@@ -128,8 +130,9 @@ function Home() {
                         }
                     })
                 } else {
-                    setActivityLabel((prevValues) => ({ ...prevValues, [1 + ActivityOneCount.toString()]: "Custom Text" }))
-                    setActivityInstruction((prevValues) => ({ ...prevValues, [1 + ActivityOneCount.toString()]: 'Use the text boxes below to provide the details of your interview transcript. After you fill in the boxes, click the Preview button to see how the transcript looks before proceeding to the next activity. If you would like to make any changes you can do so by editing the transcript text directly. Click the Submit button when you are satisfied with the look of your interview transcript. The final version of your transcript will be used in the next activity.' }))
+                    const value = 1 + ActivityOneCount.toString()
+                    setActivityLabel((prevValues) => ({ ...prevValues, [value]: "Custom Text" }))
+                    setActivityInstruction((prevValues) => ({ ...prevValues, [value]: 'Use the text boxes below to provide the details of your interview transcript. After you fill in the boxes, click the Preview button to see how the transcript looks before proceeding to the next activity. If you would like to make any changes you can do so by editing the transcript text directly. Click the Submit button when you are satisfied with the look of your interview transcript. The final version of your transcript will be used in the next activity.' }))
                 }
                 if (data[1].ActivityTwoId != null) {
                     axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${parseInt(data[1].ActivityTwoId)}`).then((response) => {
@@ -144,8 +147,9 @@ function Home() {
                         }
                     })
                 } else {
-                    setActivityLabel((prevValues) => ({ ...prevValues, [2 + ActivityTwoCount.toString()]: 'Custom Text' }))
-                    setActivityInstruction((prevValues) => ({ ...prevValues, [2 + ActivityTwoCount.toString()]: `Read through the transcript and click on sentences from the <strong>interviewee</strong> that you think provide insights or convey important information. Clicking a sentence will highlight it in yellow. Clicking a highlighted sentence again will unhighlight it. When you are satisfied with your sentence selections, click the Submit button to continue to the next activity. Your choices of which sentences to highlight will be carried forward to the next activity.` }))
+                    const value = 2 + ActivityTwoCount.toString()
+                    setActivityLabel((prevValues) => ({ ...prevValues, [value]: 'Custom Text' }))
+                    setActivityInstruction((prevValues) => ({ ...prevValues, [value]: `Read through the transcript and click on sentences from the <strong>interviewee</strong> that you think provide insights or convey important information. Clicking a sentence will highlight it in yellow. Clicking a highlighted sentence again will unhighlight it. When you are satisfied with your sentence selections, click the Submit button to continue to the next activity. Your choices of which sentences to highlight will be carried forward to the next activity.` }))
                 }
                 if (data[1].ActivityThreeId !== null) {
                     axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${parseInt(data[1].ActivityThreeId)}`).then((response) => {
@@ -164,9 +168,10 @@ function Home() {
                     })
 
                 } else {
-                    setActivityLabel((prevValues) => ({ ...prevValues, [3 + ActivityThreeCount.toString()]: "Custom Text" }))
+                    const value = 3 + ActivityThreeCount.toString()
+                    setActivityLabel((prevValues) => ({ ...prevValues, [value]: 'Custom Text' }))
                     setActivityInstruction((prevValues) => ({
-                        ...prevValues, [3 + ActivityThreeCount.toString()]: `<Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
+                        ...prevValues, [value]: `<Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
                         <br /> <br/>
                         <Typography>Please review the version of your transcript with the new highlights below. You’ll likely agree with some of the sentence selections and disagree with others. As you review the transcript, feel free to refine your sentence selections. When you are satisfied with your selections, click the Submit button to continue to the next activity. Only your choices about which sentences are important (yellow and green highlights) will be used in the next activity.</Typography>
                         <br /> <br/>
@@ -190,9 +195,10 @@ function Home() {
                         }
                     })
                 } else {
-                    setActivityLabel((prevValues) => ({ ...prevValues, [4 + ActivityFourCount.toString()]: "Custom Text" }))
+                    const value = 4 + ActivityFourCount.toString()
+                    setActivityLabel((prevValues) => ({ ...prevValues, [value]: 'Custom Text' }))
                     setActivityInstruction((prevValues) => ({
-                        ...prevValues, [4 + ActivityFourCount.toString()]: `
+                        ...prevValues, [value]: `
                         <Typography>The sentences you selected in the previous activity have been arranged on the left side of the pane below. Use the space below to cluster the sentences into themes by arranging the sentences that go together near each other. It’s okay if the sentences in a cluster overlap a bit.</Typography>
                         <br />
                         <br />
@@ -216,9 +222,10 @@ function Home() {
                         }
                     })
                 } else {
-                    setActivityLabel((prevValues) => ({ ...prevValues, [5 + ActivityFiveCount.toString()]: "Custom Text" }))
+                    const value = 5 + ActivityFiveCount.toString()
+                    setActivityLabel((prevValues) => ({ ...prevValues, [value]: 'Custom Text' }))
                     setActivityInstruction((prevValues) => ({
-                        ...prevValues, [5 + ActivityFiveCount.toString()]: `
+                        ...prevValues, [value]: `
                         <Typography>For this activity, you will see two views of your clusters and labels. In the User view, you will see the arrangement you submitted in the previous activity or the arrangement you are currently working on. In the Alternative view, you will see how the AI model would have clustered the sentences you selected. The Alternative view does not provide labels for the clusters, but you might be able to infer them yourself.</Typography>
                         <br />
                         <br />
@@ -236,9 +243,10 @@ function Home() {
                         }
                     })
                 } else {
-                    setActivityLabel((prevValues) => ({ ...prevValues, [6 + ActivitySixCount.toString()]: "Custom Text" }))
+                    const value = 6 + ActivitySixCount.toString()
+                    setActivityLabel((prevValues) => ({ ...prevValues, [value]: 'Custom Text' }))
                     setActivityInstruction((prevValues) => ({
-                        ...prevValues, [6 + ActivitySixCount.toString()]: `
+                        ...prevValues, [value]: `
                         <Typography>The sentences and cluster labels you submitted for the previous activity have been arranged in the space below. For each cluster, add any number of insights that you think emerge from the selected sentences. After surfacing the insights, add a set of needs that relate to those insights one at a time. Identifying the insights and needs should be helpful when designing your prototype.</Typography>
                         <br/>
                         <br/>
@@ -479,16 +487,8 @@ function Home() {
         let ActivityFourCount = -1
         let ActivityFiveCount = -1
         let ActivitySixCount = -1
-        // console.log(activityLabel)
         return (
             <Box>
-                <Alert severity="info">Upcoming features (expected by Friday, 16th February 2024):</Alert>
-                <ul>
-                    <li>Alternative Clustering View for Activity 5.</li>
-                    <li>Reset option for Activities.</li>
-                    <li>Creation of a new chain from a particular activity of your choice.</li>
-                    <li>Integration of Machine Learning models.</li>
-                </ul>
                 <Divider style={{marginBottom:15}}/>
                 <Typography variant='h5'>Username: {sessionStorage.getItem("Username")}</Typography>
                 <Typography variant='h5'>Occupation: {sessionStorage.getItem("Occupation")}</Typography>
@@ -516,7 +516,7 @@ function Home() {
                                 {instructor && <Alert style={{ marginBottom: 10 }} severity="warning">Important: In order to make the activities visible to the user, please press the 'Publish Activities / Save Changes' button.</Alert>}
                                 <div>
                                     {instructor && <Typography style={{ marginBottom: 10 }} variant='h6'>Activity 1</Typography>}
-                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityone/${data[1].ActivityOneId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityOneId ? "green" : "red" }} variant='contained'>
+                                    <Button onClick={() => {sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityone/${data[1].ActivityOneId}`)}} fullWidth style={{ backgroundColor: data[1].ActivityOneId ? "green" : "red" }} variant='contained'>
                                         {instructor ? "Activity One" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityOneId ? activityLabel[1 + data[1].ActivityOneId.toString()] : activityLabel[1 + ActivityOneCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-one-label-${data[1].id}`} variant='body2'></Typography>}
                                     </Button>
                                     {instructor &&
@@ -534,8 +534,9 @@ function Home() {
                                 </div>
                                 <div>
                                     {instructor && <Typography style={{ marginBottom: 10 }} variant='h6'>Activity 2</Typography>}
-                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activitytwo/${data[1].ActivityTwoId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityTwoId ? "green" : "red" }} variant='contained'>
-                                        {instructor ? "Activity Two" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityLabel[2 + data[1].ActivityTwoId.toString()] : activityLabel[1 + ActivityTwoCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-one-label-${data[1].id}`} variant='body2'></Typography>}
+                                    {console.log(2 + ActivityTwoCount.toString())}
+                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityTwoId ? navigate(`/activitytwo/${data[1].ActivityTwoId}`) : alert("Please go back to the previous activity and submit it to continue.")}} fullWidth style={{ backgroundColor: data[1].ActivityTwoId ? "green" : "red" }} variant='contained'>
+                                        {instructor ? "Activity Two" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityLabel[2 + data[1].ActivityTwoId.toString()] : activityLabel[2 + ActivityTwoCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-two-label-${data[1].id}`} variant='body2'></Typography>}
                                     </Button>
                                     {instructor &&
                                         <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
@@ -549,7 +550,7 @@ function Home() {
                                     {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: 10 }} control={<Switch checked={predefinedHighlighting[data[1].ActivityTwoId] || false} onChange={() => handleSwitchChangeHighlighting(data[1].ActivityTwoId)} />} label="Use Predefined Interview Highlighting" />}
                                 </div>
                                 <div>
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activitythree/${data[1].ActivityThreeId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityThreeId ? "green" : "red" }} variant='contained'>
+                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); sessionStorage.setItem("predefinedHighlighting",predefinedHighlighting[data[1].ActivityTwoId]); storeDetails(data); data[1].ActivityThreeId ? navigate(`/activitythree/${data[1].ActivityThreeId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityThreeId ? "green" : "red" }} variant='contained'>
                                         <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityThreeId ? activityLabel[3 + data[1].ActivityThreeId.toString()] : activityLabel[3 + ActivityThreeCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-three-label-${data[1].id}`} variant='body2'></Typography>
                                     </Button>}
                                     {instructor && <Typography variant='h6'>Activity 3</Typography>}
@@ -584,7 +585,7 @@ function Home() {
                                 </div>
                                 <div>
                                     {instructor && <Typography style={{ marginTop: 10 }} variant='h6'>Activity 4</Typography>}
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityfour/${data[1].ActivityFourId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityFourId ? "green" : "red" }} variant='contained'>
+                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityFourId ? navigate(`/activityfour/${data[1].ActivityFourId}`) : alert("Please go back to the previous activity and submit it to continue.")}} fullWidth style={{ backgroundColor: data[1].ActivityFourId ? "green" : "red" }} variant='contained'>
                                         <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFourId ? activityLabel[4 + data[1].ActivityFourId.toString()] : activityLabel[4 + ActivityFourCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-four-label-${data[1].id}`} variant='body2'></Typography>
                                     </Button>}
                                     {instructor &&
@@ -598,7 +599,7 @@ function Home() {
                                 </div>
                                 <div>
                                     {instructor && <Typography variant='h6' style={{ marginTop: 10 }}>Activity 5</Typography>}
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityfive/${data[1].ActivityFiveId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityFiveId ? "green" : "red" }} variant='contained'>
+                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityFiveId ? navigate(`/activityfive/${data[1].ActivityFiveId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityFiveId ? "green" : "red" }} variant='contained'>
                                         <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFiveId ? activityLabel[5 + data[1].ActivityFiveId.toString()] : activityLabel[5 + ActivityFiveCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-five-label-${data[1].id}`} variant='body2'></Typography>
 
                                     </Button>}
@@ -614,7 +615,7 @@ function Home() {
                                 </div>
                                 <div>
                                     {instructor && <Typography variant='h6' style={{ marginTop: 10 }}>Activity 6</Typography>}
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activitysix/${data[1].ActivitySixId}`) }} fullWidth style={{ backgroundColor: data[1].ActivitySixId ? "green" : "red" }} variant='contained'>
+                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivitySixId ? navigate(`/activitysix/${data[1].ActivitySixId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivitySixId ? "green" : "red" }} variant='contained'>
                                         <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivitySixId ? activityLabel[6 + data[1].ActivitySixId.toString()] : activityLabel[6 + ActivitySixCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-six-label-${data[1].id}`} variant='body2'></Typography>
 
                                     </Button>}
@@ -635,7 +636,6 @@ function Home() {
                 })}
                 {!instructor && <Divider style={{ marginTop: 20, marginBottom: 20 }} />}
                 {!instructor && <Typography variant='h5' style={{ marginTop: 10 }}>Templates</Typography>}
-                {!instructor && <Alert style={{marginBottom:10,marginTop:10}} severity="info">More detailed features for better analysis coming soon!</Alert>}
                 {!instructor && <Alert style={{ marginBottom: 10 }} severity="warning">Important: When copying the template, please do not refresh the page. It will automatically refresh once it creates a copy of the activities.</Alert>}
                 {Object.entries(listOfActivitiesInstructor).flatMap(([key, array]) => {
                     return array.map(data => {
@@ -658,7 +658,6 @@ function Home() {
 
                 {instructor && <Divider style={{ marginTop: 20, marginBottom: 20 }} />}
                 {instructor && <Typography variant='h5' style={{ marginTop: 10 }}>Student Activities</Typography>}
-                {instructor && <Alert style={{marginBottom:10,marginTop:10}} severity="info">More detailed features for better analysis coming soon!</Alert>}
                 {Object.entries(listOfActivitiesStudents).flatMap(([key, array]) => {
                     return array.map(data => {
                         StudentActivityCount++
@@ -681,7 +680,7 @@ function Home() {
                                             </Button>
                                         </div>
                                         <div>
-                                            <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data.id); storeDetailsStudents(data); navigate(`/activitythree/${data.ActivityThreeId}`) }} style={{ backgroundColor: data.ActivityThreeId ? "green" : "red" }} fullWidth variant='contained'>
+                                            <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data.id); sessionStorage.setItem("predefinedHighlighting",predefinedHighlighting[data.ActivityTwoId]); storeDetailsStudents(data); navigate(`/activitythree/${data.ActivityThreeId}`) }} style={{ backgroundColor: data.ActivityThreeId ? "green" : "red" }} fullWidth variant='contained'>
                                                 Activity 3
                                             </Button>
                                         </div>

@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Button, Container, Divider, Typography } from "@mui/material"
+import { Accordion, AccordionDetails, AccordionSummary, Button, Container, Divider, FormControlLabel, Switch, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import axios from 'axios'
@@ -10,6 +10,7 @@ const Act6 = () => {
     const [clustData,setClustData] = useState({})
     const [instructor, setInstructor] = useState(false)
     const [label, setLabel] = useState('Custom Text')
+    const [newChain,setNewChain] = useState(false)
     const [instruction,setInstruction] = useState(`
     <Typography>The sentences and cluster labels you submitted for the previous activity have been arranged in the space below. For each cluster, add any number of insights that you think emerge from the selected sentences. After surfacing the insights, add a set of needs that relate to those insights one at a time. Identifying the insights and needs should be helpful when designing your prototype.</Typography>
     <br/>
@@ -165,6 +166,7 @@ const Act6 = () => {
 
         let finalData = {};
         finalData.content = clustData;
+        delete finalData['id']
         finalData.label = document.getElementById("activity-six-label").innerHTML
         finalData.instruction = document.getElementById("activity-six-instruction").innerHTML
         finalData.UserId = sessionStorage.getItem("UserId")
@@ -172,8 +174,14 @@ const Act6 = () => {
 
         let data = {id:sessionStorage.getItem("ActivitiesId"),content:finalData}
 
-
-        if (id) {
+        if (newChain) {
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/new-chain", data).then((response) => {
+                const ActivitiesID = response.data.ActivitiesId.id
+                const ActivitySixId = response.data.ActivitySixId
+                sessionStorage.setItem("ActivitiesId", ActivitiesID)
+                sessionStorage.setItem("ActivitySixId", ActivitySixId)
+            })
+        } else if (id) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`, data)
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data).then((response) => {
@@ -207,7 +215,8 @@ const Act6 = () => {
             <form onSubmit={handleSubmit}>
                 <Typography>Instructions (Editable by Instructors): </Typography>
                 <Typography id="activity-six-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-                 <Button onClick={()=>{localStorage.removeItem("clusteredDataActivity6");window.location.reload(false);}} sx={{marginTop:3}} fullWidth variant="outlined" disabled>Reset</Button>
+                 <Button onClick={()=>{window.location.reload(false);}} sx={{marginTop:3}} fullWidth variant="outlined">Reset</Button>
+                 <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-around', marginTop: 20, marginBottom: 10}}>
                     <Typography>Cluster</Typography>
                     <Typography>Insights</Typography>
