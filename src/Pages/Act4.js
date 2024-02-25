@@ -12,6 +12,7 @@ const Act4 = () => {
     const [containerHeight, setContainerHeight] = useState(0)
     const [instructor, setInstructor] = useState(false)
     const [newChain,setNewChain] = useState(false)
+    const [logs,setLogs] = useState({})
     const [label, setLabel] = useState('Custom Text')
     const [instruction, setInstruction] = useState(`
     <Typography>The sentences you selected in the previous activity have been arranged on the left side of the pane below. Use the space below to cluster the sentences into themes by arranging the sentences that go together near each other. It’s okay if the sentences in a cluster overlap a bit.</Typography>
@@ -31,13 +32,23 @@ const Act4 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
+        } else {
+            let ActivitiesId = sessionStorage.getItem("ActivitiesId")
+            if (sessionStorage.getItem("Occupation") == "Student") {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].StudentEvent)
+                })
+            } else {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].InstructorEvent)
+                })
+            }
         }
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
         }
 
-        let userData = JSON.parse(localStorage.getItem("userData"))
         let height = sessionStorage.getItem("mainContainerHeight")
         let selected = {}
         let count = 0
@@ -59,8 +70,8 @@ const Act4 = () => {
                             Object.entries(userData.content).map(([key, value]) => {
                                 if (value.questioner_tag === undefined) {
                                     Object.entries(value.response_text).map(([key2, value2]) => {
-                                        if ((value2.AI_classified !== -1 && value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) || value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) {
-                                            selected[count] = { id: uuidv4(), text: value2.text, x: x, y: y, new_x: 0, new_y: 0, class: -1, type: "text", height: 0 }
+                                        if ((value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) || value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) {
+                                            selected[count] = { id: uuidv4(), text: value2.text, x: x, y: y, new_x: 0, new_y: 0, class: -1, type: "text", height: 0,AI_classified:value2.AI_classified }
                                             count = count + 1
                                             y = y + 140
                                         }
@@ -76,12 +87,14 @@ const Act4 = () => {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                 if (response.data !== null) {
                     let userData = response.data
+                    console.log('response')
+                    console.log(response.data)
                     const check = new RegExp('background-color: yellow', 'g');
                     Object.entries(userData.content).map(([key, value]) => {
                         if (value.questioner_tag === undefined) {
                             Object.entries(value.response_text).map(([key2, value2]) => {
                                 if ((value2.AI_classified !== -1 && value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) || value2.text !== "." && value2.text !== " " && value2.activity_mvc.css.match(check)) {
-                                    selected[count] = { id: uuidv4(), text: value2.text, x: x, y: y, new_x: 0, new_y: 0, class: -1, type: "text", height: 0 }
+                                    selected[count] = { id: uuidv4(), text: value2.text, x: x, y: y, new_x: 0, new_y: 0, class: -1, type: "text", height: 0, AI_classified:value2.AI_classified }
                                     count = count + 1
                                     y = y + 140
                                 }
@@ -113,10 +126,53 @@ const Act4 = () => {
         console.log(userData)
 
 
-        Object.entries(userData).map(([key, value]) => {
-            Object.entries(userData).map(([key2, value2]) => {
+        // for (let i = 0; i < Object.keys(userData).length - 1; i++) {
+        //         for (let j = i + 1; j < Object.keys(userData).length; j++) {
+        //             let value = userData[i]
+        //             let value2 = userData[j]
+        //             if (checkProximity(value.x + value.new_x, value.y + value.new_y, value2.x + value2.new_x, value2.y + value2.new_y, value.type, value2.type, value.height, value2.height) && value2.class === -1) {
+        //                 if (value.class === -1 && value2.class === -1) {
+        //                     userData[i].class = currentClass
+        //                     userData[j].class = currentClass
+        //                     currentClass++
+        //                 } else if (value.class !== -1 && value2.class === -1) {
+        //                     userData[j].class = userData[i].class
+        //                 } else if (value.class === -1 && value2.class !== -1) {
+        //                     userData[i].class = userData[j].class
+        //                 }
+        //                 if (value.type === "label") {
+        //                     colorsUsedData[userData[i].class] = userData[i].color
+        //                 }
+        //                 if (value2.type === "label") {
+        //                     colorsUsedData[userData[j].class] = userData[j].color
+        //                 }
+        //             } else {
+        //                 if (value.class === -1) {
+        //                     userData[i].class = currentClass
+        //                     currentClass++
+        //                 } 
+        //                 if (value2.class === -1) {
+        //                     userData[j].class = currentClass
+        //                     currentClass++
+        //                 }
+        //                 if (value.type === "label") {
+        //                     colorsUsedData[userData[i].class] = userData[i].color
+        //                 }
+        //                 if (value2.type === "label") {
+        //                     colorsUsedData[userData[j].class] = userData[j].color
+        //                 } 
+        //             }
+        //         }
+        //     }
 
-                if (checkProximity(value.x + value.new_x, value.y + value.new_y, value2.x + value2.new_x, value2.y + value2.new_y, value.type, value2.type, value.height, value2.height) && value2.class === -1) {
+        //     console.log("new state is")
+        //     console.log(userData)
+
+
+         Object.entries(userData).map(([key, value]) => {
+           Object.entries(userData).map(([key2, value2]) => {
+
+                if (checkProximity(value.x + value.new_x, value.y + value.new_y, value2.x + value2.new_x, value2.y + value2.new_y, value.height, value2.height) && value2.class === -1) {
 
                     if (flag === true) {
                         currentClass = currentClass + 1
@@ -134,8 +190,7 @@ const Act4 = () => {
                         userData[key2].class = currentClass
                         flag2 = false
                         if (userData[key2].type == "label") {
-                            colorsUsedData[userData[key2].class] = userData[key2].color
-                        }
+                            colorsUsedData[userData[key2].class] = userData[key2].color }
                     }
                 }
             })
@@ -144,15 +199,35 @@ const Act4 = () => {
         })
         setSelectedData(userData)
         return colorsUsedData
+
+        
     }
 
     // checks whether two components are close to each other
-    const checkProximity = (x1, y1, x2, y2, type1, type2, height1, height2) => {
-        if (Math.abs(x1 - x2) <= 230 && Math.abs(y1 - y2) <= (height1 / 2 + height2 / 2 + 15)) {
-            return true
+    const checkProximity = (x1, y1, x2, y2, height1, height2) => {
+        if (Math.abs(x1 - x2) <= 230) {
+            if (height1 == 120 && height2 == 120) {
+                if (Math.abs(y1-y2) <= 140) {
+                    return true
+                }
+            }
+            if (height1 == 40 && height2 == 40) {
+                if (Math.abs(y1-y2) <= 60) {
+                    return true
+                }
+            } else {
+                if (Math.abs(y1-y2) <= 110) {
+                    return true
+                }
+            }
         } else {
             return false
         }
+        // if (Math.abs(x1 - x2) <= 230 && Math.abs(y1 - y2) <= (height1 / 2 + height2 / 2)) {
+        //     return true
+        // } else {
+        //     return false
+        // }
 
     }
 
@@ -172,10 +247,16 @@ const Act4 = () => {
         replaceLabelNames()
         const updatedSelectedData = { ...selectedData };
 
+        console.log("updated")
         console.log(updatedSelectedData)
+
+        console.log("colors")
+        console.log(colorsUsedData)
         
         Object.entries(updatedSelectedData).forEach(([key, value]) => {
-            updatedSelectedData[key].color = colorsUsedData[value.class];
+            if (value.type !== "label") {
+                updatedSelectedData[key].color = colorsUsedData[value.class];
+            }
         });
 
         setSelectedData(updatedSelectedData);
@@ -222,16 +303,16 @@ const Act4 = () => {
                 if (data.removed === true) {
                     return (
                         <Draggable defaultPosition={{ x: data.new_x, y: data.new_y }} key={data.id} onDrag={(e, data) => handleDrag(e, data, key)} bounds="parent">
-                            <div height-id={data.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move' }}>
-                                <Typography style={{ borderRadius: 5, padding: 1 }} id={data.id} variant="h6">{data.text}</Typography>
+                            <div height-id={data.id} style={{ maxWidth: 200, maxHeight: 20, padding: 10, margin: 10, cursor: 'move',whiteSpace: 'nowrap' }}>
+                                <Typography onKeyDown={(e) => {if (e.key === "Enter") {e.preventDefault()}}} style={{ borderRadius: 5, padding: 1, display:"flex", overflowX:"hidden" }} id={data.id} variant="h6">{data.text}</Typography>
                             </div>
                         </Draggable>
                     )
                 } else {
                     return (
                         <Draggable defaultPosition={{ x: data.new_x, y: data.new_y }} key={data.id} onDrag={(e, data) => handleDrag(e, data, key)} bounds="parent">
-                            <div height-id={data.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move' }}>
-                                <Typography style={{ border: '1px solid black', backgroundColor: data.color, borderRadius: 5, padding: 1 }} id={data.id} onBlur={() => { let text = document.getElementById(data.id).innerHTML; text === '' || text === `<br>` ? removeLabel(data.id) : console.log(text) }} contenteditable="true" variant="h6">{data.text}</Typography>
+                            <div height-id={data.id} style={{ maxWidth: 200, maxHeight: 20, padding: 10, margin: 10, cursor: 'move',  whiteSpace: 'nowrap'}}>
+                                <Typography onKeyDown={(e) => {if (e.key === "Enter") {e.preventDefault()}}} style={{border: '1px solid black', backgroundColor: data.color, borderRadius: 5, padding: 1, display:"flex", overflowX:"hidden"}} id={data.id} onBlur={() => { let text = document.getElementById(data.id).innerHTML; text === '' || text === `<br>` ? removeLabel(data.id) : console.log(text) }} contenteditable="true" variant="h6">{data.text}</Typography>
                             </div>
                         </Draggable>
                     )
@@ -319,23 +400,59 @@ const Act4 = () => {
         finalData.instruction = document.getElementById("activity-four-instruction").innerHTML
         delete finalData['id']
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: finalData }
+
+        console.log("final data")
+        console.log(data)
         
-        if (newChain) {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/new-chain", data).then((response) => {
-                const ActivitiesID = response.data.ActivitiesId.id
-                const ActivityFourId = response.data.ActivityFourId
-                sessionStorage.setItem("ActivitiesId", ActivitiesID)
-                sessionStorage.setItem("ActivityFourId", ActivityFourId)
+        // if (newChain) {
+        //     await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/new-chain", data).then((response) => {
+        //         const ActivitiesID = response.data.ActivitiesId.id
+        //         const ActivityFourId = response.data.ActivityFourId
+        //         sessionStorage.setItem("ActivitiesId", ActivitiesID)
+        //         sessionStorage.setItem("ActivityFourId", ActivityFourId)
+        //         sessionStorage.removeItem("ActivityFiveId")
+        //         sessionStorage.removeItem("ActivitySixId")
+        //     })
+        // } else 
+        if (id) {
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`, data)
+            if (newChain) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
                 sessionStorage.removeItem("ActivityFiveId")
                 sessionStorage.removeItem("ActivitySixId")
-            })
-        } else if (id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`, data)
+            
+                let logsData = logs
+                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 4 has been reinitialized." }
+                if (!instructor) {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                } else {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                }
+
+            } else {
+            
+                let logsData = logs
+                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 4 has been updated." }
+                if (!instructor) {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                } else {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                }
+
+            } 
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data).then((response) => {
                 const ActivityFourId = response.data.id;
                 sessionStorage.setItem("ActivityFourId", ActivityFourId)
             })
+
+            let logsData = logs
+            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 4 has been created." }
+            if (!instructor) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            } else {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            }
         }
 
         if (sessionStorage.getItem("ActivityFiveId") !== "null" && sessionStorage.getItem("ActivityFiveId") !== null) {
@@ -354,7 +471,7 @@ const Act4 = () => {
             <form onSubmit={handleSubmit}>
                 <Typography>Instructions (Editable by Instructors): </Typography>
                 <Typography id="activity-four-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-                <FormControlLabel style={{marginTop:5}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+                <FormControlLabel style={{marginTop:5}} control={<Switch checked={newChain} onChange={() => {alert("Warning: All data in next two activities corresponding to this chain will be erased.");setNewChain((prev) => !prev)}} />} label="Create a new chain of activities" />
                 <ButtonGroup fullWidth sx={{ marginTop: 2, marginBottom: 1 }}>
                     <Button onClick={() => { createLabel() }} fullWidth variant='outlined'>Add Label</Button>
                     <Button onClick={() => { window.location.reload(false); }} variant='outlined' fullWidth>Reset</Button>

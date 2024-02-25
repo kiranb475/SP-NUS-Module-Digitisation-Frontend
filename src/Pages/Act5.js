@@ -17,6 +17,7 @@ const Act5 = () => {
     const [alternateView, setAlternateView] = useState(false)
     const [AISetting, setAISetting] = useState(false)
     const [AIClusters, setAIClusters] = useState({})
+    const [logs,setLogs] = useState({})
     const [instructor, setInstructor] = useState(false)
     const [label, setLabel] = useState('Custom Text')
     const [instruction, setInstruction] = useState(`
@@ -32,6 +33,17 @@ const Act5 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
+        } else {
+            let ActivitiesId = sessionStorage.getItem("ActivitiesId")
+            if (sessionStorage.getItem("Occupation") == "Student") {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].StudentEvent)
+                })
+            } else {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].InstructorEvent)
+                })
+            }
         }
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
@@ -98,43 +110,45 @@ const Act5 = () => {
 
     const createAIClustering = () => {
 
-        let clusters = {}
-        console.log("to clusters")
-        if (!AISetting) {
-            console.log("should be once")
-            clusters = AI_clusters()
-            setAISetting(true)
-            setAIClusters(clusters)
-        } else {
-            clusters = AIClusters
-            console.log(clusters)
-        }
+        AI_clusters()
 
-        const check = new RegExp('background-color: yellow', 'g');
-        console.log("AI Clusters")
-        console.log(clusters)
-        let x_coordinate = 200
-        let y_coordinate = 200
-        let count = 0
-        if (MLClusters) {
-            // return <>yay</>
-            Object.entries(clusters).map(([key, value], index) => {
-                if (Object.entries(value.content).length != 0) {
-                    Object.entries(value.content).map(([key2, value2]) => {
-                        Object.entries(clustData).map(([key3, value3]) => {
-                            if (value2.text == value3.text) {
-                                console.log(value2.text)
-                                console.log(value3.text)
-                                console.log(clusters[key].color)
-                                clustData[key3].ai_color = clusters[key].color
-                            }
-                        })
-                    })
-                }
-            })
-        } else {
-            return <>no</>
-        }
+        // let clusters = {}
+        // console.log("to clusters")
+        // if (!AISetting) {
+        //     console.log("should be once")
+        //     clusters = AI_clusters()
+        //     setAISetting(true)
+        //     setAIClusters(clusters)
+        // } else {
+        //     clusters = AIClusters
+        //     console.log(clusters)
+        // }
+
+        // const check = new RegExp('background-color: yellow', 'g');
+        // console.log("AI Clusters")
+        // console.log(clusters)
+        // let x_coordinate = 200
+        // let y_coordinate = 200
+        // let count = 0
+        // if (MLClusters) {
+        //     // return <>yay</>
+        //     Object.entries(clusters).map(([key, value], index) => {
+        //         if (Object.entries(value.content).length != 0) {
+        //             Object.entries(value.content).map(([key2, value2]) => {
+        //                 Object.entries(clustData).map(([key3, value3]) => {
+        //                     if (value2.text == value3.text) {
+        //                         console.log(value2.text)
+        //                         console.log(value3.text)
+        //                         console.log(clusters[key].color)
+        //                         clustData[key3].ai_color = clusters[key].color
+        //                     }
+        //                 })
+        //             })
+        //         }
+        //     })
+        // } else {
+        //     return <>no</>
+        // }
 
 
     }
@@ -159,8 +173,21 @@ const Act5 = () => {
         scrollNewLabelIntoView(key);
     }
     const checkProximity = (x1, y1, x2, y2, type1, type2, height1, height2) => {
-        if (Math.abs(x1 - x2) <= 260 && Math.abs(y1 - y2) <= (height1 / 2 + height2 / 2 + 30)) {
-            return true
+        if (Math.abs(x1 - x2) <= 230) {
+            if (height1 == 120 && height2 == 120) {
+                if (Math.abs(y1-y2) <= 140) {
+                    return true
+                }
+            }
+            if (height1 == 40 && height2 == 40) {
+                if (Math.abs(y1-y2) <= 60) {
+                    return true
+                }
+            } else {
+                if (Math.abs(y1-y2) <= 110) {
+                    return true
+                }
+            }
         } else {
             return false
         }
@@ -228,7 +255,9 @@ const Act5 = () => {
         const updatedClustData = { ...clustData };
 
         Object.entries(updatedClustData).forEach(([key, value]) => {
-            updatedClustData[key].color = colorsUsedData[value.class];
+            if (value.type !== "label") {
+                updatedClustData[key].color = colorsUsedData[value.class];
+            }
         });
 
         console.log(updatedClustData)
@@ -279,16 +308,16 @@ const Act5 = () => {
                     if (value.removed === true) {
                         return (
                             <Draggable defaultPosition={{ x: value.new_x, y: value.new_y }} key={value.id} onDrag={(e, data) => handleDrag(e, data, key)} bounds="parent">
-                                <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move' }}>
-                                    <Typography style={{ borderRadius: 5, padding: 1 }} id={value.id} variant="h6"></Typography>
+                                <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move',whiteSpace: 'nowrap' }}>
+                                    <Typography onKeyDown={(e) => {if (e.key === "Enter") {e.preventDefault()}}} style={{ borderRadius: 5, padding: 1,display:"flex", overflowX:"hidden" }} id={value.id} variant="h6"></Typography>
                                 </div>
                             </Draggable>
                         )
                     } else {
                         return (
                             <Draggable defaultPosition={{ x: value.new_x, y: value.new_y }} key={value.id} onDrag={(e, data) => handleDrag(e, data, key)} bounds="parent">
-                                <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move' }}>
-                                    <Typography style={{ border: '1px solid black', backgroundColor: alternateView ? value.ai_color : value.color, borderRadius: 5, padding: 1 }} onBlur={() => { let text = document.getElementById(value.id).innerHTML; text === '' || text === `<br>` ? removeLabel(value.id) : console.log(text) }} id={value.id} contenteditable="true" variant="h6">{value.text}</Typography>
+                                <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move',whiteSpace: 'nowrap' }}>
+                                    <Typography onKeyDown={(e) => {if (e.key === "Enter") {e.preventDefault()}}} style={{ border: '1px solid black', backgroundColor: alternateView ? value.ai_color : value.color, borderRadius: 5, padding: 1,display:"flex", overflowX:"hidden" }} onBlur={() => { let text = document.getElementById(value.id).innerHTML; text === '' || text === `<br>` ? removeLabel(value.id) : console.log(text) }} id={value.id} contenteditable="true" variant="h6">{value.text}</Typography>
                                 </div>
                             </Draggable>
                         )
@@ -323,31 +352,39 @@ const Act5 = () => {
     const AI_clusters = () => {
 
         let clusters = {
-            '-1': { content: {}, color: getColor() },
-            '0': { content: {}, color: getColor() },
-            '1': { content: {}, color: getColor() },
-            '2': { content: {}, color: getColor() },
-            '3': { content: {}, color: getColor() },
-            '4': { content: {}, color: getColor() }
+            '0': getColor(),
+            '1': getColor(),
+            '2': getColor(),
+            '3': getColor(),
+            '4': getColor(),
         }
 
         const ori_y = 0
         const ori_x = 0
         const check = new RegExp('background-color: yellow', 'g');
-        console.log("ori data")
-        console.log(oriData)
-        Object.entries(oriData.content).map(([key, value]) => {
-            if (value.questioner_tag === undefined) {
-                Object.entries(value.response_text).map(([key2, value2]) => {
-                    console.log(value2)
-                    if ((value2.AI_classified !== -1 && value2.AI_classified !== undefined) && value2.activity_mvc.css.match(check) || value2.activity_mvc.css.match(check)) {
-                        clusters[value2.AI_classified.toString()].content[Object.keys(clusters[value2.AI_classified.toString()]).length - 1] = value2
-                    }
-                })
+        console.log("clust data")
+        console.log(clustData)
+        // Object.entries(oriData.content).map(([key, value]) => {
+        //     if (value.questioner_tag === undefined) {
+        //         Object.entries(value.response_text).map(([key2, value2]) => {
+        //             console.log(value2)
+        //             if ((value2.AI_classified !== -1 && value2.AI_classified !== undefined) && value2.activity_mvc.css.match(check) || value2.activity_mvc.css.match(check)) {
+        //                 clusters[value2.AI_classified.toString()].content[Object.keys(clusters[value2.AI_classified.toString()]).length - 1] = value2
+        //             }
+        //         })
+        //     }
+        // })
+
+        Object.entries(clustData).map(([key,value]) => {
+            if (value.AI_classified != null && value.ai_color == null && value.AI_classified != -1) {
+                clustData[key].ai_color = clusters[value.AI_classified.toString()]
+                //clusters[value.AI_classified.toString()].content[Object.keys(clusters[value.AI_classified.toString()]).length - 1] = value
+            } else if (value.AI_classified != null && value.AI_classified == -1) {
+                clustData[key].ai_color = ''
             }
         })
         console.log("returned")
-        console.log(clusters)
+        console.log(clustData)
         return clusters
     }
 
@@ -374,23 +411,56 @@ const Act5 = () => {
 
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: final_data }
 
-        if (newChain) {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/new-chain", data).then((response) => {
-                const ActivitiesID = response.data.ActivitiesId.id
-                const ActivityFiveId = response.data.ActivityFiveId
-                sessionStorage.setItem("ActivitiesId", ActivitiesID)
-                sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
-                sessionStorage.removeItem("ActivitySixId")
-            })
-        } else if (id)  {
+        // if (newChain) {
+        //     await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/new-chain", data).then((response) => {
+        //         const ActivitiesID = response.data.ActivitiesId.id
+        //         const ActivityFiveId = response.data.ActivityFiveId
+        //         sessionStorage.setItem("ActivitiesId", ActivitiesID)
+        //         sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
+        //         sessionStorage.removeItem("ActivitySixId")
+        //     })
+        // } else
+         if (id)  {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`, data).then((response) => {
                 console.log(response)
             })
+            
+            if (newChain) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
+                sessionStorage.removeItem("ActivitySixId")
+               
+                let logsData = logs
+                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 5 has been reinitialized." }
+                if (!instructor) {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                } else {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                }
+            
+            } else {
+
+                let logsData = logs
+                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 5 has been updated." }
+                if (!instructor) {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                } else {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                }
+
+            }
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive", data).then((response) => {
                 const ActivityFiveId = response.data.id;
                 sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
             })
+
+            let logsData = logs
+            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 5 has been created." }
+            if (!instructor) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            } else {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            }
         }
 
         if (sessionStorage.getItem("ActivitySixId") !== "null" && sessionStorage.getItem("ActivitySixId") !== null) {
@@ -433,7 +503,7 @@ const Act5 = () => {
                 <Typography>Instructions (Editable by Instructors): </Typography>
                 <Typography id="activity-five-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
                 {displayConfig()}
-                <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+                <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => {alert("Warning: All data in next activity corresponding to this chain will be erased.");setNewChain((prev) => !prev)}} />} label="Create a new chain of activities" />
                 {viewUser ?
                     <ButtonGroup fullWidth variant="outlined" sx={{ marginTop: 1, marginBottom: 3 }}>
                         <Button onClick={() => { window.location.reload(false); }} fullWidth variant="outlined" >Reset</Button>

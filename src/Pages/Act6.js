@@ -11,6 +11,7 @@ const Act6 = () => {
     const [instructor, setInstructor] = useState(false)
     const [label, setLabel] = useState('Custom Text')
     const [newChain,setNewChain] = useState(false)
+    const [logs,setLogs] = useState({})
     const [instruction,setInstruction] = useState(`
     <Typography>The sentences and cluster labels you submitted for the previous activity have been arranged in the space below. For each cluster, add any number of insights that you think emerge from the selected sentences. After surfacing the insights, add a set of needs that relate to those insights one at a time. Identifying the insights and needs should be helpful when designing your prototype.</Typography>
     <br/>
@@ -28,6 +29,17 @@ const Act6 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
+        } else {
+            let ActivitiesId = sessionStorage.getItem("ActivitiesId")
+            if (sessionStorage.getItem("Occupation") == "Student") {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].StudentEvent)
+                })
+            } else {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].InstructorEvent)
+                })
+            }
         }
         
         if (id) {
@@ -174,20 +186,38 @@ const Act6 = () => {
 
         let data = {id:sessionStorage.getItem("ActivitiesId"),content:finalData}
 
-        if (newChain) {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/new-chain", data).then((response) => {
-                const ActivitiesID = response.data.ActivitiesId.id
-                const ActivitySixId = response.data.ActivitySixId
-                sessionStorage.setItem("ActivitiesId", ActivitiesID)
-                sessionStorage.setItem("ActivitySixId", ActivitySixId)
-            })
-        } else if (id) {
+        // if (newChain) {
+        //     await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/new-chain", data).then((response) => {
+        //         const ActivitiesID = response.data.ActivitiesId.id
+        //         const ActivitySixId = response.data.ActivitySixId
+        //         sessionStorage.setItem("ActivitiesId", ActivitiesID)
+        //         sessionStorage.setItem("ActivitySixId", ActivitySixId)
+        //     })
+        // } else 
+        if (id) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`, data)
+
+            let logsData = logs
+            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 6 has been updated." }
+            if (!instructor) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            } else {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            }            
+            
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data).then((response) => {
                 const ActivitySixId = response.data.id;
                 sessionStorage.setItem("ActivitySixId",ActivitySixId)
             })
+
+            let logsData = logs
+            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 6 has been created." }
+            if (!instructor) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            } else {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            }
         }
 
         navigate('/home')
@@ -216,7 +246,7 @@ const Act6 = () => {
                 <Typography>Instructions (Editable by Instructors): </Typography>
                 <Typography id="activity-six-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
                  <Button onClick={()=>{window.location.reload(false);}} sx={{marginTop:3}} fullWidth variant="outlined">Reset</Button>
-                 <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+                 {/* <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" /> */}
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-around', marginTop: 20, marginBottom: 10}}>
                     <Typography>Cluster</Typography>
                     <Typography>Insights</Typography>

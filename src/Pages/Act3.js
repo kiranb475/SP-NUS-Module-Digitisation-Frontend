@@ -15,6 +15,7 @@ const Act3 = () => {
     const [newChain,setNewChain] = useState(false)
     const [predefinedMLSelection, setPredefinedMLSelection] = useState(false)
     const [label, setLabel] = useState('Custom Text')
+    const [logs,setLogs] = useState({})
     const [instruction,setInstruction] = useState(`<Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
     <br /> <br/>
     <Typography>Please review the version of your transcript with the new highlights below. You’ll likely agree with some of the sentence selections and disagree with others. As you review the transcript, feel free to refine your sentence selections. When you are satisfied with your selections, click the Submit button to continue to the next activity. Only your choices about which sentences are important (yellow and green highlights) will be used in the next activity.</Typography>
@@ -49,6 +50,17 @@ const Act3 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
+        } else {
+            let ActivitiesId = sessionStorage.getItem("ActivitiesId")
+            if (sessionStorage.getItem("Occupation") == "Student") {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].StudentEvent)
+                })
+            } else {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].InstructorEvent)
+                })
+            }
         }
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
@@ -268,23 +280,59 @@ const Act3 = () => {
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: userContent_ori }
 
         console.log(data)
-        if (newChain) {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/new-chain", data).then((response) => {
-                const ActivitiesID = response.data.ActivitiesId.id
-                const ActivityThreeId = response.data.ActivityThreeId
-                sessionStorage.setItem("ActivitiesId", ActivitiesID)
-                sessionStorage.setItem("ActivityThreeId", ActivityThreeId)
+        // if (newChain) {
+        //     await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/new-chain", data).then((response) => {
+        //         const ActivitiesID = response.data.ActivitiesId.id
+        //         const ActivityThreeId = response.data.ActivityThreeId
+        //         sessionStorage.setItem("ActivitiesId", ActivitiesID)
+        //         sessionStorage.setItem("ActivityThreeId", ActivityThreeId)
+        //         sessionStorage.removeItem("ActivityFourId")
+        //         sessionStorage.removeItem("ActivityFiveId")
+        //         sessionStorage.removeItem("ActivitySixId")
+        //     })
+        // } else
+         if (id) {
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data)
+
+            if (newChain) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
                 sessionStorage.removeItem("ActivityFourId")
                 sessionStorage.removeItem("ActivityFiveId")
                 sessionStorage.removeItem("ActivitySixId")
-            })
-        } else if (id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data)
+
+                let logsData = logs
+                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 3 has been reinitialized." }
+                if (!instructor) {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                } else {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                }
+
+            } else {
+
+                let logsData = logs
+                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 3 has been updated." }
+                if (!instructor) {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                } else {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                }
+
+            }
+              
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
                 const ActivityThreeId = response.data.id;
                 sessionStorage.setItem("ActivityThreeId",ActivityThreeId)
             })
+
+            let logsData = logs
+            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 3 has been created." }
+            if (!instructor) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            } else {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            }
         }
 
         if (sessionStorage.getItem("ActivityFourId") !== "null" && sessionStorage.getItem("ActivityFourId") !== null) {
@@ -336,7 +384,7 @@ const Act3 = () => {
                 {!instructor && predefinedHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
                 {!instructor && predefinedMLSelection && <Typography style={{ marginTop: 10 }}>The Machine Learning selection for the template has been predefined.</Typography>}
                 <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
-                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => {alert("Warning: All data in next three activities corresponding to this chain will be erased.");setNewChain((prev) => !prev)}} />} label="Create a new chain of activities" />
                 {displayConfig()}
                 <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }} id="content-container">
                     {Object.entries(activityMVCContent).map(([key, value]) => {

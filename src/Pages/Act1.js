@@ -24,6 +24,7 @@ const Act1 = () => {
   const [transcriptEditable, setTranscriptEditable] = useState(false)
   const [instructor, setInstructor] = useState(false)
   const [newChain, setNewChain] = useState(false)
+  const [logs,setLogs] = useState({})
   const navigate = useNavigate()
   const { id } = useParams()
 
@@ -81,6 +82,18 @@ const Act1 = () => {
 
         }
       })
+
+      let ActivitiesId = sessionStorage.getItem("ActivitiesId")
+      if (sessionStorage.getItem("Occupation") == "Student") {
+        axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
+          setLogs(response.data[0].StudentEvent)
+        })
+      } else {
+        axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
+          setLogs(response.data[0].InstructorEvent)
+        })
+      }
+
     }
 
 
@@ -168,7 +181,11 @@ const Act1 = () => {
 
       for (let i = 0; i < lines.length; i++) {
         lines[i] = cleaning(lines[i])
-        if (lines[i].match(check1) !== null) {
+        // console.log("something")
+        // console.log(lines[i].split(':')[0])
+        // console.log(lines[i].split(':')[0].match(check1))
+        // console.log(lines[i].split(':')[0].match(check2))
+        if (lines[i].split(':')[0].match(check1) !== null) {
           data[count] = {
             sentence_num: count,
             question_id: interviewCount,
@@ -179,7 +196,7 @@ const Act1 = () => {
           interviewFlag = true
           intervieweeFlag = false
           interviewCount++
-        } else if (lines[i].match(check2) !== null) {
+        } else if (lines[i].split(':')[0].match(check2) !== null) {
           data[count] = {
             sentence_num: count,
             response_id: interviewCount - 1,
@@ -206,6 +223,7 @@ const Act1 = () => {
         }
       }
 
+      console.log('before putting in')
       console.log(data)
 
       setPreviewClicked(true)
@@ -226,6 +244,8 @@ const Act1 = () => {
 
   // displays transcript 
   const displayTranscript = () => {
+    {console.log("display transcript")}
+    {console.log(previewTranscript)}
     if (Object.keys(previewTranscript).length === 0) {
       return (
         <>
@@ -327,29 +347,74 @@ const Act1 = () => {
       instruction: document.getElementById("activity-one-instruction").innerHTML
     }
 
-    if (newChain) {
-      await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/new-chain", final_data).then((response) => {
-        const ActivitiesID = response.data.ActivitiesId.id
-        const ActivityOneId = response.data.ActivityOneId
-        sessionStorage.setItem("ActivitiesId", ActivitiesID)
-        sessionStorage.setItem("ActivityOneId", ActivityOneId)
+    console.log("final data")
+    console.log(final_data)
+
+    // if (newChain) {
+    //   await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/new-chain", final_data).then((response) => {
+    //     const ActivitiesID = response.data.ActivitiesId.id
+    //     const ActivityOneId = response.data.ActivityOneId
+    //     sessionStorage.setItem("ActivitiesId", ActivitiesID)
+    //     sessionStorage.setItem("ActivityOneId", ActivityOneId)
+    //     sessionStorage.removeItem("ActivityTwoId")
+    //     sessionStorage.removeItem("ActivityThreeId")
+    //     sessionStorage.removeItem("ActivityFourId")
+    //     sessionStorage.removeItem("ActivityFiveId")
+    //     sessionStorage.removeItem("ActivitySixId")
+    //   })
+    // } else
+     if (id) {
+      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data)
+      
+      if (newChain) {
+        await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
         sessionStorage.removeItem("ActivityTwoId")
         sessionStorage.removeItem("ActivityThreeId")
         sessionStorage.removeItem("ActivityFourId")
         sessionStorage.removeItem("ActivityFiveId")
         sessionStorage.removeItem("ActivitySixId")
-      })
-    } else if (id) {
-      console.log("no")
-      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data)
+
+        let data = logs
+        data[Object.keys(logs).length]  = {DateTime: Date.now(), EventType: "Activity 1 has been reinitialized."}
+        if (!instructor) {
+          await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, data)
+        } else {
+          await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, data)
+        }
+
+      } else {
+
+        let data = logs
+        data[Object.keys(logs).length]  = {DateTime: Date.now(), EventType: "Activity 1 has been updated."}
+        console.log(data)
+        if (!instructor) {
+          await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, data)
+        } else {
+          await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, data)
+        }
+
+      }
+
     } else {
-      console.log("no")
       await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", final_data).then((response) => {
         const ActivitiesID = response.data.ActivitiesId.id
         const ActivityOneId = response.data.ActivityOneId
         sessionStorage.setItem("ActivitiesId", ActivitiesID)
         sessionStorage.setItem("ActivityOneId", ActivityOneId)
       })
+
+
+      if (!instructor) {
+        let data = {StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), StudentEvent: {0: {DateTime: Date.now(), EventType: "Activity 1 has been created."}}}
+        await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data).then((response) => {
+          sessionStorage.setItem("StudentLogsId",response.data.StudentLogsId)
+        })
+      } else {
+        let data = {ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), InstructorEvent: {0: {DateTime: Date.now(), EventType: "Activity 1 has been created."}}}
+        await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data).then((response) => {
+          sessionStorage.setItem("InstructorLogsId",response.data.InstructorLogsId)
+        })
+      }
     }
 
     if (sessionStorage.getItem("ActivityTwoId") !== "null" && sessionStorage.getItem("ActivityTwoId") !== null) {
@@ -394,7 +459,7 @@ const Act1 = () => {
         <Typography>Instructions (Editable by Instructors): </Typography>
         <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
         {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={switchValue} onChange={() => setSwitchValue((prev) => !prev)} />} label="Predefined Interview Text" />}
-        <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+        <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => {alert("Warning: All data in next five activities corresponding to this chain will be erased.");setNewChain((prev) => !prev)}} />} label="Create a new chain of activities" />
         {!instructor && transcriptEditable && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the transcript in this template.</Typography>}
         <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
         <TextField error={transcriptTitleError} margin='normal' value={transcriptTitle} label='Transcript title' fullWidth onChange={(e) => setTranscriptTitle(e.target.value)}></TextField>

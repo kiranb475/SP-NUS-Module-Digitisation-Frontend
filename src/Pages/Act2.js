@@ -14,7 +14,7 @@ const Act2 = () => {
     const [instructor, setInstructor] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams()
-
+    const [logs, setLogs] = useState({})
 
     // gets activity mvc for each interviewee sentence
     const getActivityMVCInterviewee = (data) => {
@@ -29,6 +29,17 @@ const Act2 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
+        } else {
+            let ActivitiesId = sessionStorage.getItem("ActivitiesId")
+            if (sessionStorage.getItem("Occupation") == "Student") {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].StudentEvent)
+                })
+            } else {
+                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
+                    setLogs(response.data[0].InstructorEvent)
+                })
+            }
         }
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
@@ -163,24 +174,62 @@ const Act2 = () => {
         userContent.instruction = document.getElementById("activity-two-instruction").innerHTML
         let data = { id: sessionStorage.getItem("ActivitiesId"), content: userContent }
 
-        if (newChain) {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/new-chain", data).then((response) => {
-                const ActivitiesID = response.data.ActivitiesId.id
-                const ActivityTwoId = response.data.ActivityTwoId
-                sessionStorage.setItem("ActivitiesId", ActivitiesID)
-                sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
+
+        console.log('final data')
+        console.log(data)
+
+        // if (newChain) {
+        //     await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/new-chain", data).then((response) => {
+        //         const ActivitiesID = response.data.ActivitiesId.id
+        //         const ActivityTwoId = response.data.ActivityTwoId
+        //         sessionStorage.setItem("ActivitiesId", ActivitiesID)
+        //         sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
+        //         sessionStorage.removeItem("ActivityThreeId")
+        //         sessionStorage.removeItem("ActivityFourId")
+        //         sessionStorage.removeItem("ActivityFiveId")
+        //         sessionStorage.removeItem("ActivitySixId")
+        //     })
+        // } else
+
+        if (id) {
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data)
+            if (newChain) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
                 sessionStorage.removeItem("ActivityThreeId")
                 sessionStorage.removeItem("ActivityFourId")
                 sessionStorage.removeItem("ActivityFiveId")
                 sessionStorage.removeItem("ActivitySixId")
-            })
-        } else if (id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data)
+
+                let logsData = logs
+                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 2 has been reinitialized." }
+                if (!instructor) {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                } else {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                }
+            } else {
+                let logsData = logs
+                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 2 has been updated." }
+                if (!instructor) {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                } else {
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+                }
+            }
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data).then((response) => {
                 const ActivityTwoId = response.data.id;
                 sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
             })
+
+            let logsData = logs
+            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 2 has been created." }
+            if (!instructor) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            } else {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
+            }
+
         }
 
         sessionStorage.setItem("predefinedHighlighting", transcriptHighlighting)
@@ -207,7 +256,7 @@ const Act2 = () => {
                 {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={transcriptHighlighting} onChange={() => setTranscriptHighlighting((prev) => !prev)} />} label="Predefined Interview Highlighting" />}
                 {!instructor && transcriptHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
                 <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
-                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" />
+                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => { alert("Warning: All data in next four activities corresponding to this chain will be erased."); setNewChain((prev) => !prev) }} />} label="Create a new chain of activities" />
                 <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }} id="content-container">
                     {Object.entries(activityMVCContent).map(([key, value]) => {
                         if (key % 2 !== 0) {
