@@ -32,13 +32,17 @@ const Act2 = () => {
         } else {
             let ActivitiesId = sessionStorage.getItem("ActivitiesId")
             if (sessionStorage.getItem("Occupation") == "Student") {
-                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
-                    setLogs(response.data[0].StudentEvent)
-                })
+              axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
+                if (response.data) {
+                  setLogs(response.data[0].StudentEvent)
+                }
+              })
             } else {
-                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
-                    setLogs(response.data[0].InstructorEvent)
-                })
+              axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
+                if (response.data) {
+                  setLogs(response.data[0].InstructorEvent)
+                }  
+              })
             }
         }
 
