@@ -36,7 +36,7 @@ function Home() {
         if (sessionStorage.getItem("Occupation") === "Instructor") {
             setInstructor(true)
         }
-        if (sessionStorage.getItem("Occupation") == "Instructor") { 
+        if (sessionStorage.getItem("Occupation") == "Instructor") {
             // gets a list of all activities created by students
             axios.get("https://activities-alset-aef528d2fd94.herokuapp.com/home/students").then((response) => {
                 if (response.data != null) {
@@ -404,7 +404,7 @@ function Home() {
     }
 
     // updates instructor configurations 
-    const handleChanges = (data) => {
+    const handleChanges = async (data) => {
         const activityId = data[1].id
         const activityOneId = data[1].ActivityOneId
         const activityTwoId = data[1].ActivityTwoId
@@ -428,40 +428,87 @@ function Home() {
         const activitySixInstruction = document.getElementById(`activity-six-instruction-${activityId}`).innerHTML
 
         if (activityOneId) {
-            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activityOneId}`, { transcriptEditable: switchValues[data[1].ActivityOneId], label: activityOneLabel, instruction: activityOneInstruction })
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activityOneId}`, { transcriptEditable: switchValues[data[1].ActivityOneId], label: activityOneLabel, instruction: activityOneInstruction })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityOneId, ActivityType: "Activity 1"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
-            axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", { transcriptEditable: switchValues[data[1].ActivityOneId], label: activityOneLabel, instruction: activityOneInstruction })
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", { transcriptEditable: switchValues[data[1].ActivityOneId], label: activityOneLabel, instruction: activityOneInstruction }).then((response) => {
+                const ActivitiesID = response.data.ActivitiesId.id
+                const ActivityOneId = response.data.ActivityOneId
+                sessionStorage.setItem("ActivitiesId", ActivitiesID)
+                sessionStorage.setItem("ActivityOneId", ActivityOneId)
+            })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
         if (activityTwoId) {
-            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activityTwoId}`, { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId], label: activityTwoLabel, instruction: activityTwoInstruction })
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activityTwoId}`, { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId], label: activityTwoLabel, instruction: activityTwoInstruction })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityTwoId, ActivityType: "Activity 2"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
-            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/', { id: activityId, content: { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId], label: activityTwoLabel, instruction: activityTwoInstruction } })
+            await axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/', { id: activityId, content: { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId], label: activityTwoLabel, instruction: activityTwoInstruction } }).then((response) => {
+                const ActivityTwoId = response.data.id;
+                sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
+            })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
+
         if (activityThreeId) {
-            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activityThreeId}`, { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId], label: activityThreeLabel, instruction: activityThreeInstruction })
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activityThreeId}`, { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId], label: activityThreeLabel, instruction: activityThreeInstruction })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityThreeId, ActivityType: "Activity 3"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
-            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitythree', { id: activityId, content: { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId], label: activityThreeLabel, instruction: activityThreeInstruction } })
+            await axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitythree', { id: activityId, content: { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId], label: activityThreeLabel, instruction: activityThreeInstruction } }).then((response) => {
+                const ActivityThreeId = response.data.id;
+                sessionStorage.setItem("ActivityThreeId", ActivityThreeId)
+            })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityThreeId"), ActivityType: "Activity 3"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
         if (activityFourId) {
-            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/home/${activityFourId}`, { label: activityFourLabel, instruction: activityFourInstruction })
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/home/${activityFourId}`, { label: activityFourLabel, instruction: activityFourInstruction })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityFourId, ActivityType: "Activity 4"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
-            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/', { id: activityId, content: { label: activityFourLabel, instruction: activityFourInstruction } })
+            await axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/', { id: activityId, content: { label: activityFourLabel, instruction: activityFourInstruction } }).then((response) => {
+                const ActivityFourId = response.data.id;
+                sessionStorage.setItem("ActivityFourId", ActivityFourId)
+            })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
         if (activityFiveId) {
-            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activityFiveId}`, { MLClusters: MLClusters[data[1].ActivityFiveId], label: activityFiveLabel, instruction: activityFiveInstruction })
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activityFiveId}`, { MLClusters: MLClusters[data[1].ActivityFiveId], label: activityFiveLabel, instruction: activityFiveInstruction })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityFiveId, ActivityType: "Activity 5"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
-            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`, { id: activityId, content: { MLClusters: MLClusters[data[1].ActivityFiveId], label: activityFiveLabel, instruction: activityFiveInstruction } })
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`, { id: activityId, content: { MLClusters: MLClusters[data[1].ActivityFiveId], label: activityFiveLabel, instruction: activityFiveInstruction } }).then((response) => {
+                const ActivityFiveId = response.data.id;
+                sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
+            })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
         if (activitySixId) {
-            axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/home/${activitySixId}`, { label: activitySixLabel, instruction: activitySixInstruction })
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/home/${activitySixId}`, { label: activitySixLabel, instruction: activitySixInstruction })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activitySixId, ActivityType: "Activity 6"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
-            axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/', { id: activityId, content: { label: activitySixLabel, instruction: activitySixInstruction } })
+            await axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/', { id: activityId, content: { label: activitySixLabel, instruction: activitySixInstruction } }).then((response) => {
+                const ActivitySixId = response.data.id;
+                sessionStorage.setItem("ActivitySixId", ActivitySixId)
+            })
+            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivitySixId"), ActivityType: "Activity 6"}
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
+
+        alert("Successfully published")
 
     }
 
@@ -489,7 +536,7 @@ function Home() {
         let ActivitySixCount = -1
         return (
             <Box>
-                <Divider style={{marginBottom:15}}/>
+                <Divider style={{ marginBottom: 15 }} />
                 <Typography variant='h5'>Username: {sessionStorage.getItem("Username")}</Typography>
                 <Typography variant='h5'>Occupation: {sessionStorage.getItem("Occupation")}</Typography>
                 <Divider style={{ marginTop: 20, marginBottom: 20 }} />
@@ -516,7 +563,7 @@ function Home() {
                                 {instructor && <Alert style={{ marginBottom: 10 }} severity="warning">Important: In order to make the activities visible to the user, please press the 'Publish Activities / Save Changes' button.</Alert>}
                                 <div>
                                     {instructor && <Typography style={{ marginBottom: 10 }} variant='h6'>Activity 1</Typography>}
-                                    <Button onClick={() => {sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityone/${data[1].ActivityOneId}`)}} fullWidth style={{ backgroundColor: data[1].ActivityOneId ? "green" : "red" }} variant='contained'>
+                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityone/${data[1].ActivityOneId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityOneId ? "green" : "red" }} variant='contained'>
                                         {instructor ? "Activity One" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityOneId ? activityLabel[1 + data[1].ActivityOneId.toString()] : activityLabel[1 + ActivityOneCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-one-label-${data[1].id}`} variant='body2'></Typography>}
                                     </Button>
                                     {instructor &&
@@ -535,7 +582,7 @@ function Home() {
                                 <div>
                                     {instructor && <Typography style={{ marginBottom: 10 }} variant='h6'>Activity 2</Typography>}
                                     {console.log(2 + ActivityTwoCount.toString())}
-                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityTwoId ? navigate(`/activitytwo/${data[1].ActivityTwoId}`) : alert("Please go back to the previous activity and submit it to continue.")}} fullWidth style={{ backgroundColor: data[1].ActivityTwoId ? "green" : "red" }} variant='contained'>
+                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityTwoId ? navigate(`/activitytwo/${data[1].ActivityTwoId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityTwoId ? "green" : "red" }} variant='contained'>
                                         {instructor ? "Activity Two" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityLabel[2 + data[1].ActivityTwoId.toString()] : activityLabel[2 + ActivityTwoCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-two-label-${data[1].id}`} variant='body2'></Typography>}
                                     </Button>
                                     {instructor &&
@@ -550,7 +597,7 @@ function Home() {
                                     {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: 10 }} control={<Switch checked={predefinedHighlighting[data[1].ActivityTwoId] || false} onChange={() => handleSwitchChangeHighlighting(data[1].ActivityTwoId)} />} label="Use Predefined Interview Highlighting" />}
                                 </div>
                                 <div>
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); sessionStorage.setItem("predefinedHighlighting",predefinedHighlighting[data[1].ActivityTwoId]); storeDetails(data); data[1].ActivityThreeId ? navigate(`/activitythree/${data[1].ActivityThreeId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityThreeId ? "green" : "red" }} variant='contained'>
+                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); sessionStorage.setItem("predefinedHighlighting", predefinedHighlighting[data[1].ActivityTwoId]); storeDetails(data); data[1].ActivityThreeId ? navigate(`/activitythree/${data[1].ActivityThreeId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityThreeId ? "green" : "red" }} variant='contained'>
                                         <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityThreeId ? activityLabel[3 + data[1].ActivityThreeId.toString()] : activityLabel[3 + ActivityThreeCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-three-label-${data[1].id}`} variant='body2'></Typography>
                                     </Button>}
                                     {instructor && <Typography variant='h6'>Activity 3</Typography>}
@@ -585,7 +632,7 @@ function Home() {
                                 </div>
                                 <div>
                                     {instructor && <Typography style={{ marginTop: 10 }} variant='h6'>Activity 4</Typography>}
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityFourId ? navigate(`/activityfour/${data[1].ActivityFourId}`) : alert("Please go back to the previous activity and submit it to continue.")}} fullWidth style={{ backgroundColor: data[1].ActivityFourId ? "green" : "red" }} variant='contained'>
+                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityFourId ? navigate(`/activityfour/${data[1].ActivityFourId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityFourId ? "green" : "red" }} variant='contained'>
                                         <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFourId ? activityLabel[4 + data[1].ActivityFourId.toString()] : activityLabel[4 + ActivityFourCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-four-label-${data[1].id}`} variant='body2'></Typography>
                                     </Button>}
                                     {instructor &&
@@ -680,7 +727,7 @@ function Home() {
                                             </Button>
                                         </div>
                                         <div>
-                                            <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data.id); sessionStorage.setItem("predefinedHighlighting",predefinedHighlighting[data.ActivityTwoId]); storeDetailsStudents(data); navigate(`/activitythree/${data.ActivityThreeId}`) }} style={{ backgroundColor: data.ActivityThreeId ? "green" : "red" }} fullWidth variant='contained'>
+                                            <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data.id); sessionStorage.setItem("predefinedHighlighting", predefinedHighlighting[data.ActivityTwoId]); storeDetailsStudents(data); navigate(`/activitythree/${data.ActivityThreeId}`) }} style={{ backgroundColor: data.ActivityThreeId ? "green" : "red" }} fullWidth variant='contained'>
                                                 Activity 3
                                             </Button>
                                         </div>
@@ -714,7 +761,7 @@ function Home() {
 
 
     return (
-        <Container style={{ marginTop: 50,marginBottom:50 }}>
+        <Container style={{ marginTop: 50, marginBottom: 50 }}>
             <div>
                 {!sessionStorage.getItem("Username") && <Typography variant='h5'>Please login/register to access/create activities</Typography>}
                 {sessionStorage.getItem("Username") && displayActivities()}

@@ -14,7 +14,6 @@ const Act2 = () => {
     const [instructor, setInstructor] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams()
-    const [logs, setLogs] = useState({})
 
     // gets activity mvc for each interviewee sentence
     const getActivityMVCInterviewee = (data) => {
@@ -29,22 +28,7 @@ const Act2 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
-        } else {
-            let ActivitiesId = sessionStorage.getItem("ActivitiesId")
-            if (sessionStorage.getItem("Occupation") == "Student") {
-              axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
-                if (response.data) {
-                  setLogs(response.data[0].StudentEvent)
-                }
-              })
-            } else {
-              axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
-                if (response.data) {
-                  setLogs(response.data[0].InstructorEvent)
-                }  
-              })
-            }
-        }
+        } 
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
@@ -204,21 +188,21 @@ const Act2 = () => {
                 sessionStorage.removeItem("ActivityFiveId")
                 sessionStorage.removeItem("ActivitySixId")
 
-                let logsData = logs
-                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 2 has been reinitialized." }
                 if (!instructor) {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                } else {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                }
+                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+                  } else {
+                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+                  }
             } else {
-                let logsData = logs
-                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 2 has been updated." }
                 if (!instructor) {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                } else {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                }
+                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+                  } else {
+                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityTwiId"), ActivityType: "Activity 2"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+                  }
             }
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data).then((response) => {
@@ -226,13 +210,13 @@ const Act2 = () => {
                 sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
             })
 
-            let logsData = logs
-            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 2 has been created." }
             if (!instructor) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-            } else {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-            }
+                let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+              } else {
+                let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+              }
 
         }
 

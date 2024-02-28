@@ -17,7 +17,6 @@ const Act5 = () => {
     const [alternateView, setAlternateView] = useState(false)
     const [AISetting, setAISetting] = useState(false)
     const [AIClusters, setAIClusters] = useState({})
-    const [logs,setLogs] = useState({})
     const [instructor, setInstructor] = useState(false)
     const [label, setLabel] = useState('Custom Text')
     const [instruction, setInstruction] = useState(`
@@ -33,22 +32,7 @@ const Act5 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
-        } else {
-            let ActivitiesId = sessionStorage.getItem("ActivitiesId")
-            if (sessionStorage.getItem("Occupation") == "Student") {
-              axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
-                if (response.data) {
-                  setLogs(response.data[0].StudentEvent)
-                }
-              })
-            } else {
-              axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
-                if (response.data) {
-                  setLogs(response.data[0].InstructorEvent)
-                }  
-              })
-            }
-        }
+        } 
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
@@ -433,23 +417,23 @@ const Act5 = () => {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
                 sessionStorage.removeItem("ActivitySixId")
                
-                let logsData = logs
-                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 5 has been reinitialized." }
                 if (!instructor) {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                } else {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                }
+                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+                  } else {
+                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+                  }
             
             } else {
 
-                let logsData = logs
-                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 5 has been updated." }
                 if (!instructor) {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                } else {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                }
+                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+                  } else {
+                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+                  }
 
             }
         } else {
@@ -458,13 +442,13 @@ const Act5 = () => {
                 sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
             })
 
-            let logsData = logs
-            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 5 has been created." }
             if (!instructor) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-            } else {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-            }
+                let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+              } else {
+                let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 5"}
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+              }
         }
 
         if (sessionStorage.getItem("ActivitySixId") !== "null" && sessionStorage.getItem("ActivitySixId") !== null) {

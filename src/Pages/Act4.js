@@ -12,7 +12,6 @@ const Act4 = () => {
     const [containerHeight, setContainerHeight] = useState(0)
     const [instructor, setInstructor] = useState(false)
     const [newChain,setNewChain] = useState(false)
-    const [logs,setLogs] = useState({})
     const [label, setLabel] = useState('Custom Text')
     const [instruction, setInstruction] = useState(`
     <Typography>The sentences you selected in the previous activity have been arranged on the left side of the pane below. Use the space below to cluster the sentences into themes by arranging the sentences that go together near each other. It’s okay if the sentences in a cluster overlap a bit.</Typography>
@@ -32,22 +31,7 @@ const Act4 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
-        } else {
-            let ActivitiesId = sessionStorage.getItem("ActivitiesId")
-            if (sessionStorage.getItem("Occupation") == "Student") {
-              axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/get/byId/${ActivitiesId}`).then((response) => {
-                if (response.data) {
-                  setLogs(response.data[0].StudentEvent)
-                }
-              })
-            } else {
-              axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/byId/${ActivitiesId}`).then((response) => {
-                if (response.data) {
-                  setLogs(response.data[0].InstructorEvent)
-                }  
-              })
-            }
-        }
+        } 
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
@@ -425,23 +409,23 @@ const Act4 = () => {
                 sessionStorage.removeItem("ActivityFiveId")
                 sessionStorage.removeItem("ActivitySixId")
             
-                let logsData = logs
-                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 4 has been reinitialized." }
                 if (!instructor) {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                } else {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                }
+                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+                  } else {
+                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+                  }
 
             } else {
             
-                let logsData = logs
-                logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 4 has been updated." }
                 if (!instructor) {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                } else {
-                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-                }
+                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+                  } else {
+                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4"}
+                    await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+                  }
 
             } 
         } else {
@@ -450,13 +434,13 @@ const Act4 = () => {
                 sessionStorage.setItem("ActivityFourId", ActivityFourId)
             })
 
-            let logsData = logs
-            logsData[Object.keys(logs).length] = { DateTime: Date.now(), EventType: "Activity 4 has been created." }
             if (!instructor) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-            } else {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/update/byId/${sessionStorage.getItem("ActivitiesId")}`, logsData)
-            }
+                let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4"}
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
+              } else {
+                let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4"}
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
+              }
         }
 
         if (sessionStorage.getItem("ActivityFiveId") !== "null" && sessionStorage.getItem("ActivityFiveId") !== null) {
