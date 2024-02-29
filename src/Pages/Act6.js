@@ -211,7 +211,7 @@ const Act6 = () => {
             let summary_data = {};
             // summaries table
             if (!instructor) {
-                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
+                await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
                     if (response.data.content !== null && response.data.content !== "" && Object.entries(response.data.content).length !== 0) {
                         Object.entries(response.data.content).map(([key, value]) => {
                             if (value.questioner_tag === undefined) {
@@ -237,9 +237,10 @@ const Act6 = () => {
             }
             console.log("answer is")
             console.log(summary_data)
+            //await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/summary/create`,summary_data)
     }
 
-    //navigate('/home')
+    navigate('/home')
 }
 
 const replaceName = () => {
