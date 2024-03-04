@@ -8,7 +8,7 @@ const Act2 = () => {
     const [activityMVCContent, setActivityMVCContent] = useState({});
     const [userData, setUserData] = useState({})
     const [transcriptHighlighting, setTranscriptHighlighting] = useState(false)
-    const [label, setLabel] = useState('Custom Text')
+    const [label, setLabel] = useState('Activity 2 Label')
     const [instruction, setInstruction] = useState(`Read through the transcript and click on sentences from the <strong>interviewee</strong> that you think provide insights or convey important information. Clicking a sentence will highlight it in yellow. Clicking a highlighted sentence again will unhighlight it. When you are satisfied with your sentence selections, click the Submit button to continue to the next activity. Your choices of which sentences to highlight will be carried forward to the next activity.`)
     const [newChain, setNewChain] = useState(false)
     const [instructor, setInstructor] = useState(false)
@@ -28,7 +28,7 @@ const Act2 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
-        } 
+        }
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
@@ -189,20 +189,20 @@ const Act2 = () => {
                 sessionStorage.removeItem("ActivitySixId")
 
                 if (!instructor) {
-                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                    let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2" }
                     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
-                  } else {
-                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                } else {
+                    let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2" }
                     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
-                  }
+                }
             } else {
                 if (!instructor) {
-                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                    let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2" }
                     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
-                  } else {
-                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityTwiId"), ActivityType: "Activity 2"}
+                } else {
+                    let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityTwiId"), ActivityType: "Activity 2" }
                     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
-                  }
+                }
             }
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data).then((response) => {
@@ -211,12 +211,12 @@ const Act2 = () => {
             })
 
             if (!instructor) {
-                let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+                let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2" }
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
-              } else {
-                let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+            } else {
+                let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2" }
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
-              }
+            }
 
         }
 
@@ -232,20 +232,25 @@ const Act2 = () => {
 
     return (
         <Container style={{ marginTop: 20 }}>
-            <div style={{ display: "flex", direction: "row" }}>
-                <h2>Activity 2:</h2>&nbsp;&nbsp;
+            <div style={{ display: "flex", direction: "row", fontFamily: `"Lato", sans-serif` }}>
+                {/* <h2>Activity 2:</h2>&nbsp;&nbsp; */}
                 <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-two-label"></h2>
+                <Button onClick={() => { onReset() }} sx={{
+                    marginLeft: "auto", "&.MuiButtonBase-root:hover": {
+                        bgcolor: "transparent",
+                    }
+                }} >Reset</Button>
             </div>
             <form onSubmit={handleSubmit}>
-                <Typography>Instructions (Editable by Instructors): </Typography>
-                <Typography id="activity-two-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
+                {/* <Typography>Instructions (Editable by Instructors): </Typography> */}
+                <Typography id="activity-two-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17 }}></Typography>
                 {instructor && <Divider style={{ marginTop: 10 }} />}
-                {instructor && <Typography style={{ marginTop: 10 }}>Upon submission of this activity, you will be redirected to the home page. You can go back to the home page and choose the configurations for the remaining activities.</Typography>}
-                {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={transcriptHighlighting} onChange={() => setTranscriptHighlighting((prev) => !prev)} />} label="Predefined Interview Highlighting" />}
+                {instructor && <Typography style={{ marginTop: 10,fontFamily: `"Lato", sans-serif`, fontSize: 17}}>After submitting this activity, you will be automatically redirected to the home page. From there, you can return to select configurations for the remaining activities.</Typography>}
+                {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={transcriptHighlighting} onChange={() => setTranscriptHighlighting((prev) => !prev)} />} label="Standardised Script Highlighting" />}
                 {!instructor && transcriptHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
-                <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
-                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => { alert("Warning: All data in next four activities corresponding to this chain will be erased."); setNewChain((prev) => !prev) }} />} label="Create a new chain of activities" />
-                <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }} id="content-container">
+                {/* <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button> */}
+                <FormControlLabel style={{ marginTop: 10}}  control={<Switch checked={newChain} onChange={() => { if (!newChain) {alert("Caution: Data associated with the next four activities in this sequence will be permanently deleted")}; setNewChain((prev) => !prev) }} />} label="Re-initialise Activity 2 and subsequent activites" />
+                <Box sx={{ marginTop: 2, padding: 2, border: '1px solid black', borderRadius:2 }} id="content-container">
                     {Object.entries(activityMVCContent).map(([key, value]) => {
                         if (key % 2 !== 0) {
                             return (

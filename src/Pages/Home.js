@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Container, Divider, FormControlLabel, InputLabel, MenuItem, Select, StepLabel, Switch, TextField, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, ButtonGroup, Container, Divider, FormControlLabel, InputLabel, MenuItem, Select, Stack, StepLabel, Switch, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios'
@@ -20,12 +20,9 @@ function Home() {
     const [MLClusters, setMLClusters] = useState({})
     const [listOfActivitiesStudents, setListOfActivitiesStudents] = useState({})
     const [activityTitle, setActivityTitle] = useState({})
-    const [activityDescription, setActivityDescription] = useState({})
     const [predefinedHighlighting, setPredefinedHighlighting] = useState({})
     const [activityTitleInstructor, setActivityTitleInstructor] = useState({})
-    const [activityDescriptionInstructor, setActivityDescriptionInstructor] = useState({})
     const [activityTitleStudent, setActivityTitleStudent] = useState({})
-    const [activityDescriptionStudent, setActivityDescriptionStudent] = useState({})
     const [activityLabel, setActivityLabel] = useState({})
     const [activityInstruction, setActivityInstruction] = useState({})
     const navigate = useNavigate()
@@ -49,7 +46,6 @@ function Home() {
                                     if (data[1].ActivityOneId) {
                                         axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(data[1].ActivityOneId)}`).then((response) => {
                                             setActivityTitleStudent((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.transcript_source_id }))
-                                            setActivityDescriptionStudent((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.activity_description }))
                                         })
                                     }
                                 })
@@ -71,7 +67,6 @@ function Home() {
                                     if (data[1].ActivityOneId) {
                                         axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(data[1].ActivityOneId)}`).then((response) => {
                                             setActivityTitleInstructor((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.transcript_source_id }))
-                                            setActivityDescriptionInstructor((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.activity_description }))
                                         })
                                     }
                                 })
@@ -120,7 +115,6 @@ function Home() {
                             setTranscript((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: transcriptText }))
                         }
                         setActivityTitle((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.transcript_source_id }))
-                        setActivityDescription((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.activity_description }))
                         setSwitchValues((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: response.data.transcriptEditable }))
                         if (response.data.label) {
                             setActivityLabel((prevValues) => ({ ...prevValues, [1 + data[1].ActivityOneId.toString()]: response.data.label }))
@@ -429,7 +423,7 @@ function Home() {
 
         if (activityOneId) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activityOneId}`, { transcriptEditable: switchValues[data[1].ActivityOneId], label: activityOneLabel, instruction: activityOneInstruction })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityOneId, ActivityType: "Activity 1"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityOneId, ActivityType: "Activity 1" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", { transcriptEditable: switchValues[data[1].ActivityOneId], label: activityOneLabel, instruction: activityOneInstruction }).then((response) => {
@@ -438,73 +432,73 @@ function Home() {
                 sessionStorage.setItem("ActivitiesId", ActivitiesID)
                 sessionStorage.setItem("ActivityOneId", ActivityOneId)
             })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
         if (activityTwoId) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activityTwoId}`, { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId], label: activityTwoLabel, instruction: activityTwoInstruction })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityTwoId, ActivityType: "Activity 2"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityTwoId, ActivityType: "Activity 2" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
             await axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/', { id: activityId, content: { predefinedHighlighting: predefinedHighlighting[data[1].ActivityTwoId], label: activityTwoLabel, instruction: activityTwoInstruction } }).then((response) => {
                 const ActivityTwoId = response.data.id;
                 sessionStorage.setItem("ActivityTwoId", ActivityTwoId)
             })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityTwoId"), ActivityType: "Activity 2" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
 
         if (activityThreeId) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activityThreeId}`, { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId], label: activityThreeLabel, instruction: activityThreeInstruction })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityThreeId, ActivityType: "Activity 3"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityThreeId, ActivityType: "Activity 3" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
             await axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitythree', { id: activityId, content: { MLModel: MLModel[data[1].ActivityThreeId], AllowMLModel: AllowMLModel[data[1].ActivityThreeId], predefinedMLSelection: predefinedMLSelection[data[1].ActivityThreeId], label: activityThreeLabel, instruction: activityThreeInstruction } }).then((response) => {
                 const ActivityThreeId = response.data.id;
                 sessionStorage.setItem("ActivityThreeId", ActivityThreeId)
             })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityThreeId"), ActivityType: "Activity 3"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityThreeId"), ActivityType: "Activity 3" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
         if (activityFourId) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/home/${activityFourId}`, { label: activityFourLabel, instruction: activityFourInstruction })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityFourId, ActivityType: "Activity 4"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityFourId, ActivityType: "Activity 4" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
             await axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/', { id: activityId, content: { label: activityFourLabel, instruction: activityFourInstruction } }).then((response) => {
                 const ActivityFourId = response.data.id;
                 sessionStorage.setItem("ActivityFourId", ActivityFourId)
             })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 4" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
         if (activityFiveId) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activityFiveId}`, { MLClusters: MLClusters[data[1].ActivityFiveId], label: activityFiveLabel, instruction: activityFiveInstruction })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityFiveId, ActivityType: "Activity 5"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activityFiveId, ActivityType: "Activity 5" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`, { id: activityId, content: { MLClusters: MLClusters[data[1].ActivityFiveId], label: activityFiveLabel, instruction: activityFiveInstruction } }).then((response) => {
                 const ActivityFiveId = response.data.id;
                 sessionStorage.setItem("ActivityFiveId", ActivityFiveId)
             })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
         if (activitySixId) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/home/${activitySixId}`, { label: activitySixLabel, instruction: activitySixInstruction })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activitySixId, ActivityType: "Activity 6"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: activitySixId, ActivityType: "Activity 6" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         } else {
             await axios.post('https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/', { id: activityId, content: { label: activitySixLabel, instruction: activitySixInstruction } }).then((response) => {
                 const ActivitySixId = response.data.id;
                 sessionStorage.setItem("ActivitySixId", ActivitySixId)
             })
-            let logs_data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivitySixId"), ActivityType: "Activity 6"}
+            let logs_data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivitySixId"), ActivityType: "Activity 6" }
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data)
         }
 
@@ -522,7 +516,6 @@ function Home() {
             navigate(`/activityone/${data[1].ActivityOneId}`)
         }
     }
-
     // displayes different sets of activities created by instructors and students
     const displayActivities = () => {
         let ActivityCount = -1
@@ -536,12 +529,11 @@ function Home() {
         let ActivitySixCount = -1
         return (
             <Box>
-                <Divider style={{ marginBottom: 15 }} />
-                <Typography variant='h5'>Username: {sessionStorage.getItem("Username")}</Typography>
-                <Typography variant='h5'>Occupation: {sessionStorage.getItem("Occupation")}</Typography>
-                <Divider style={{ marginTop: 20, marginBottom: 20 }} />
-                <Button style={{ marginTop: 10, marginBottom: 10 }} fullWidth variant='outlined' onClick={() => { removeDetails(); navigate("/activityone") }}>Create a new activity</Button>
-                <Typography variant='h5' style={{ marginTop: 10 }}>Your Activities</Typography>
+                <Typography style={{ fontFamily: `"DM Serif Display", serif` }} variant='h5'>Credentials</Typography>
+                <Typography style={{ fontFamily: `"Lato", sans-serif`, marginTop: 5, color: "#333333" }} variant='h5'>Username: {sessionStorage.getItem("Username")}</Typography>
+                <Typography style={{ fontFamily: `"Lato", sans-serif`, color: "#333333" }} variant='h5'>Role: {sessionStorage.getItem("Occupation")}</Typography>
+                {instructor && <Button style={{ marginTop: 20, marginBottom: 10, backgroundColor: "#c8bea0", color: "#50352a", border: "1px solid #50352a" }} fullWidth variant='outlined' onClick={() => { removeDetails(); navigate("/activityone") }}>Create a Template</Button>}
+                <Typography variant='h5' style={{ marginTop: !instructor ? 40 : 10, marginBottom: 10, fontFamily: `"Lato", sans-serif` }}>Your Custom Activities</Typography>
                 {Object.entries(listOfActivities).map((data) => {
                     {
                         ActivityCount++;
@@ -554,168 +546,188 @@ function Home() {
                     }
                     console.log(activityLabel)
                     return (
-                        <Accordion style={{ marginTop: 10, marginBottom: 10 }}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data[1].id}><Typography variant='h6'>Title: {activityTitle[data[1].ActivityOneId]}</Typography></AccordionSummary>
-                            <AccordionDetails>
-                                <div style={{ marginTop: 0, marginBottom: 10 }}>
-                                    <Typography variant='h6'>Description: {activityDescription[data[1].ActivityOneId]}</Typography>
+
+                        <div>
+
+                            {!instructor &&
+                                <div style={{ display: "flex", width: "100%", border: "1px solid black", padding: "10px", marginTop: 10, marginBottom: 10, backgroundColor: "#E6E6FA", borderRadius: 5 }}>
+                                    {/* <Stack style={{ width: "100%" }}> */}
+
+                                    <Typography variant='h6' style={{ fontFamily: `"Lato", sans-serif`, fontSize: 20 }}>{activityTitle[data[1].ActivityOneId]}</Typography>
+                                    <Button onClick={() => { startActivity(data) }} style={{ marginLeft: "auto" }}>Start Activity</Button>
+
+
+                                    {/* <ButtonGroup fullWidth>
+                                                <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityone/${data[1].ActivityOneId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityOneId ? "#357960" : "grey", }} variant='contained'></Button>
+                                                <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityTwoId ? navigate(`/activitytwo/${data[1].ActivityTwoId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityTwoId ? "#357960" : "grey", borderLeft: "1px solid black" }} variant='contained'></Button>
+                                                <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); sessionStorage.setItem("predefinedHighlighting", predefinedHighlighting[data[1].ActivityTwoId]); storeDetails(data); data[1].ActivityThreeId ? navigate(`/activitythree/${data[1].ActivityThreeId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityThreeId ? "#357960" : "grey", borderLeft: "1px solid black" }} variant='contained'></Button>
+                                                <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityFourId ? navigate(`/activityfour/${data[1].ActivityFourId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityFourId ? "#357960" : "grey", borderLeft: "1px solid black" }} variant='contained'></Button>
+                                                <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityFiveId ? navigate(`/activityfive/${data[1].ActivityFiveId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityFiveId ? "#357960" : "grey", borderLeft: "1px solid black" }} variant='contained'></Button>
+                                                <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivitySixId ? navigate(`/activitysix/${data[1].ActivitySixId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivitySixId ? "#357960" : "grey", borderLeft: "1px solid black" }} variant='contained'></Button>
+                                            </ButtonGroup> */}
+
+                                    {/* </Stack> */}
                                 </div>
-                                {instructor && <Alert style={{ marginBottom: 10 }} severity="warning">Important: In order to make the activities visible to the user, please press the 'Publish Activities / Save Changes' button.</Alert>}
-                                <div>
-                                    {instructor && <Typography style={{ marginBottom: 10 }} variant='h6'>Activity 1</Typography>}
-                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityone/${data[1].ActivityOneId}`) }} fullWidth style={{ backgroundColor: data[1].ActivityOneId ? "green" : "red" }} variant='contained'>
-                                        {instructor ? "Activity One" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityOneId ? activityLabel[1 + data[1].ActivityOneId.toString()] : activityLabel[1 + ActivityOneCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-one-label-${data[1].id}`} variant='body2'></Typography>}
-                                    </Button>
-                                    {instructor &&
-                                        <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
-                                            <Typography>Label:</Typography>&nbsp;&nbsp;
-                                            <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityOneId ? activityLabel[1 + data[1].ActivityOneId.toString()] : activityLabel[1 + ActivityOneCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-one-label-${data[1].id}`}></Typography>
-                                        </div>
-                                    }
-                                    {instructor && <Typography style={{ marginTop: 10 }}>Instructions: </Typography>}
-                                    {instructor && <Typography id={`activity-one-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityOneId ? activityInstruction[1 + data[1].ActivityOneId.toString()] : activityInstruction[1 + ActivityOneCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>}
-                                    <Divider style={{ marginTop: 10 }} />
-                                    {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: !switchValues[data[1].ActivityOneId] ? 10 : 0 }} control={<Switch checked={switchValues[data[1].ActivityOneId] || false} onChange={() => handleSwitchChange(data[1].ActivityOneId)} />} label="Predefined Interview Text" />}
-                                    {instructor && <Typography style={{ marginBottom: 10 }}>In order to make changes in the transcript, please go to Activity 1 and make the relevant changes.</Typography>}
-                                    {instructor && switchValues[data[1].ActivityOneId] && <TextField helperText={helperText[data[1].ActivityOneId] || false} error={transcriptError[data[1].ActivityOneId] || false} margin='normal' value={transcript[data[1].ActivityOneId] || ""} rows={15} fullWidth multiline variant='outlined' label="Transcript" onChange={(e) => setTranscript((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: e.target.value }))}></TextField>}
-                                </div>
-                                <div>
-                                    {instructor && <Typography style={{ marginBottom: 10 }} variant='h6'>Activity 2</Typography>}
-                                    {console.log(2 + ActivityTwoCount.toString())}
-                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityTwoId ? navigate(`/activitytwo/${data[1].ActivityTwoId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityTwoId ? "green" : "red" }} variant='contained'>
-                                        {instructor ? "Activity Two" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityLabel[2 + data[1].ActivityTwoId.toString()] : activityLabel[2 + ActivityTwoCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-two-label-${data[1].id}`} variant='body2'></Typography>}
-                                    </Button>
-                                    {instructor &&
-                                        <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
-                                            <Typography>Label:</Typography>&nbsp;&nbsp;
-                                            <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityLabel[2 + data[1].ActivityTwoId.toString()] : activityLabel[2 + ActivityTwoCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-two-label-${data[1].id}`}></Typography>
-                                        </div>
-                                    }
-                                    {instructor && <Typography style={{ marginTop: 10 }}>Instructions: </Typography>}
-                                    {instructor && <Typography id={`activity-two-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityInstruction[2 + data[1].ActivityTwoId.toString()] : activityInstruction[2 + ActivityTwoCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>}
-                                    <Divider style={{ marginTop: 10 }} />
-                                    {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: 10 }} control={<Switch checked={predefinedHighlighting[data[1].ActivityTwoId] || false} onChange={() => handleSwitchChangeHighlighting(data[1].ActivityTwoId)} />} label="Use Predefined Interview Highlighting" />}
-                                </div>
-                                <div>
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); sessionStorage.setItem("predefinedHighlighting", predefinedHighlighting[data[1].ActivityTwoId]); storeDetails(data); data[1].ActivityThreeId ? navigate(`/activitythree/${data[1].ActivityThreeId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityThreeId ? "green" : "red" }} variant='contained'>
-                                        <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityThreeId ? activityLabel[3 + data[1].ActivityThreeId.toString()] : activityLabel[3 + ActivityThreeCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-three-label-${data[1].id}`} variant='body2'></Typography>
-                                    </Button>}
-                                    {instructor && <Typography variant='h6'>Activity 3</Typography>}
-                                    {instructor && <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
-                                        <Typography>Label:</Typography>&nbsp;&nbsp;
-                                        <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityThreeId ? activityLabel[3 + data[1].ActivityThreeId.toString()] : activityLabel[3 + ActivityThreeCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-three-label-${data[1].id}`}></Typography>
-                                    </div>}
-                                    {instructor && <Typography style={{ marginTop: 10 }}>Instructions: </Typography>}
-                                    {instructor && <Typography id={`activity-three-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityThreeId ? activityInstruction[3 + data[1].ActivityThreeId.toString()] : activityInstruction[3 + ActivityThreeCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>}
-                                    <Divider style={{ marginTop: 10 }} />
-                                    {instructor && <>
-                                        <Typography style={{ marginTop: 10, marginBottom: 10 }}>If no machine learning model is selected, machine learning selections will not be made.</Typography>
-                                        <Typography>Selected machine learning model: {MLModel[data[1].ActivityThreeId]}</Typography>
-                                        <Typography style={{ marginTop: 10, marginBottom: 10 }}>Please select another machine learning model below if you would like to change.</Typography>
-                                        <div style={{ display: "flex", width: "100%" }}>
-                                            <div style={{ width: "50%" }}>
-                                                <Select value={MLModel[data[1].ActivityThreeId]} onChange={(e) => { setMLModel((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: e.target.value })) }} fullWidth>
-                                                    <MenuItem value={"None"}>None</MenuItem>
-                                                    <MenuItem value={"Model1"}>Model 1</MenuItem>
-                                                    <MenuItem value={"Model2"}>Model 2</MenuItem>
-                                                    <MenuItem value={"Model3"}>Model 3</MenuItem>
-                                                    <MenuItem value={"Model4"}>Model 4</MenuItem>
-                                                </Select>
+                            }
+                            {instructor && <div>
+                                <Accordion style={{ marginTop: 10, marginBottom: 10 }}>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data[1].id} style={{ backgroundColor: "#E6E6FA", border: '1px solid black' }}>
+                                        <Typography variant='h6' style={{ fontFamily: `"Lato", sans-serif`, fontSize: 20 }}>{activityTitle[data[1].ActivityOneId]}</Typography>
+                                        <Button onClick={() => { startActivity(data) }} style={{ marginLeft: "auto" }}>Start Activity</Button>
+
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Alert style={{ marginBottom: 20, marginTop: 20 }} severity="warning">To ensure the activities are accessible to users, please click the 'Publish Activities / Save Changes' button</Alert>
+                                        <div>
+                                            <div>
+                                                <div style={{display:"flex",width:"100%"}}>
+                                                    <Typography style={{ marginBottom: 10, fontFamily: `"Lato", sans-serif`, fontSize: 20 }} variant='h6'><strong>Activity 1</strong></Typography>
+                                                    <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); navigate(`/activityone/${data[1].ActivityOneId}`) }} style={{ color: data[1].ActivityOneId ? "green" : "grey",marginLeft:"auto" }}>
+                                                        {instructor ? "Activity One" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityOneId ? activityLabel[1 + data[1].ActivityOneId.toString()] : activityLabel[1 + ActivityOneCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-one-label-${data[1].id}`} variant='body2'></Typography>}
+                                                    </Button>
+                                                </div>
+
+                                                <div style={{ display: "flex", direction: "row", marginTop: 2 }}>
+                                                    {/* <Typography>Label:</Typography>&nbsp;&nbsp; */}
+                                                    <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityOneId ? activityLabel[1 + data[1].ActivityOneId.toString()] : activityLabel[1 + ActivityOneCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17  }} id={`activity-one-label-${data[1].id}`}></Typography>
+                                                </div>
+{/* 
+                                                <Typography style={{ marginTop: 10 }}>Instructions: </Typography> */}
+                                                <Typography id={`activity-one-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityOneId ? activityInstruction[1 + data[1].ActivityOneId.toString()] : activityInstruction[1 + ActivityOneCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17,marginTop:15 }}></Typography>
+                                                <Divider style={{ marginTop: 10 }} />
+                                                <FormControlLabel style={{ marginTop: 10, marginBottom: !switchValues[data[1].ActivityOneId] ? 10 : 0 }} control={<Switch checked={switchValues[data[1].ActivityOneId] || false} onChange={() => handleSwitchChange(data[1].ActivityOneId)} />} label="Standardised Script" />
+                                                <Typography style={{ marginBottom: 10, fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>To update the transcript, kindly navigate to Activity 1 and implement the necessary modifications.</Typography>
+                                               {/* {switchValues[data[1].ActivityOneId] && <TextField helperText={helperText[data[1].ActivityOneId] || false} error={transcriptError[data[1].ActivityOneId] || false} margin='normal' value={transcript[data[1].ActivityOneId] || ""} rows={15} fullWidth multiline variant='outlined' label="Transcript" onChange={(e) => setTranscript((prevValues) => ({ ...prevValues, [data[1].ActivityOneId]: e.target.value }))}></TextField> */}
                                             </div>
-                                        </div>
-                                        <div style={{ width: "100%" }}>
-                                            <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={AllowMLModel[data[1].ActivityThreeId]} onChange={() => { setAllowMLModel((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: !prevValues[data[1].ActivityThreeId], })); }} />} label="Allow Machine Learning Sentence Selections" />
-                                        </div>
-                                        <div style={{ width: "100%" }}>
-                                            <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={predefinedMLSelection[data[1].ActivityThreeId]} onChange={() => { setPredefinedMLSelection((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: !prevValues[data[1].ActivityThreeId], })); }} />} label="Predefined Machine Learning Selection" />
-                                        </div></>}
-                                </div>
-                                <div>
-                                    {instructor && <Typography style={{ marginTop: 10 }} variant='h6'>Activity 4</Typography>}
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityFourId ? navigate(`/activityfour/${data[1].ActivityFourId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityFourId ? "green" : "red" }} variant='contained'>
-                                        <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFourId ? activityLabel[4 + data[1].ActivityFourId.toString()] : activityLabel[4 + ActivityFourCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-four-label-${data[1].id}`} variant='body2'></Typography>
-                                    </Button>}
-                                    {instructor &&
-                                        <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
-                                            <Typography>Label:</Typography>&nbsp;&nbsp;
-                                            <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFourId ? activityLabel[4 + data[1].ActivityFourId.toString()] : activityLabel[4 + ActivityFourCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-four-label-${data[1].id}`}></Typography>
-                                        </div>}
-                                    {instructor && <Typography style={{ marginTop: 10 }}>Instructions: </Typography>}
-                                    {instructor && <Typography id={`activity-four-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityFourId ? activityInstruction[4 + data[1].ActivityFourId.toString()] : activityInstruction[4 + ActivityFourCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>}
-                                    <Divider style={{ marginTop: 10 }} />
-                                </div>
-                                <div>
-                                    {instructor && <Typography variant='h6' style={{ marginTop: 10 }}>Activity 5</Typography>}
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityFiveId ? navigate(`/activityfive/${data[1].ActivityFiveId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivityFiveId ? "green" : "red" }} variant='contained'>
-                                        <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFiveId ? activityLabel[5 + data[1].ActivityFiveId.toString()] : activityLabel[5 + ActivityFiveCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-five-label-${data[1].id}`} variant='body2'></Typography>
+                                            <div>
+                                                <div style={{display:"flex",width:"100%"}}>
+                                                 <Typography style={{ marginBottom: 10,marginTop:15,fontFamily: `"Lato", sans-serif`, fontSize: 20 }} variant='h6'><strong>Activity 2</strong></Typography>
+                                                 <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivityTwoId ? navigate(`/activitytwo/${data[1].ActivityTwoId}`) : alert("Please go back to the previous activity and submit it to continue.") }} style={{ color: data[1].ActivityTwoId ? "green" : "grey",marginLeft:"auto" }}>
+                                                    {instructor ? "Activity Two" : <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityLabel[2 + data[1].ActivityTwoId.toString()] : activityLabel[2 + ActivityTwoCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-two-label-${data[1].id}`} variant='body2'></Typography>}
+                                                </Button>
+                                                </div>
 
-                                    </Button>}
-                                    {instructor && <FormControlLabel style={{ marginTop: 10, marginBottom: 10 }} control={<Switch checked={MLClusters[data[1].ActivityFiveId]} onChange={() => { setMLClusters((prevValues) => ({ ...prevValues, [data[1].ActivityFiveId]: !prevValues[data[1].ActivityFiveId], })); }} />} label="Allow Machine Learning Clustering" />}
-                                    {instructor &&
-                                        <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
-                                            <Typography>Label:</Typography>&nbsp;&nbsp;
-                                            <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFiveId ? activityLabel[5 + data[1].ActivityFiveId.toString()] : activityLabel[5 + ActivityFiveCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-five-label-${data[1].id}`}></Typography>
-                                        </div>}
-                                    {instructor && <Typography style={{ marginTop: 10 }}>Instructions: </Typography>}
-                                    {instructor && <Typography id={`activity-five-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityFiveId ? activityInstruction[5 + data[1].ActivityFiveId.toString()] : activityInstruction[5 + ActivityFiveCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>}
-                                    <Divider style={{ marginTop: 10 }} />
-                                </div>
-                                <div>
-                                    {instructor && <Typography variant='h6' style={{ marginTop: 10 }}>Activity 6</Typography>}
-                                    {!instructor && <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data[1].id); storeDetails(data); data[1].ActivitySixId ? navigate(`/activitysix/${data[1].ActivitySixId}`) : alert("Please go back to the previous activity and submit it to continue.") }} fullWidth style={{ backgroundColor: data[1].ActivitySixId ? "green" : "red" }} variant='contained'>
-                                        <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivitySixId ? activityLabel[6 + data[1].ActivitySixId.toString()] : activityLabel[6 + ActivitySixCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-six-label-${data[1].id}`} variant='body2'></Typography>
 
-                                    </Button>}
-                                    {instructor &&
-                                        <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
-                                            <Typography>Label:</Typography>&nbsp;&nbsp;
-                                            <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivitySixId ? activityLabel[6 + data[1].ActivitySixId.toString()] : activityLabel[6 + ActivitySixCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id={`activity-six-label-${data[1].id}`}></Typography>
-                                        </div>}
-                                    {instructor && <Typography style={{ marginTop: 10 }}>Instructions: </Typography>}
-                                    {instructor && <Typography id={`activity-six-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivitySixId ? activityInstruction[6 + data[1].ActivitySixId.toString()] : activityInstruction[6 + ActivitySixCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>}
-                                    <Divider style={{ marginTop: 10 }} />
-                                </div>
-                                {!instructor && <Button fullWidth style={{ marginTop: 10 }} onClick={() => { startActivity(data) }} variant='contained'>Start Activity</Button>}
-                                {instructor && <Button fullWidth style={{ marginTop: 10 }} onClick={() => handleChanges(data)} variant='contained'>Publish Activities / Save Changes</Button>}
-                            </AccordionDetails>
-                        </Accordion>
+                                                <div style={{ display: "flex", direction: "row", marginTop: 2 }}>
+                                                    {/* <Typography>Label:</Typography>&nbsp;&nbsp; */}
+                                                    <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityLabel[2 + data[1].ActivityTwoId.toString()] : activityLabel[2 + ActivityTwoCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17  }} id={`activity-two-label-${data[1].id}`}></Typography>
+                                                </div>
+
+                                                {/* <Typography style={{ marginTop: 10 }}>Instructions: </Typography> */}
+                                                <Typography id={`activity-two-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityTwoId ? activityInstruction[2 + data[1].ActivityTwoId.toString()] : activityInstruction[2 + ActivityTwoCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17, marginTop:15 }}></Typography>
+                                                <Divider style={{ marginTop: 10 }} />
+                                                <FormControlLabel style={{ marginTop: 10, marginBottom: 10 }} control={<Switch checked={predefinedHighlighting[data[1].ActivityTwoId] || false} onChange={() => handleSwitchChangeHighlighting(data[1].ActivityTwoId)} />} label="Standardised Script Highlighting" />
+                                            </div>
+                                            <div>
+
+                                                <Typography variant='h6' style={{fontFamily: `"Lato", sans-serif`, fontSize: 20,marginTop:15}}><strong>Activity 3</strong></Typography>
+                                                <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
+                                                    {/* <Typography>Label:</Typography>&nbsp;&nbsp; */}
+                                                    <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityThreeId ? activityLabel[3 + data[1].ActivityThreeId.toString()] : activityLabel[3 + ActivityThreeCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17 }} id={`activity-three-label-${data[1].id}`}></Typography>
+                                                </div>
+                                                {/* <Typography style={{ marginTop: 10 }}>Instructions: </Typography> */}
+                                                <Typography id={`activity-three-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityThreeId ? activityInstruction[3 + data[1].ActivityThreeId.toString()] : activityInstruction[3 + ActivityThreeCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17,marginTop:15 }}></Typography>
+                                                <Divider style={{ marginTop: 10 }} />
+                                                <>
+                                                    <Typography style={{ marginTop: 10, marginBottom: 10,fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>If a machine learning model isn't chosen, no selections based on machine learning will occur.</Typography>
+                                                    <Typography style={{fontFamily: `"Lato", sans-serif`, fontSize: 17}}>Currently selected machine learning model: {MLModel[data[1].ActivityThreeId]}</Typography>
+                                                    <Typography style={{ marginTop: 10, marginBottom: 10,fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>To choose a different machine learning model, please make your selection from the options below.</Typography>
+                                                    <div style={{ display: "flex", width: "100%" }}>
+                                                        <div style={{ width: "50%" }}>
+                                                            <Select value={MLModel[data[1].ActivityThreeId]} onChange={(e) => { setMLModel((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: e.target.value })) }} fullWidth>
+                                                                <MenuItem value={"None"}>None</MenuItem>
+                                                                <MenuItem value={"Model1"}>Model 1</MenuItem>
+                                                                <MenuItem value={"Model2"}>Model 2</MenuItem>
+                                                                <MenuItem value={"Model3"}>Model 3</MenuItem>
+                                                                <MenuItem value={"Model4"}>Model 4</MenuItem>
+                                                            </Select>
+                                                        </div>
+                                                    </div>
+                                                    <div style={{ width: "100%" }}>
+                                                        <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={AllowMLModel[data[1].ActivityThreeId]} onChange={() => { setAllowMLModel((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: !prevValues[data[1].ActivityThreeId], })); }} />} label="Enable Selections Based on Machine Learning Analysis" />
+                                                    </div>
+                                                    <div style={{ width: "100%" }}>
+                                                        <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={predefinedMLSelection[data[1].ActivityThreeId]} onChange={() => { setPredefinedMLSelection((prevValues) => ({ ...prevValues, [data[1].ActivityThreeId]: !prevValues[data[1].ActivityThreeId], })); }} />} label="Standardise Machine Learning Selections" />
+                                                    </div></>
+                                            </div>
+                                            <div>
+                                            <Typography variant='h6' style={{fontFamily: `"Lato", sans-serif`, fontSize: 20,marginTop:23}}><strong>Activity 4</strong></Typography>
+
+
+                                                <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
+                                                    {/* <Typography>Label:</Typography>&nbsp;&nbsp; */}
+                                                    <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFourId ? activityLabel[4 + data[1].ActivityFourId.toString()] : activityLabel[4 + ActivityFourCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17 }} id={`activity-four-label-${data[1].id}`}></Typography>
+                                                </div>
+                                                {/* <Typography style={{ marginTop: 10 }}>Instructions: </Typography> */}
+                                                <Typography id={`activity-four-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityFourId ? activityInstruction[4 + data[1].ActivityFourId.toString()] : activityInstruction[4 + ActivityFourCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17,marginTop:15 }}></Typography>
+                                                {/* <Divider style={{ marginTop: 10 }} /> */}
+                                            </div>
+                                            <div>
+                                            <Typography variant='h6' style={{fontFamily: `"Lato", sans-serif`, fontSize: 20,marginTop:23}}><strong>Activity 5</strong></Typography>
+
+                                                <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
+                                                    {/* <Typography>Label:</Typography>&nbsp;&nbsp; */}
+                                                    <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivityFiveId ? activityLabel[5 + data[1].ActivityFiveId.toString()] : activityLabel[5 + ActivityFiveCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17 }} id={`activity-five-label-${data[1].id}`}></Typography>
+                                                </div>
+                                                {/* <Typography style={{ marginTop: 10 }}>Instructions: </Typography> */}
+                                                <Typography id={`activity-five-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivityFiveId ? activityInstruction[5 + data[1].ActivityFiveId.toString()] : activityInstruction[5 + ActivityFiveCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17,marginTop:15 }}></Typography>
+                                            </div>
+                                            <FormControlLabel style={{ marginTop: 10, marginBottom: 0 }} control={<Switch checked={MLClusters[data[1].ActivityFiveId]} onChange={() => { setMLClusters((prevValues) => ({ ...prevValues, [data[1].ActivityFiveId]: !prevValues[data[1].ActivityFiveId], })); }} />} label="Allow Machine Learning Clustering" />
+                                            <div>
+                                            <Typography variant='h6' style={{fontFamily: `"Lato", sans-serif`, fontSize: 20,marginTop:15}}><strong>Activity 6</strong></Typography>
+
+                                                <div style={{ display: "flex", direction: "row", marginTop: 10 }}>
+                                                    {/* <Typography>Label:</Typography>&nbsp;&nbsp; */}
+                                                    <Typography dangerouslySetInnerHTML={{ __html: data[1].ActivitySixId ? activityLabel[6 + data[1].ActivitySixId.toString()] : activityLabel[6 + ActivitySixCount.toString()] }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17 }} id={`activity-six-label-${data[1].id}`}></Typography>
+                                                </div>
+                                                {/* <Typography style={{ marginTop: 10 }}>Instructions: </Typography> */}
+                                                <Typography id={`activity-six-instruction-${data[1].id}`} dangerouslySetInnerHTML={{ __html: data[1].ActivitySixId ? activityInstruction[6 + data[1].ActivitySixId.toString()] : activityInstruction[6 + ActivitySixCount.toString()] }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17,marginTop:15 }}></Typography>
+                                            </div>
+
+                                        </div>
+                                        {!instructor && <Button fullWidth style={{ marginTop: 10 }} onClick={() => { startActivity(data) }} variant='contained'>Start Activity</Button>}
+                                        {instructor && <Button fullWidth style={{ marginTop: 10 }} onClick={() => handleChanges(data)} variant='contained'>Save and Publish Updates</Button>}
+                                    </AccordionDetails>
+                                </Accordion>
+
+                            </div>}
+
+
+                        </div>
+
+
                     )
                 })}
-                {!instructor && <Divider style={{ marginTop: 20, marginBottom: 20 }} />}
-                {!instructor && <Typography variant='h5' style={{ marginTop: 10 }}>Templates</Typography>}
-                {!instructor && <Alert style={{ marginBottom: 10 }} severity="warning">Important: When copying the template, please do not refresh the page. It will automatically refresh once it creates a copy of the activities.</Alert>}
+                {!instructor && <Typography variant='h5' style={{ marginTop: 50, fontFamily: `"Lato", sans-serif` }}>Instructor-Designed Activity Templates</Typography>}
+                {!instructor && <Alert style={{ marginTop: 20, marginBottom: 20 }} severity="warning">Important: Please avoid refreshing the page while the template is being copied. The page will refresh automatically once the activities have been successfully duplicated.</Alert>}
                 {Object.entries(listOfActivitiesInstructor).flatMap(([key, array]) => {
                     return array.map(data => {
                         templateCount++
                         if (data != null) {
                             return (
-                                <Accordion style={{ marginTop: 10, marginBottom: 10 }}>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data.id}><Typography variant="h6">Title: {activityTitleInstructor[data.ActivityOneId]}</Typography></AccordionSummary>
-                                    <AccordionDetails>
-                                        <div style={{ marginTop: 0, marginBottom: 5 }}>
-                                            <Typography variant="h6">Description: {activityDescriptionInstructor[data.ActivityOneId]}</Typography>
-                                        </div>
-                                        <Button onClick={() => { newActivity(data) }} fullWidth style={{ marginTop: 10 }} variant='contained'>Copy Template</Button>
-                                    </AccordionDetails>
-                                </Accordion>
+                                <div style={{ display: "flex", width: "100%", border: "1px solid black", padding: "10px", marginTop: 10, marginBottom: 10, backgroundColor: "#C7E6F4", borderRadius: 5 }}>
+                                    <Typography variant="h6" style={{ fontFamily: `"Lato", sans-serif`, fontSize: 20 }}>{activityTitleInstructor[data.ActivityOneId]}</Typography>
+                                    <Button onClick={() => { newActivity(data) }} style={{ marginLeft: "auto" }} >Copy Template</Button>
+                                </div>
+                                // <Accordion style={{ marginTop: 10, marginBottom: 10 }}>
+                                //     <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data.id} style={{ backgroundColor: "#C7E6F4", border: '1px solid black' }}>
+
+                                //     </AccordionSummary>
+                                // </Accordion>
                             )
                         }
                     })
                 })}
 
-                {instructor && <Divider style={{ marginTop: 20, marginBottom: 20 }} />}
-                {instructor && <Typography variant='h5' style={{ marginTop: 10 }}>Student Activities</Typography>}
+                {instructor && <Typography variant='h5' style={{ marginTop: 50 }}>Student Activities</Typography>}
                 {Object.entries(listOfActivitiesStudents).flatMap(([key, array]) => {
                     return array.map(data => {
                         StudentActivityCount++
                         if (data != null) {
                             return (
                                 <Accordion style={{ marginTop: 10, marginBottom: 10 }}>
-                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data.id}><Typography variant="h6">Title: {activityTitleStudent[data.ActivityOneId]}</Typography></AccordionSummary>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={data.id} style={{ backgroundColor: "#C7E6F4", border: '1px solid black' }}><Typography variant="h6" style={{ fontFamily: `"Lato", sans-serif`, fontSize: 20 }}>{activityTitleStudent[data.ActivityOneId]}</Typography></AccordionSummary>
                                     <AccordionDetails>
-                                        <div style={{ marginTop: 0, marginBottom: 10 }}>
-                                            <Typography variant="h6">Description: {activityDescriptionStudent[data.ActivityOneId]}</Typography>
-                                        </div>
                                         <div>
                                             <Button onClick={() => { sessionStorage.setItem("ActivitiesId", data.id); storeDetailsStudents(data); navigate(`/activityone/${data.ActivityOneId}`) }} style={{ backgroundColor: data.ActivityOneId ? "green" : "red" }} fullWidth variant='contained'>
                                                 Activity 1
@@ -761,10 +773,16 @@ function Home() {
 
 
     return (
-        <Container style={{ marginTop: 50, marginBottom: 50 }}>
-            <div>
-                {!sessionStorage.getItem("Username") && <Typography variant='h5'>Please login/register to access/create activities</Typography>}
-                {sessionStorage.getItem("Username") && displayActivities()}
+        <Container>
+            <div style={{ paddingLeft: 24, paddingRight: 24, marginTop: 50, marginBottom: 50 }}>
+                {/* {!sessionStorage.getItem("UserId") && <Typography variant='h5'>Please login/register to access/create activities</Typography>} */}
+
+                {!sessionStorage.getItem("UserId") && <div>
+                    <Typography style={{ fontFamily: `"Lato", sans-serif`, fontSize: 40 }}>Welcome To Our Platform!</Typography>
+                    <Typography style={{ fontFamily: `"Lato", sans-serif`, fontSize: 20 }}>In order to access or create activities, please Log in or Register to unlock the full experience.</Typography>
+                </div>}
+
+                {sessionStorage.getItem("UserId") && displayActivities()}
             </div>
         </Container>
     )

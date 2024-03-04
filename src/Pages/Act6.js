@@ -9,10 +9,11 @@ const Act6 = () => {
 
     const [clustData, setClustData] = useState({})
     const [instructor, setInstructor] = useState(false)
-    const [label, setLabel] = useState('Custom Text')
+    const [label, setLabel] = useState('Activity 6 Label')
     const [newChain, setNewChain] = useState(false)
     const [instruction, setInstruction] = useState(`
     <Typography>The sentences and cluster labels you submitted for the previous activity have been arranged in the space below. For each cluster, add any number of insights that you think emerge from the selected sentences. After surfacing the insights, add a set of needs that relate to those insights one at a time. Identifying the insights and needs should be helpful when designing your prototype.</Typography>
+    <br/>
     <br/>
     <Typography>When you are satisfied with your listed insights and needs, click the Submit button to complete this stage of the design thinking process. You can come back and make changes to your submissions whenever you like.</Typography>`)
     const { id } = useParams()
@@ -94,7 +95,7 @@ const Act6 = () => {
         return Object.entries(data.content).map(([key, value]) => {
             if (value.type !== 'label') {
                 return (
-                    <div style={{ borderRadius: 15, border: "1px solid black", padding: 10, margin: 10 }}>
+                    <div style={{ borderRadius: 15, margin: 10, fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>
                         {value.text}
                     </div>
                 )
@@ -121,8 +122,8 @@ const Act6 = () => {
     const getInsight = (data, baseKey) => {
         return Object.entries(data.insights).map(([key, value]) => {
             return (
-                <div style={{ borderRadius: 15, border: "1px solid black", padding: 10, margin: 10, backgroundColor: 'lightyellow' }}>
-                    <Typography onBlur={() => { let element = document.querySelector(`[Insight-id="${baseKey.toString() + key.toString()}"]`); (element.innerHTML === '' || element.innerHTML === `<br>`) ? deleteInsight(baseKey, key) : console.log(element.innerHTML) }} Insight-id={baseKey.toString() + key.toString()} contenteditable="true">{value}</Typography>
+                <div style={{ borderRadius: 5, border: "1px solid black", padding: 10, margin: '0px 10px 10px 10px', backgroundColor: '#6699CC' }}>
+                    <Typography onBlur={() => { let element = document.querySelector(`[Insight-id="${baseKey.toString() + key.toString()}"]`); (element.innerHTML === '' || element.innerHTML === `<br>`) ? deleteInsight(baseKey, key) : console.log(element.innerHTML) }} Insight-id={baseKey.toString() + key.toString()} contenteditable="true" style={{ fontFamily: `"Lato", sans-serif`, fontSize: 17 }} >{value}</Typography>
                 </div>
             )
         })
@@ -131,8 +132,8 @@ const Act6 = () => {
     const getNeed = (data, baseKey) => {
         return Object.entries(data.needs).map(([key, value]) => {
             return (
-                <div style={{ backgroundColor: 'lightgreen', borderRadius: 15, border: "1px solid black", padding: 10, margin: 10 }}>
-                    <Typography onBlur={() => { let element = document.querySelector(`[Needs-id="${baseKey.toString() + key.toString()}"]`); (element.innerHTML === '' || element.innerHTML === `<br>`) ? deleteNeeds(baseKey, key) : console.log(element.innerHTML) }} Needs-id={baseKey.toString() + key.toString()} contenteditable="true">{value}</Typography>
+                <div style={{ borderRadius: 5, border: "1px solid black", padding: 10, margin: '0px 10px 10px 10px', backgroundColor: '#008080' }}>
+                    <Typography onBlur={() => { let element = document.querySelector(`[Needs-id="${baseKey.toString() + key.toString()}"]`); (element.innerHTML === '' || element.innerHTML === `<br>`) ? deleteNeeds(baseKey, key) : console.log(element.innerHTML) }} Needs-id={baseKey.toString() + key.toString()} contenteditable="true" style={{ fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>{value}</Typography>
                 </div>
             )
         })
@@ -215,12 +216,12 @@ const Act6 = () => {
                     if (response.data.content !== null && response.data.content !== "" && Object.entries(response.data.content).length !== 0) {
                         Object.entries(response.data.content).map(([key, value]) => {
                             if (value.questioner_tag === undefined) {
-                                Object.entries(value.response_text).map(([key2,value2]) => {
+                                Object.entries(value.response_text).map(([key2, value2]) => {
                                     summary_data[Object.keys(summary_data).length] = {
-                                        InstructorId: null, 
-                                        ActivitySequenceId: {}, 
+                                        InstructorId: null,
+                                        ActivitySequenceId: parseInt(sessionStorage.getItem("ActivitiesId")),
                                         StudentId: parseInt(sessionStorage.getItem("UserId")),
-                                        StudentTemplateId: {},
+                                        StudentTemplateId: -1,
                                         InterviewerSentenceIndexA1: value.response_id,
                                         InterviewerSentenceContentA1: response.data.content[value.response_id].question_text,
                                         IntervieweeSentenceIndexA1: parseInt(key2),
@@ -233,83 +234,90 @@ const Act6 = () => {
                             }
                         })
                     }
-                })   
+                })
             }
             console.log("answer is")
             console.log(summary_data)
             //await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/summary/create`,summary_data)
+        }
+
+        // navigate('/home')
     }
 
-    navigate('/home')
-}
-
-const replaceName = () => {
-    Object.entries(clustData).map(([key, value]) => {
-        Object.entries(value.insights).map(([key2, value2]) => {
-            let val = document.querySelector(`[Insight-id="${key.toString() + key2.toString()}"]`).innerHTML
-            clustData[key].insights[key2] = val
+    const replaceName = () => {
+        Object.entries(clustData).map(([key, value]) => {
+            Object.entries(value.insights).map(([key2, value2]) => {
+                let val = document.querySelector(`[Insight-id="${key.toString() + key2.toString()}"]`).innerHTML
+                clustData[key].insights[key2] = val
+            })
+            Object.entries(value.needs).map(([key2, value2]) => {
+                let val = document.querySelector(`[Needs-id="${key.toString() + key2.toString()}"]`).innerHTML
+                clustData[key].needs[key2] = val
+            })
         })
-        Object.entries(value.needs).map(([key2, value2]) => {
-            let val = document.querySelector(`[Needs-id="${key.toString() + key2.toString()}"]`).innerHTML
-            clustData[key].needs[key2] = val
-        })
-    })
-}
+    }
 
-return (
-    <Container style={{ marginTop: 20 }}>
-        <div style={{ display: "flex", direction: "row" }}>
-            <h2>Activity 6:</h2>&nbsp;&nbsp;
-            <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-six-label"></h2>
-        </div>
-        <form onSubmit={handleSubmit}>
-            <Typography>Instructions (Editable by Instructors): </Typography>
-            <Typography id="activity-six-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-            <Button onClick={() => { window.location.reload(false); }} sx={{ marginTop: 3 }} fullWidth variant="outlined">Reset</Button>
-            {/* <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" /> */}
-            <div style={{ display: 'flex', width: '100%', justifyContent: 'space-around', marginTop: 20, marginBottom: 10 }}>
-                <Typography>Cluster</Typography>
-                <Typography>Insights</Typography>
-                <Typography>Needs</Typography>
+    return (
+        <Container style={{ marginTop: 20 }}>
+            <div style={{ display: "flex", direction: "row", fontFamily: `"Lato", sans-serif` }}>
+                {/* <h2>Activity 6:</h2>&nbsp;&nbsp; */}
+                <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-six-label"></h2>
+                <Button onClick={() => { window.location.reload(false) }} sx={{
+                    marginLeft: "auto", "&.MuiButtonBase-root:hover": {
+                        bgcolor: "transparent",
+                    }
+                }} >Reset</Button>
             </div>
-            <Divider></Divider>
-            {Object.entries(clustData).map(([key, value]) => {
-                if (checkLabel(value).includes(true)) {
-                    return (
-                        <>
-                            <div key={key} style={{ display: 'flex', with: '100%', justifyContent: 'space-around', marginTop: 20, marginBottom: 20 }}>
-                                <div style={{ width: '100%' }}>
-                                    <Accordion>
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                        >
-                                            <Typography>{getLabel(value)}</Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                            {getContent(value)}
-                                        </AccordionDetails>
-                                    </Accordion>
+            <form onSubmit={handleSubmit}>
+                {/* <Typography>Instructions (Editable by Instructors): </Typography> */}
+                <Typography id="activity-six-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none", fontFamily: `"Lato", sans-serif`, fontSize: 17 }}></Typography>
+                {/* <Button onClick={() => { window.location.reload(false); }} sx={{ marginTop: 3 }} fullWidth variant="outlined">Reset</Button> */}
+                {/* <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => setNewChain((prev) => !prev)} />} label="Create a new chain of activities" /> */}
+                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-around', marginTop: 20, marginBottom: 10 }}>
+                    <Typography style={{ fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>Cluster</Typography>
+                    <Typography style={{ fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>Insights</Typography>
+                    <Typography style={{ fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>Needs</Typography>
+                </div>
+                <Divider></Divider>
+                {Object.entries(clustData).map(([key, value]) => {
+                    if (checkLabel(value).includes(true)) {
+                        return (
+                            <>
+                                <div key={key} style={{ display: 'flex', with: '100%', justifyContent: 'space-around', marginTop: 10, marginBottom: 10 }}>
+                                    <div style={{ width: '100%' }}>
+                                        <Accordion style={{ borderRadius: 3 }}>
+                                            <AccordionSummary style={{ backgroundColor: "#E6E6FA" }}
+                                                expandIcon={<ExpandMoreIcon />}
+                                            >
+                                                <Typography style={{ fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>{getLabel(value)}</Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails>
+                                                {getContent(value)}
+                                            </AccordionDetails>
+                                        </Accordion>
+                                    </div>
+                                    <div style={{ width: '100%' }}>
+                                        {getInsight(value, key)}
+                                        <Button variant="outlined" onClick={() => addInsight(key)} style={{padding: '10px',minWidth: '0', marginLeft:15, width: '20px',height: '20px',borderRadius: "50%",textAlign: 'center'}}>+</Button>
+                                    </div>
+                                    <div style={{ width: '100%' }}>
+                                        {getNeed(value, key)}
+                                        <Button
+                                            variant="outlined" onClick={() => addNeed(key)} style={{padding: '10px',minWidth: '0',marginLeft:15, width: '20px',height: '20px',borderRadius: "50%",textAlign: 'center'}}>+
+                                        </Button>
+                                    </div>
                                 </div>
-                                <div style={{ width: '100%' }}>
-                                    {getInsight(value, key)}
-                                    <Button variant="outlined" onClick={() => addInsight(key)} style={{ margin: 10 }}>Add</Button>
-                                </div>
-                                <div style={{ width: '100%' }}>
-                                    {getNeed(value, key)}
-                                    <Button variant="outlined" onClick={() => addNeed(key)} style={{ margin: 10 }}>Add</Button>
-                                </div>
-                            </div>
-                            <Divider />
-                        </>
 
-                    )
-                }
+                            </>
 
-            })}
-            <Button sx={{ marginTop: 3, marginBottom: 3 }} fullWidth type="submit" variant='outlined'>Submit</Button>
-        </form>
-    </Container>
-)
+                        )
+                    }
+
+                })}
+                <Button sx={{ marginTop: 3, marginBottom: 3 }} fullWidth type="submit" variant='outlined'>Submit</Button>
+            </form>
+        </Container>
+    )
 }
 
 export default Act6

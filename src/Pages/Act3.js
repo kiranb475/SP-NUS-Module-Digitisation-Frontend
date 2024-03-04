@@ -14,7 +14,7 @@ const Act3 = () => {
     const [predefinedHighlighting,setPredefinedHighlighting] = useState(false)
     const [newChain,setNewChain] = useState(false)
     const [predefinedMLSelection, setPredefinedMLSelection] = useState(false)
-    const [label, setLabel] = useState('Custom Text')
+    const [label, setLabel] = useState('Activity 3 Label')
     const [instruction,setInstruction] = useState(`<Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
     <br /> <br/>
     <Typography>Please review the version of your transcript with the new highlights below. You’ll likely agree with some of the sentence selections and disagree with others. As you review the transcript, feel free to refine your sentence selections. When you are satisfied with your selections, click the Submit button to continue to the next activity. Only your choices about which sentences are important (yellow and green highlights) will be used in the next activity.</Typography>
@@ -362,19 +362,24 @@ const Act3 = () => {
 
     return (
         <Container style={{ marginTop: 20 }}>
-            <div style={{ display: "flex", direction: "row" }}>
-                <h2>Activity 3:</h2>&nbsp;&nbsp;
+            <div style={{ display: "flex", direction: "row", fontFamily: `"Lato", sans-serif` }}>
+                {/* <h2>Activity 3:</h2>&nbsp;&nbsp; */}
                 <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-three-label"></h2>
+                <Button onClick={() => { onReset() }} sx={{
+                    marginLeft: "auto", "&.MuiButtonBase-root:hover": {
+                        bgcolor: "transparent",
+                    }
+                }} >Reset</Button>
             </div>
             <form onSubmit={handleSubmit}>
-                <Typography>Instructions (Editable by Instructors): </Typography>
-                <Typography id="activity-three-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-                {!instructor && predefinedHighlighting && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
-                {!instructor && predefinedMLSelection && <Typography style={{ marginTop: 10 }}>The Machine Learning selection for the template has been predefined.</Typography>}
-                <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
-                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => {alert("Warning: All data in next three activities corresponding to this chain will be erased.");setNewChain((prev) => !prev)}} />} label="Create a new chain of activities" />
-                {displayConfig()}
-                <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }} id="content-container">
+                {/* <Typography>Instructions (Editable by Instructors): </Typography> */}
+                <Typography id="activity-three-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17 }}></Typography>
+                {!instructor && predefinedHighlighting && <Typography style={{ marginTop: 10,fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>You are not allowed to edit the highlighting of the transcript in this template.</Typography>}
+                {!instructor && predefinedMLSelection && <Typography style={{ marginTop: 10,fontFamily: `"Lato", sans-serif`, fontSize: 17 }}>The Machine Learning selection for the template has been predefined.</Typography>}
+                {/* <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button> */}
+                <FormControlLabel style={{ marginTop: 0}}  control={<Switch checked={newChain} onChange={() => { if (!newChain) {alert("Caution: Data associated with the next three activities in this sequence will be permanently deleted")}; setNewChain((prev) => !prev) }} />} label="Re-initialise Activity 3 and subsequent activites" /> 
+                {/* {displayConfig()} */}
+                <Box sx={{ marginTop: 2, padding: 2, border: '1px solid black',borderRadius:2 }} id="content-container">
                     {Object.entries(activityMVCContent).map(([key, value]) => {
                         if (key % 2 !== 0) {
                             return (

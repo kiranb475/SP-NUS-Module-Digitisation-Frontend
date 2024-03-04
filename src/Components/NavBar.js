@@ -1,4 +1,4 @@
-import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, InputLabel, MenuItem, Select, TextField, Toolbar, Typography, alertClasses } from '@mui/material'
+import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, InputLabel, MenuItem, Select, TextField, Toolbar, Typography, alertClasses } from '@mui/material'
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
@@ -91,51 +91,52 @@ function NavBar() {
 
     return (
         <AppBar position="static">
-
             {/*Dialog for user login*/}
             <Dialog open={openLogin} onClose={() => setOpenLogin(false)}>
-                <DialogTitle>Login</DialogTitle>
+                <DialogTitle style={{ fontFamily: `"Lato", sans-serif`, fontSize: 25, paddingBottom: 0 }}>Enter your login details</DialogTitle>
                 <DialogContent>
-                    <TextField margin='normal' label='Username' error={usernameError} fullWidth onChange={(e) => setUsername(e.target.value)}></TextField>
-                    <TextField margin='normal' label='Password' fullWidth error={passwordError} onChange={(e) => setPassword(e.target.value)}></TextField>
-                    <InputLabel style={{ marginTop: 10 }}>Occupation</InputLabel>
+                    <TextField style={{ marginBottom: 0, marginTop: 10 }} variant='standard' required margin='normal' label='Username' error={usernameError} fullWidth onChange={(e) => setUsername(e.target.value)}></TextField>
+                    <TextField type='password' style={{ marginTop: 15 }} variant='standard' required margin='normal' label='Password' fullWidth error={passwordError} onChange={(e) => setPassword(e.target.value)}></TextField>
+                    <InputLabel required style={{ marginTop: 25 }}>Occupation</InputLabel>
                     <Select fullWidth error={occupationError} onChange={(e) => setOccupation(e.target.value)}>
                         <MenuItem value="Student">Student</MenuItem>
                         <MenuItem value="Instructor">Instructor</MenuItem>
                     </Select>
                 </DialogContent>
                 <DialogActions>
-                    <Button type='submit' onClick={onSubmitLogin}>Submit</Button>
+                    <Button onClick={() => { setOpenLogin(false) }}>Cancel</Button>
+                    <Button type='submit' onClick={onSubmitLogin}>Log In</Button>
                 </DialogActions>
             </Dialog>
 
             {/*Dialog for user registration*/}
             <Dialog open={openRegister} onClose={() => setOpenRegister(false)}>
-                <DialogTitle>Register</DialogTitle>
+                <DialogTitle style={{ fontFamily: `"Lato", sans-serif`, fontSize: 25, paddingBottom: 0 }}>Register with your details</DialogTitle>
                 <DialogContent>
-                    <TextField margin='normal' label='Username' error={usernameError} fullWidth onChange={(e) => setUsername(e.target.value)}></TextField>
-                    <TextField margin='normal' label='Password' fullWidth error={passwordError} onChange={(e) => setPassword(e.target.value)}></TextField>
-                    <InputLabel style={{ marginTop: 10 }}>Occupation</InputLabel>
+                    <TextField style={{ marginBottom: 0, marginTop: 10 }} variant='standard' required margin='normal' label='Username' error={usernameError} fullWidth onChange={(e) => setUsername(e.target.value)}></TextField>
+                    <TextField type='password' style={{ marginTop: 15 }} variant='standard' required margin='normal' label='Password' fullWidth error={passwordError} onChange={(e) => setPassword(e.target.value)}></TextField>
+                    <InputLabel required style={{ marginTop: 25 }}>Occupation</InputLabel>
                     <Select fullWidth error={occupationError} onChange={(e) => setOccupation(e.target.value)}>
                         <MenuItem value="Student">Student</MenuItem>
                         <MenuItem value="Instructor">Instructor</MenuItem>
                     </Select>
                 </DialogContent>
                 <DialogActions>
-                    <Button type='submit' onClick={onSubmitRegister}>Submit</Button>
+                    <Button onClick={() => { setOpenRegister(false) }}>Cancel</Button>
+                    <Button type='submit' onClick={onSubmitRegister}>Register</Button>
                 </DialogActions>
             </Dialog>
 
-            <Toolbar>
-                <Typography onClick={() => { navigate('/home') }} variant="h6" sx={{ flexGrow: 1 }}>
-                    NUS ALSET
+            <Toolbar style={{ backgroundColor: "black" }}>
+                <Typography onClick={() => { navigate('/home') }} variant="h6" sx={{ flexGrow: 1, fontFamily: `"Playfair Display", serif`, fontSize: 30, paddingBottom: 1 }}>
+                    Singapore Polytechnic
                 </Typography>
-                {sessionStorage.getItem('Username') &&
-                    <Typography style={{ marginRight: 10 }}>Welcome {sessionStorage.getItem("Username")}</Typography>
+                {sessionStorage.getItem('UserId') &&
+                    <Typography style={{marginRight:10,fontFamily: `"Bebas Neue", sans-serif`, fontSize: 25,paddingTop:5 }}>{sessionStorage.getItem("Username")}</Typography>
                 }
-                <Button onClick={() => setOpenLogin(true)} color="inherit">Login</Button>
-                <Button onClick={() => setOpenRegister(true)} color="inherit">Register</Button>
-                <Button onClick={() => { sessionStorage.clear(); localStorage.clear(); window.location.reload() }} color='inherit'>Logout</Button>
+                {!sessionStorage.getItem('UserId') && <Button onClick={() => setOpenLogin(true)} color="inherit" style={{ fontFamily: `"Oswald", sans-serif`, fontSize: 20 }}>Log in</Button>}
+                {!sessionStorage.getItem('UserId') && <Button onClick={() => setOpenRegister(true)} color="inherit" style={{ fontFamily: `"Oswald", sans-serif`, fontSize: 20 }}>Register</Button>}
+                {sessionStorage.getItem('UserId') && <Button onClick={() => { sessionStorage.clear(); localStorage.clear(); navigate('/') }} color='inherit' style={{ fontFamily: `"Oswald", sans-serif`, fontSize: 20 }}>Log out</Button>}
             </Toolbar>
         </AppBar>
     )

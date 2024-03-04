@@ -16,7 +16,7 @@ const Act1 = () => {
   const [previewTranscript, setPreviewTranscript] = useState({})
   const [previewClicked, setPreviewClicked] = useState(false)
   const [transcriptTitle, setTranscriptTitle] = useState('')
-  const [label, setLabel] = useState('Custom Text')
+  const [label, setLabel] = useState('Activity 1 Label')
   const [instruction, setInstruction] = useState(`Use the text boxes below to provide the details of your interview transcript. After you fill in the boxes, click the Preview button to see how the transcript looks before proceeding to the next activity. If you would like to make any changes you can do so by editing the transcript text directly. Click the Submit button when you are satisfied with the look of your interview transcript. The final version of your transcript will be used in the next activity.`)
   const [transcriptTitleError, setTranscriptTitleError] = useState(false)
   const [previewClickedError, setPreviewClickedError] = useState('');
@@ -76,7 +76,7 @@ const Act1 = () => {
                 })
               }
             })
-            setTranscript(transcriptText)          
+            setTranscript(transcriptText)
           }
 
         }
@@ -232,18 +232,18 @@ const Act1 = () => {
 
   // displays transcript 
   const displayTranscript = () => {
-    {console.log("display transcript")}
-    {console.log(previewTranscript)}
+    { console.log("display transcript") }
+    { console.log(previewTranscript) }
     if (Object.keys(previewTranscript).length === 0) {
       return (
         <>
-          <Typography align='center'>Please press the preview button in order to preview the transcript.</Typography>
+          <Typography align='center'>Please click the 'Preview' button to view the transcript</Typography>
         </>
       )
     } else {
       return Object.entries(previewTranscript).map(([key, value]) => {
         if (value.questioner_tag !== undefined) {
-          {console.log(value.question_text)}
+          { console.log(value.question_text) }
           return (
             <div key={key}>
               <Typography display="inline">{value.questioner_tag}: </Typography>
@@ -280,7 +280,7 @@ const Act1 = () => {
       }
     }
 
-    !instructor && setInterviewerError(false) &&  setPreviewClickedError('') && setTranscriptError(false) && setTranscriptTitleError(false)
+    !instructor && setInterviewerError(false) && setPreviewClickedError('') && setTranscriptError(false) && setTranscriptTitleError(false)
     setTranscriptTitleError(false)
     e.preventDefault()
     let flag = false
@@ -302,7 +302,7 @@ const Act1 = () => {
         flag = true
       }
     }
-    
+
     if (transcriptTitle === '') {
       setTranscriptTitleError(true)
       flag = true
@@ -351,9 +351,9 @@ const Act1 = () => {
     //     sessionStorage.removeItem("ActivitySixId")
     //   })
     // } else
-     if (id) {
+    if (id) {
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data)
-      
+
       if (newChain) {
         await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
         sessionStorage.removeItem("ActivityTwoId")
@@ -363,20 +363,20 @@ const Act1 = () => {
         sessionStorage.removeItem("ActivitySixId")
 
         if (!instructor) {
-          let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1"}
+          let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1" }
           await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
         } else {
-          let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1"}
+          let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1" }
           await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
         }
 
       } else {
 
         if (!instructor) {
-          let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1"}
+          let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1" }
           await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
         } else {
-          let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1"}
+          let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1" }
           await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
         }
 
@@ -392,10 +392,10 @@ const Act1 = () => {
 
 
       if (!instructor) {
-        let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1"}
+        let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1" }
         await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
       } else {
-        let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1"}
+        let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityOneId"), ActivityType: "Activity 1" }
         await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
       }
     }
@@ -422,38 +422,44 @@ const Act1 = () => {
 
   const onReset = () => {
     // setActivityDescription("")
-    setTranscriptTitle("")
-    { !transcriptEditable || instructor && setInterviewer("") }
-    { !transcriptEditable || instructor && setInterviewee("") }
-    { instructor && setTranscriptEditable(false) }
-    { instructor && setSwitchValue(false) }
-    { !transcriptEditable || instructor && setTranscript("") }
-    setLabel("")
-    { instructor && setInstruction("") }
+    // setTranscriptTitle("")
+    // { !transcriptEditable || instructor && setInterviewer("") }
+    // { !transcriptEditable || instructor && setInterviewee("") }
+    // { instructor && setTranscriptEditable(false) }
+    // { instructor && setSwitchValue(false) }
+    // { !transcriptEditable || instructor && setTranscript("") }
+    // setLabel("Activity 1 Label")
+    // { instructor && setInstruction("") }
+    window.location.reload()
   }
 
   return (
     <Container style={{ marginTop: 20 }}>
-      <div style={{ display: "flex", direction: "row" }}>
-        <h2>Activity 1:</h2>&nbsp;&nbsp;
+      <div style={{ display: "flex", direction: "row", fontFamily: `"Lato", sans-serif` }}>
+        {/* <h2>Activity 1:</h2>&nbsp;&nbsp; */}
         <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-one-label"></h2>
+        <Button onClick={() => { onReset() }} sx={{
+          marginLeft: "auto", "&.MuiButtonBase-root:hover": {
+            bgcolor: "transparent",
+          }
+        }} >Reset</Button>
       </div>
       <form onSubmit={handleSubmit} noValidate autoComplete='off'>
-        <Typography>Instructions (Editable by Instructors): </Typography>
-        <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-        {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={switchValue} onChange={() => setSwitchValue((prev) => !prev)} />} label="Predefined Interview Text" />}
-        <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => {alert("Warning: All data in next five activities corresponding to this chain will be erased.");setNewChain((prev) => !prev)}} />} label="Create a new chain of activities" />
-        {!instructor && transcriptEditable && <Typography style={{ marginTop: 10 }}>You are not allowed to edit the transcript in this template.</Typography>}
-        <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button>
+        {/* <Typography style={{fontFamily:`"Lato", sans-serif`}}>Instructions: </Typography> */}
+        <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none", fontFamily: `"Lato", sans-serif`, fontSize: 17 }}></Typography>
+        {instructor && <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={switchValue} onChange={() => setSwitchValue((prev) => !prev)} />} label="Standardised Script" />}
+        <FormControlLabel style={{ marginTop: 10}}  control={<Switch checked={newChain} onChange={() => { if (!newChain) {alert("Caution: Data associated with the next five activities in this sequence will be permanently deleted")}; setNewChain((prev) => !prev) }} />} label="Re-initialise Activity 1 and subsequent activites" />
+        {!instructor && transcriptEditable && <Typography style={{ marginTop: 10 }}>The transcript is not editable in this template.</Typography>}
+        {/* <Button onClick={() => { onReset() }} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Reset</Button> */}
         <TextField error={transcriptTitleError} margin='normal' value={transcriptTitle} label='Transcript title' fullWidth onChange={(e) => setTranscriptTitle(e.target.value)}></TextField>
         <TextField disabled={!instructor && transcriptEditable} error={interviewerError} margin='normal' value={interviewer} fullWidth variant='outlined' label="Interviewer label (e.g. Interviewer)" onChange={(e) => setInterviewer(e.target.value)}></TextField>
         <TextField disabled={!instructor && transcriptEditable} error={intervieweeError} margin='normal' value={interviewee} fullWidth variant='outlined' label="Interviewee label (e.g. Interviewee)" onChange={(e) => setInterviewee(e.target.value)}></TextField>
         <TextField disabled={!instructor && transcriptEditable} helperText={helperText} error={transcriptError} margin='normal' value={transcript} rows={15} fullWidth multiline variant='outlined' label="Transcript" onChange={(e) => setTranscript(e.target.value)}></TextField>
         <Button onClick={handlePreview} sx={{ marginTop: 2 }} variant='outlined' fullWidth>Preview</Button>
-        <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black' }}>
+        <Box sx={{ marginTop: 3, padding: 2, border: '1px solid black', borderRadius:2 }}>
           {displayTranscript()}
         </Box>
-        <Typography sx={{ marginTop: 3 }}>{previewClickedError}</Typography>
+        <Typography sx={{ marginTop: previewClickedError ? 3 : 1 }}>{previewClickedError}</Typography>
         <Button sx={{ marginTop: 1, marginBottom: 3 }} fullWidth type="submit" variant='outlined'>Submit</Button>
       </form>
     </Container>

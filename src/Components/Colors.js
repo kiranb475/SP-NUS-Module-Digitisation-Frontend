@@ -4,7 +4,6 @@ const colors = [
     "#556B2F", // Olive Green
     "#008080", // Teal
     "#DAA520", // Muted Yellow
-    "#E6E6FA", // Soft Lavender
     "#D2691E", // Rustic Orange
     "#87AE73", // Sage Green
     "#E5D9C7", // Oatmeal

@@ -13,12 +13,12 @@ const Act5 = () => {
     const [containerHeight, setContainerHeight] = useState(0)
     const [containerWidth, setContainerWidth] = useState(0)
     const [MLClusters, setMLClusters] = useState(false)
-    const [newChain,setNewChain] = useState(false)
+    const [newChain, setNewChain] = useState(false)
     const [alternateView, setAlternateView] = useState(false)
     const [AISetting, setAISetting] = useState(false)
     const [AIClusters, setAIClusters] = useState({})
     const [instructor, setInstructor] = useState(false)
-    const [label, setLabel] = useState('Custom Text')
+    const [label, setLabel] = useState('Activity 5 Label')
     const [instruction, setInstruction] = useState(`
     <Typography>For this activity, you will see two views of your clusters and labels. In the User view, you will see the arrangement you submitted in the previous activity or the arrangement you are currently working on. In the Alternative view, you will see how the AI model would have clustered the sentences you selected. The Alternative view does not provide labels for the clusters, but you might be able to infer them yourself.</Typography>
     <br />
@@ -32,7 +32,7 @@ const Act5 = () => {
 
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.")
-        } 
+        }
 
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true)
@@ -163,16 +163,16 @@ const Act5 = () => {
     const checkProximity = (x1, y1, x2, y2, type1, type2, height1, height2) => {
         if (Math.abs(x1 - x2) <= 230) {
             if (height1 == 120 && height2 == 120) {
-                if (Math.abs(y1-y2) <= 140) {
+                if (Math.abs(y1 - y2) <= 140) {
                     return true
                 }
             }
             if (height1 == 40 && height2 == 40) {
-                if (Math.abs(y1-y2) <= 60) {
+                if (Math.abs(y1 - y2) <= 60) {
                     return true
                 }
             } else {
-                if (Math.abs(y1-y2) <= 110) {
+                if (Math.abs(y1 - y2) <= 110) {
                     return true
                 }
             }
@@ -296,16 +296,16 @@ const Act5 = () => {
                     if (value.removed === true) {
                         return (
                             <Draggable defaultPosition={{ x: value.new_x, y: value.new_y }} key={value.id} onDrag={(e, data) => handleDrag(e, data, key)} bounds="parent">
-                                <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move',whiteSpace: 'nowrap' }}>
-                                    <Typography onKeyDown={(e) => {if (e.key === "Enter") {e.preventDefault()}}} style={{ borderRadius: 5, padding: 1,display:"flex", overflowX:"hidden" }} id={value.id} variant="h6"></Typography>
+                                <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move', whiteSpace: 'nowrap' }}>
+                                    <Typography onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault() } }} style={{ borderRadius: 5, padding: 1, display: "flex", overflowX: "hidden" }} id={value.id} variant="h6"></Typography>
                                 </div>
                             </Draggable>
                         )
                     } else {
                         return (
                             <Draggable defaultPosition={{ x: value.new_x, y: value.new_y }} key={value.id} onDrag={(e, data) => handleDrag(e, data, key)} bounds="parent">
-                                <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move',whiteSpace: 'nowrap' }}>
-                                    <Typography onKeyDown={(e) => {if (e.key === "Enter") {e.preventDefault()}}} style={{ border: '1px solid black', backgroundColor: alternateView ? value.ai_color : value.color, borderRadius: 5, padding: 1,display:"flex", overflowX:"hidden" }} onBlur={() => { let text = document.getElementById(value.id).innerHTML; text === '' || text === `<br>` ? removeLabel(value.id) : console.log(text) }} id={value.id} contenteditable="true" variant="h6">{value.text}</Typography>
+                                <div height-id={value.id} style={{ width: 200, height: 20, padding: 10, margin: 10, cursor: 'move', whiteSpace: 'nowrap' }}>
+                                    <Typography onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault() } }} style={{ border: '1px solid black', backgroundColor: alternateView ? value.ai_color : value.color, borderRadius: 5, padding: 1, display: "flex", overflowX: "hidden" }} onBlur={() => { let text = document.getElementById(value.id).innerHTML; text === '' || text === `<br>` ? removeLabel(value.id) : console.log(text) }} id={value.id} contenteditable="true" variant="h6">{value.text}</Typography>
                                 </div>
                             </Draggable>
                         )
@@ -363,7 +363,7 @@ const Act5 = () => {
         //     }
         // })
 
-        Object.entries(clustData).map(([key,value]) => {
+        Object.entries(clustData).map(([key, value]) => {
             if (value.AI_classified != null && value.ai_color == null && value.AI_classified != -1) {
                 clustData[key].ai_color = clusters[value.AI_classified.toString()]
                 //clusters[value.AI_classified.toString()].content[Object.keys(clusters[value.AI_classified.toString()]).length - 1] = value
@@ -408,32 +408,32 @@ const Act5 = () => {
         //         sessionStorage.removeItem("ActivitySixId")
         //     })
         // } else
-         if (id)  {
+        if (id) {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`, data).then((response) => {
                 console.log(response)
             })
-            
+
             if (newChain) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
                 sessionStorage.removeItem("ActivitySixId")
-               
+
                 if (!instructor) {
-                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                    let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5" }
                     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
-                  } else {
-                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                } else {
+                    let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Reinitialise", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5" }
                     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
-                  }
-            
+                }
+
             } else {
 
                 if (!instructor) {
-                    let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                    let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5" }
                     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
-                  } else {
-                    let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                } else {
+                    let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Update", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5" }
                     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
-                  }
+                }
 
             }
         } else {
@@ -443,12 +443,12 @@ const Act5 = () => {
             })
 
             if (!instructor) {
-                let data = {DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5"}
+                let data = { DateTime: Date.now(), StudentTemplateId: sessionStorage.getItem("ActivitiesId"), StudentId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFiveId"), ActivityType: "Activity 5" }
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data)
-              } else {
-                let data = {DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 5"}
+            } else {
+                let data = { DateTime: Date.now(), ActivitySequenceId: sessionStorage.getItem("ActivitiesId"), InstructorId: sessionStorage.getItem("UserId"), Event: "Create", ActivityId: sessionStorage.getItem("ActivityFourId"), ActivityType: "Activity 5" }
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data)
-              }
+            }
         }
 
         if (sessionStorage.getItem("ActivitySixId") !== "null" && sessionStorage.getItem("ActivitySixId") !== null) {
@@ -483,29 +483,30 @@ const Act5 = () => {
 
     return (
         <Container style={{ marginTop: 20 }}>
-            <div style={{ display: "flex", direction: "row" }}>
-                <h2>Activity 5:</h2>&nbsp;&nbsp;
+            <div style={{ display: "flex", direction: "row", fontFamily: `"Lato", sans-serif` }}>
+                {/* <h2>Activity 5:</h2>&nbsp;&nbsp; */}
                 <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-five-label"></h2>
+                <Button onClick={() => { window.location.reload(false) }} sx={{
+                    marginLeft: "auto", "&.MuiButtonBase-root:hover": {
+                        bgcolor: "transparent",
+                    }
+                }} >Reset</Button>
             </div>
             <form onSubmit={handleSubmit}>
-                <Typography>Instructions (Editable by Instructors): </Typography>
-                <Typography id="activity-five-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-                {displayConfig()}
-                <FormControlLabel style={{marginTop: 10}} control={<Switch checked={newChain} onChange={() => {alert("Warning: All data in next activity corresponding to this chain will be erased.");setNewChain((prev) => !prev)}} />} label="Create a new chain of activities" />
-                {viewUser ?
-                    <ButtonGroup fullWidth variant="outlined" sx={{ marginTop: 1, marginBottom: 3 }}>
-                        <Button onClick={() => { window.location.reload(false); }} fullWidth variant="outlined" >Reset</Button>
-                        <Button onClick={() => { createLabel() }} fullWidth variant='outlined'>Add Label</Button>
-                    </ButtonGroup>
-                    : <div style={{ marginBottom: 20 }}></div>
-                }
+                {/* <Typography>Instructions (Editable by Instructors): </Typography> */}
+                <Typography id="activity-five-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none", fontFamily: `"Lato", sans-serif`, fontSize: 17 }}></Typography>
+                {/* {displayConfig()} */}
+                <FormControlLabel style={{ marginTop: 10 }} control={<Switch checked={newChain} onChange={() => { if (!newChain) { alert("Caution: Data associated with the next activity in this sequence will be permanently deleted") }; setNewChain((prev) => !prev) }} />} label="Re-initialise Activity 5 and subsequent activites" />
+                <FormControlLabel style={{ marginTop: 10, marginLeft: 10 }} control={<Switch checked={alternateView} onChange={() => { console.log("yay"); createAIClustering(); setAlternateView((prev) => !prev) }} />} label="View AI Clustering" />
+
+                <Button onClick={() => { createLabel() }} sx={{ marginTop: 2, marginBottom: 3 }} fullWidth variant='outlined'>Add Label</Button>
+
                 {console.log("container height")}
                 {console.log(containerHeight)}
                 {/* <Button onClick={()=>{createLabel()}} sx={{marginTop:3,marginBottom:3}} fullWidth variant='outlined'>Add Label</Button> */}
-                <Box style={{ backgroundColor: viewUser ? "lightyellow" : "lightblue", borderRadius: 10, minHeight: containerHeight, width: '100%', position: 'relative', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', flexDirection: viewUser ? 'column' : 'row', alignContent: 'flex-start' }}>
-                    <div style={{display:"flex"}}>
-                    <FormControlLabel style={{ marginTop: 10, marginLeft: 10 }} control={<Switch checked={alternateView} onChange={() => { console.log("yay"); createAIClustering(); setAlternateView((prev) => !prev) }} />} label="View AI Clustering" />
-
+                <Box style={{ backgroundColor:"#E6E6FA", borderRadius: 2, minHeight: containerHeight, width: '100%', position: 'relative', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', flexDirection: viewUser ? 'column' : 'row', alignContent: 'flex-start' }}>
+                    <div style={{ display: "flex" }}>
+                        
                     </div>
                     {displayComponents()}
                 </Box>

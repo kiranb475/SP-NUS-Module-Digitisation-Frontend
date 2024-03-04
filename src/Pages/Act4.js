@@ -12,7 +12,7 @@ const Act4 = () => {
     const [containerHeight, setContainerHeight] = useState(0)
     const [instructor, setInstructor] = useState(false)
     const [newChain,setNewChain] = useState(false)
-    const [label, setLabel] = useState('Custom Text')
+    const [label, setLabel] = useState('Activity 4 Label')
     const [instruction, setInstruction] = useState(`
     <Typography>The sentences you selected in the previous activity have been arranged on the left side of the pane below. Use the space below to cluster the sentences into themes by arranging the sentences that go together near each other. It’s okay if the sentences in a cluster overlap a bit.</Typography>
     <br />
@@ -452,21 +452,26 @@ const Act4 = () => {
 
     return (
         <Container style={{ marginTop: 20 }}>
-            <div style={{ display: "flex", direction: "row" }}>
-                <h2>Activity 4:</h2>&nbsp;&nbsp;
+            <div style={{ display: "flex", direction: "row",  fontFamily: `"Lato", sans-serif`}}>
+                {/* <h2>Activity 4:</h2>&nbsp;&nbsp; */}
                 <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }} id="activity-four-label"></h2>
+                <Button onClick={() => { window.location.reload(false) }} sx={{
+                    marginLeft: "auto", "&.MuiButtonBase-root:hover": {
+                        bgcolor: "transparent",
+                    }
+                }} >Reset</Button>
             </div>
             <form onSubmit={handleSubmit}>
-                <Typography>Instructions (Editable by Instructors): </Typography>
-                <Typography id="activity-four-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none" }}></Typography>
-                <FormControlLabel style={{marginTop:5}} control={<Switch checked={newChain} onChange={() => {alert("Warning: All data in next two activities corresponding to this chain will be erased.");setNewChain((prev) => !prev)}} />} label="Create a new chain of activities" />
+                {/* <Typography>Instructions (Editable by Instructors): </Typography> */}
+                <Typography id="activity-four-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} style={{ minHeight: 1, borderRight: "solid rgba(0,0,0,0) 1px", outline: "none",fontFamily: `"Lato", sans-serif`, fontSize: 17}}></Typography>
+                <FormControlLabel style={{ marginTop: 10}}  control={<Switch checked={newChain} onChange={() => { if (!newChain) {alert("Caution: Data associated with the next two activities in this sequence will be permanently deleted")}; setNewChain((prev) => !prev) }} />} label="Re-initialise Activity 4 and subsequent activites" /> 
                 <ButtonGroup fullWidth sx={{ marginTop: 2, marginBottom: 1 }}>
                     <Button onClick={() => { createLabel() }} fullWidth variant='outlined'>Add Label</Button>
-                    <Button onClick={() => { window.location.reload(false); }} variant='outlined' fullWidth>Reset</Button>
+                    {/* <Button onClick={() => { window.location.reload(false); }} variant='outlined' fullWidth>Reset</Button> */}
                     {/* <Button onClick={() => checkClustering()} variant="outlined" fullWidth>Check clustering</Button> */}
                 </ButtonGroup>
 
-                <Box id="main-container" style={{ minHeight: containerHeight === 0 ? 900 : containerHeight, width: '100%', position: 'relative', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', flexDirection: 'column' }}>
+                <Box id="main-container" style={{ minHeight: containerHeight === 0 ? 900 : containerHeight, width: '100%', position: 'relative', overflow: 'hidden', display: 'flex', flexWrap: 'wrap', flexDirection: 'column',backgroundColor:"#E6E6FA", borderRadius: 2 }}>
                     {displayComponents()}
                 </Box>
                 <Button sx={{ marginTop: 3, marginBottom: 3 }} fullWidth type="submit" variant='outlined'>Submit</Button>
