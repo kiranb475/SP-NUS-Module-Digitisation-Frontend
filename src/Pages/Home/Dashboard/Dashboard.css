@@ -1,0 +1,171 @@
+.credentials-title {
+    font-family: "DM Serif Display", serif !important;
+}
+
+.credentials-detail {
+    font-family: "Lato", sans-serif !important;
+    color: #333333;
+}
+
+.create-template-button {
+    margin-top: 20px !important;
+    margin-bottom: 0px !important;
+    background-color: #c8bea0 !important;
+    color: #50352a !important;
+    border: 1px solid #50352a !important;
+}
+
+.create-template-button:hover {
+    background-color: #b0a690 !important;
+}
+
+.custom-activities-title {
+    margin-top: 20px !important;
+    margin-bottom: 10px !important;
+    font-family: "Lato", sans-serif !important;
+}
+
+.custom-activities {
+    display: flex !important;
+    width: 100% !important;
+    border: 1px solid black !important;
+    padding: 10px !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    background-color: #E6E6FA !important;
+    border-radius: 5px !important;
+}
+
+.other-activities {
+    display: flex !important;
+    width: 100% !important;
+    border: 1px solid black !important;
+    padding: 10px !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    background-color: #C7E6F4 !important;
+    border-radius: 5px !important;
+}
+
+.activity-title {
+    font-family: "Lato", sans-serif !important;
+    font-size: 20px !important;
+}
+
+.activity-author {
+    margin-left: 10px !important;
+}
+
+.activity-container {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.activity-buttons {
+    margin-left: auto !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.separator {
+    color: #2e82d6 !important;
+    margin: 0 2px !important;
+}
+
+.accordian {
+    width: 100% !important;
+}
+
+.activity-accordion {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    width: 100% !important;
+}
+
+.accordion-summary {
+    font-family: "Lato", sans-serif !important;
+    font-size: 20px !important;
+    background-color: #e8e4fc !important;
+    border: 1px solid black !important;
+}
+
+.start-activity-button {
+    margin-left: auto !important;
+}
+
+.alert-warning {
+    margin-bottom: 20px !important;
+    margin-top: 20px !important;
+}
+
+.activity-header-section {
+    display: flex;
+    width: 100%;
+}
+
+.activity-section-title {
+    font-family: "Lato", sans-serif !important;
+    font-size: 20px !important;
+    margin-bottom: 10px !important;
+}
+
+.activity-button.active {
+    color: green;
+    margin-left: auto;
+}
+
+.activity-button.disabled {
+    color: grey;
+    margin-left: auto;
+}
+
+.editable-label {
+    min-height: 1px !important;
+    border-right: solid rgba(0,0,0,0) 1px !important;
+    outline: none !important;
+    font-family: "Lato", sans-serif !important;
+    font-size: 17px !important;
+}
+
+.editable-instruction {
+    min-height: 1px !important;
+    border-right: solid rgba(0,0,0,0) 1px !important;
+    outline: none !important;
+    font-family: "Lato", sans-serif !important;
+    font-size: 17px !important;
+    margin-top: 15px !important
+}
+
+.activity-sub-section {
+    display: flex !important;
+    flex-direction: column !important;
+    margin-top: 10px !important;
+}
+
+.activity-info-text {
+    margin-top: 15px !important;
+    margin-bottom: 10px !important;
+    font-family: "Lato", sans-serif !important;
+    font-size: 17px !important;
+}
+
+.activity-switch {
+    margin-top: 0px !important;
+    margin-bottom: 15px !important;
+}
+
+.activity-divider {
+    margin-bottom: 15px !important;
+}
+
+.activity-submit-button {
+    margin-top: 20px !important;
+}
+
+.copy-template-button {
+    margin-left: auto !important;
+}
+
+.activity-button-delete {
+    color: lightcoral !important;
+}

@@ -1,0 +1,57 @@
+.container {
+  padding: 20px 0px 20px 0px !important;
+  font-family: "Lato", sans-serif !important;
+}
+
+.header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.header h2 {
+  min-height: 1 !important;
+  border-right: solid rgba(0, 0, 0, 0) 1px !important;
+  outline: none !important;
+}
+
+
+.resetButton {
+  margin-left: auto !important;
+}
+
+.resetButton .MuiButtonBase-root:hover {
+  background-color: transparent !important;
+}
+
+/* can be abstracted */
+.editableInstruction {
+  min-height: 1 !important;
+  border-right: solid rgba(0,0,0,0) 1px !important;
+  outline: none !important;
+  font-family: "Lato", sans-serif !important;
+  font-size: 17px !important;
+}
+
+.divider, .formControlLabel, .infoText {
+  margin-top: 10px !important;
+}
+
+.infoText {
+  font-family: "Lato", sans-serif !important;
+  font-size: 17px !important;
+}
+
+.contentContainer {
+  margin-top: 10px !important;
+  padding: 10px !important;
+  border: 1px solid black !important;
+  border-radius: 2px !important;
+}
+
+.submitButton {
+  margin-top: 20px !important;
+  margin-bottom: 3px !important;
+}
+

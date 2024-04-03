@@ -1,0 +1,50 @@
+.container {
+    padding: 20px 0px 20px 0px;
+    font-family: "Lato", sans-serif;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header h2 {
+    min-height: 1;
+    border-right: solid rgba(0, 0, 0, 0) 1px;
+    outline: none;
+}
+
+.reset-btn:hover {
+    background-color: transparent !important;
+}
+
+.instructions {
+    min-height: 1;
+    border-right: solid rgba(0, 0, 0, 0) 1px;
+    outline: none;
+    font-size: 17px;
+}
+
+.switch-label {
+    margin-top: 10px;
+}
+
+button.preview-btn,
+button.submit-btn {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.preview-box {
+    margin-top: 3px;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 2px;
+}
+
+.error-text,
+.helper-text {
+    margin-top: 3px;
+}
