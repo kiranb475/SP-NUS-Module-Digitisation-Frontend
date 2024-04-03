@@ -1,4 +1,5 @@
 import {HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+<<<<<<< HEAD
 import Act1 from './Pages/Act1';
 import Act2 from './Pages/Act2';
 import Act3 from './Pages/Act3';
@@ -6,6 +7,15 @@ import Act4 from './Pages/Act4';
 import Act5 from './Pages/Act5';
 import Act6 from './Pages/Act6';
 import Home from './Pages/Home';
+=======
+import Act1 from './Pages/Activity1/Activity1';
+import Act2 from './Pages/Activity2/Activity2';
+import Act3 from './Pages/Activity3/Activity3';
+import Act4 from './Pages/Act4-old';
+import Act5 from './Pages/Act5';
+import Act6 from './Pages/Act6';
+import Home from './Pages/Home/Home';
+>>>>>>> master
 import NavBar from './Components/NavBar';
 
 function App() {

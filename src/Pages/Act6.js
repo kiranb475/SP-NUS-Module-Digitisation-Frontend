@@ -71,6 +71,7 @@ const Act6 = () => {
               ([key, value]) => {
                 if (value.response_id) {
                   Object.entries(value.response_text).map(([key2, value2]) => {
+<<<<<<< HEAD
                     console.log("insights n needs");
                     console.log(
                       insightsAndNeeds[value2.clusterData.userClusterIndexA5]
@@ -93,6 +94,32 @@ const Act6 = () => {
                         coreKey: value2.clusterData.coreKey,
                         subKey: value2.clusterData.subKey,
                       };
+=======
+                    if (value2.clusterData) {
+                      console.log("insights n needs");
+                      console.log(
+                        insightsAndNeeds[value2.clusterData.userClusterIndexA5]
+                      );
+                      if (
+                        insightsAndNeeds[
+                          value2.clusterData.userClusterIndexA5
+                        ] !== undefined
+                      ) {
+                        insightsAndNeeds[
+                          value2.clusterData.userClusterIndexA5
+                        ].content[
+                          Object.keys(
+                            insightsAndNeeds[
+                              value2.clusterData.userClusterIndexA5
+                            ].content
+                          ).length
+                        ] = {
+                          text: value2.text,
+                          coreKey: value2.clusterData.coreKey,
+                          subKey: value2.clusterData.subKey,
+                        };
+                      } 
+>>>>>>> master
                     }
                   });
                 }
@@ -206,7 +233,12 @@ const Act6 = () => {
               ([key, value]) => {
                 if (value.response_id) {
                   Object.entries(value.response_text).map(([key2, value2]) => {
+<<<<<<< HEAD
                     console.log("insights n needs");
+=======
+                    if (value2.clusterData) {
+                      console.log("insights n needs");
+>>>>>>> master
                     console.log(
                       insightsAndNeeds[value2.clusterData.userClusterIndexA5]
                     );
@@ -229,6 +261,10 @@ const Act6 = () => {
                         subKey: value2.clusterData.subKey,
                       };
                     }
+<<<<<<< HEAD
+=======
+                    }
+>>>>>>> master
                   });
                 }
               }
@@ -568,6 +604,7 @@ const Act6 = () => {
         Object.entries(finalData.content.content).map(([key, value]) => {
           if (value.response_id) {
             Object.entries(value.response_text).map(([key2, value2]) => {
+<<<<<<< HEAD
               if (
                 !finalData.content.insightsAndNeeds[
                   value2.clusterData.userClusterIndexA5
@@ -624,6 +661,24 @@ const Act6 = () => {
                     value2.clusterData.userClusterIndexA5
                   ].needs
                 ).map(([key4, value4]) => {
+=======
+              if (value2.clusterData) {
+                if (
+                  !finalData.content.insightsAndNeeds[
+                    value2.clusterData.userClusterIndexA5
+                  ] ||
+                  (Object.keys(
+                    finalData.content.insightsAndNeeds[
+                      value2.clusterData.userClusterIndexA5
+                    ].insights
+                  ).length === 0 &&
+                    Object.keys(
+                      finalData.content.insightsAndNeeds[
+                        value2.clusterData.userClusterIndexA5
+                      ].needs
+                    ).length === 0)
+                ) {
+>>>>>>> master
                   summary_data[Object.keys(summary_data).length] = {
                     InstructorId: null,
                     ActivitySequenceId: null,
@@ -633,8 +688,12 @@ const Act6 = () => {
                     ),
                     InterviewerSentenceIndexA1: value.response_id,
                     InterviewerSentenceContentA1:
+<<<<<<< HEAD
                       finalData.content.content[value.response_id]
                         .question_text,
+=======
+                      finalData.content.content[value.response_id].question_text,
+>>>>>>> master
                     IntervieweeSentenceIndexA1: parseInt(key2),
                     IntervieweeSentenceContentA1: value2.text,
                     SentenceUserHighlightA2: value2.sentenceUserHighlightA2,
@@ -651,6 +710,7 @@ const Act6 = () => {
                     MLClusterIndexA5: value2.sentenceAIClassified,
                     InsightIndex: null,
                     InsightLabel: null,
+<<<<<<< HEAD
                     NeedIndex: key4,
                     NeedLabel: value4,
                   };
@@ -704,6 +764,18 @@ const Act6 = () => {
                     value2.clusterData.userClusterIndexA5
                   ].insights
                 ).map(([key3, value3]) => {
+=======
+                    NeedIndex: null,
+                    NeedLabel: null,
+                  };
+                } else if (
+                  Object.keys(
+                    finalData.content.insightsAndNeeds[
+                      value2.clusterData.userClusterIndexA5
+                    ].insights
+                  ).length === 0
+                ) {
+>>>>>>> master
                   Object.entries(
                     finalData.content.insightsAndNeeds[
                       value2.clusterData.userClusterIndexA5
@@ -734,14 +806,111 @@ const Act6 = () => {
                         value2.clusterData.userClusterIndexA5
                       ),
                       MLClusterIndexA5: value2.sentenceAIClassified,
+<<<<<<< HEAD
                       InsightIndex: key3,
                       InsightLabel: value3,
+=======
+                      InsightIndex: null,
+                      InsightLabel: null,
+>>>>>>> master
                       NeedIndex: key4,
                       NeedLabel: value4,
                     };
                   });
+<<<<<<< HEAD
                 });
               }
+=======
+                } else if (
+                  Object.keys(
+                    finalData.content.insightsAndNeeds[
+                      value2.clusterData.userClusterIndexA5
+                    ].needs
+                  ).length === 0
+                ) {
+                  Object.entries(
+                    finalData.content.insightsAndNeeds[
+                      value2.clusterData.userClusterIndexA5
+                    ].insights
+                  ).map(([key3, value3]) => {
+                    summary_data[Object.keys(summary_data).length] = {
+                      InstructorId: null,
+                      ActivitySequenceId: null,
+                      StudentId: parseInt(sessionStorage.getItem("UserId")),
+                      StudentTemplateId: parseInt(
+                        sessionStorage.getItem("ActivitiesId")
+                      ),
+                      InterviewerSentenceIndexA1: value.response_id,
+                      InterviewerSentenceContentA1:
+                        finalData.content.content[value.response_id]
+                          .question_text,
+                      IntervieweeSentenceIndexA1: parseInt(key2),
+                      IntervieweeSentenceContentA1: value2.text,
+                      SentenceUserHighlightA2: value2.sentenceUserHighlightA2,
+                      SentenceUserHighlightA3: value2.sentenceUserHighlightA3,
+                      SentenceMLHighlightA3: value2.sentenceMLHighlightA3,
+                      UserClusterIndexA4: value2.clusterData.userClusterIndexA4,
+                      UserClusterLabelA4: correspondingLabelA4(
+                        value2.clusterData.userClusterIndexA4
+                      ),
+                      UserClusterIndexA5: value2.clusterData.userClusterIndexA5,
+                      UserClusterLabelA5: correspondingLabelA5(
+                        value2.clusterData.userClusterIndexA5
+                      ),
+                      MLClusterIndexA5: value2.sentenceAIClassified,
+                      InsightIndex: key3,
+                      InsightLabel: value3,
+                      NeedIndex: null,
+                      NeedLabel: null,
+                    };
+                  });
+                } else {
+                  Object.entries(
+                    finalData.content.insightsAndNeeds[
+                      value2.clusterData.userClusterIndexA5
+                    ].insights
+                  ).map(([key3, value3]) => {
+                    Object.entries(
+                      finalData.content.insightsAndNeeds[
+                        value2.clusterData.userClusterIndexA5
+                      ].needs
+                    ).map(([key4, value4]) => {
+                      summary_data[Object.keys(summary_data).length] = {
+                        InstructorId: null,
+                        ActivitySequenceId: null,
+                        StudentId: parseInt(sessionStorage.getItem("UserId")),
+                        StudentTemplateId: parseInt(
+                          sessionStorage.getItem("ActivitiesId")
+                        ),
+                        InterviewerSentenceIndexA1: value.response_id,
+                        InterviewerSentenceContentA1:
+                          finalData.content.content[value.response_id]
+                            .question_text,
+                        IntervieweeSentenceIndexA1: parseInt(key2),
+                        IntervieweeSentenceContentA1: value2.text,
+                        SentenceUserHighlightA2: value2.sentenceUserHighlightA2,
+                        SentenceUserHighlightA3: value2.sentenceUserHighlightA3,
+                        SentenceMLHighlightA3: value2.sentenceMLHighlightA3,
+                        UserClusterIndexA4: value2.clusterData.userClusterIndexA4,
+                        UserClusterLabelA4: correspondingLabelA4(
+                          value2.clusterData.userClusterIndexA4
+                        ),
+                        UserClusterIndexA5: value2.clusterData.userClusterIndexA5,
+                        UserClusterLabelA5: correspondingLabelA5(
+                          value2.clusterData.userClusterIndexA5
+                        ),
+                        MLClusterIndexA5: value2.sentenceAIClassified,
+                        InsightIndex: key3,
+                        InsightLabel: value3,
+                        NeedIndex: key4,
+                        NeedLabel: value4,
+                      };
+                    });
+                  });
+                }
+              }
+
+>>>>>>> master
             });
           }
         });
