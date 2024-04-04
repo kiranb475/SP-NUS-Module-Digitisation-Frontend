@@ -18,7 +18,7 @@ import {
 } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { getColor } from "../Components/Colors.js";
+import { getColor } from "../../Components/Colors.js";
 
 const Act5 = () => {
   const [clustData, setClustData] = useState({});
@@ -181,20 +181,6 @@ const Act5 = () => {
   };
 
   const createLabel = () => {
-<<<<<<< HEAD
-    const newKey = Object.keys(clustData.content).length;
-    let data_y = 0;
-    let data = clustData;
-    if (data.content[newKey].type === "label") {
-      data_y = data.content[newKey].y + 60;
-    } else {
-      const keyIntervieweeText = Object.keys(
-        data.content[newKey].response_text
-      ).length;
-      data_y =
-        data.content[newKey].response_text[keyIntervieweeText].clusterData.y +
-        100;
-=======
 
     const dataLength = Object.keys(clustData.content).length;
     let data_y = 0;
@@ -210,7 +196,6 @@ const Act5 = () => {
           break;
         }
       }
->>>>>>> master
     }
 
     const key = uuidv4();
@@ -220,11 +205,7 @@ const Act5 = () => {
         ...prevState,
         content: {
           ...prevState.content,
-<<<<<<< HEAD
-          [newKey + 1]: {
-=======
           [dataLength + 1]: {
->>>>>>> master
             id: key,
             clusterLabelA5: "Click to edit label",
             x: 120,
@@ -297,13 +278,9 @@ const Act5 = () => {
         data.userClusterIndexA5 = -1;
       } else if (data.response_id) {
         Object.entries(data.response_text).map(([key2, data2]) => {
-<<<<<<< HEAD
-          data2.clusterData.userClusterIndexA5 = -1;
-=======
           if (data2.clusterData) {
             data2.clusterData.userClusterIndexA5 = -1;
           }
->>>>>>> master
         });
       }
     });
@@ -311,19 +288,12 @@ const Act5 = () => {
     Object.entries(userData.content).map(([key, data]) => {
       if (data.response_id) {
         Object.entries(data.response_text).map(([key2, data2]) => {
-<<<<<<< HEAD
-          data2.clusterData.coreKey = key;
-          data2.clusterData.subKey = key2;
-          checkClassData[Object.keys(checkClassData).length + 1] =
-            data2.clusterData;
-=======
           if (data2.clusterData) {
             data2.clusterData.coreKey = key;
           data2.clusterData.subKey = key2;
           checkClassData[Object.keys(checkClassData).length + 1] =
             data2.clusterData;
           }
->>>>>>> master
         });
       } else if (data.type === "label") {
         data.coreKey = key;
@@ -427,21 +397,12 @@ const Act5 = () => {
         clustData.content[key].height = element.clientHeight;
       } else if (data.response_id) {
         Object.entries(data.response_text).map(([key2, data2]) => {
-<<<<<<< HEAD
           console.log(data2);
-=======
-          if (data2.clusterData) {
-            console.log(data2);
->>>>>>> master
           const element = document.querySelector(
             `[height-id="${data2.clusterData.id}"]`
           );
           clustData.content[key].response_text[key2].clusterData.height =
             element.clientHeight;
-<<<<<<< HEAD
-=======
-          }
->>>>>>> master
         });
       }
     });
@@ -461,14 +422,8 @@ const Act5 = () => {
     Object.entries(updatedClustData.content).forEach(([key, value]) => {
       if (value.response_id) {
         Object.entries(value.response_text).map(([key2, value2]) => {
-<<<<<<< HEAD
           updatedClustData.content[key].response_text[key2].clusterData.color =
             colorsUsedData[value2.clusterData.userClusterIndexA5];
-=======
-          if (value2.clusterData) {
-            updatedClustData.content[key].response_text[key2].clusterData.color = colorsUsedData[value2.clusterData.userClusterIndexA5];
-          }
->>>>>>> master
         });
       }
     });
@@ -666,44 +621,6 @@ const Act5 = () => {
           }
         } else if (data.response_id) {
           return Object.entries(data.response_text).map(([key2, data2]) => {
-<<<<<<< HEAD
-            return (
-              <Draggable
-                defaultPosition={{
-                  x: data2.clusterData.new_x,
-                  y: data2.clusterData.new_y,
-                }}
-                key={data2.clusterData.id}
-                onDrag={(e, data) => handleDrag(e, data, key, key2)}
-                bounds="parent"
-              >
-                <div
-                  height-id={data2.clusterData.id}
-                  style={{
-                    width: 200,
-                    height: 100,
-                    backgroundColor: alternateView
-                      ? data2.clusterData.AIColor
-                      : data2.clusterData.color
-                      ? data2.clusterData.color
-                      : "lightgrey",
-                    padding: 10,
-                    margin: 10,
-                    cursor: "move",
-                    borderRadius: 15,
-                    border: "1px solid black",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Tooltip title={data.response_text[key2].text}>
-                    <Typography id={data2.clusterData.id} fontSize={13}>
-                      {data.response_text[key2].text}
-                    </Typography>
-                  </Tooltip>
-                </div>
-              </Draggable>
-            );
-=======
             if (data2.clusterData) {
               return (
                 <Draggable
@@ -742,7 +659,6 @@ const Act5 = () => {
                 </Draggable>
               );
             }
->>>>>>> master
           });
         }
       });
@@ -823,14 +739,6 @@ const Act5 = () => {
         clustData.content[key].height = element.clientHeight;
       } else if (data.response_id) {
         Object.entries(data.response_text).map(([key2, data2]) => {
-<<<<<<< HEAD
-          console.log(data2);
-          const element = document.querySelector(
-            `[height-id="${data2.clusterData.id}"]`
-          );
-          clustData.content[key].response_text[key2].clusterData.height =
-            element.clientHeight;
-=======
           if (data2.clusterData) {
             console.log(data2);
             const element = document.querySelector(
@@ -839,7 +747,6 @@ const Act5 = () => {
             clustData.content[key].response_text[key2].clusterData.height =
               element.clientHeight;
           }
->>>>>>> master
         });
       }
     });

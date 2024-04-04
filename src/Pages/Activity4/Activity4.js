@@ -1,11 +1,11 @@
 import './Activity4.css'
-import { Box, Button, ButtonGroup, Container, FormControlLabel, Switch, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Container, FormControlLabel, Switch, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import Draggable from "react-draggable";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { getColor } from "../Components/Colors.js";
+import { getColor } from "../../Components/Colors.js";
+import DisplayComponents from './DisplayComponents.js';
 
 const Activity4 = () => {
     const [selectedData, setSelectedData] = useState({});
@@ -13,6 +13,7 @@ const Activity4 = () => {
     const [instructor, setInstructor] = useState(false);
     const [newChain, setNewChain] = useState(false);
     const [label, setLabel] = useState("Activity 4 Label");
+    const [blankTemplate, setBlankTemplate] = useState(false)
     const [instruction, setInstruction] = useState(
         `<Typography>The sentences you selected in the previous activity have been arranged on the left side of the pane below. Use the space below to cluster the sentences into themes by arranging the sentences that go together near each other. It’s okay if the sentences in a cluster overlap a bit.</Typography>
       <br />
@@ -39,9 +40,10 @@ const Activity4 = () => {
         }
 
         let height = sessionStorage.getItem("mainContainerHeight");
-        let selected = {};
-        let x = 120;
-        let y = 70;
+
+        let gridWidth = 120;
+        let gridHeight = 70;
+        let perRow = 2;
 
         // if valid id exists, fetch data from activity 4 table
         if (id) {
@@ -50,6 +52,9 @@ const Activity4 = () => {
                 setInstruction(response.data.instruction);
                 if (response.data.content !== null) {
                     setSelectedData(response.data.content);
+                    if (Object.entries(response.data.content).length === 0) {
+                        setBlankTemplate(true)
+                    }
                     if (height != null) {
                         setContainerHeight(height);
                     }
@@ -61,26 +66,33 @@ const Activity4 = () => {
                     let userData = response.data;
                     const check = new RegExp("background-color: yellow", "g");
                     const check2 = new RegExp("background-color: lightgreen", "g");
-                    Object.entries(userData.content).map(([key, value]) => {
-                        if (value.questioner_tag === undefined) {
-                            Object.entries(value.response_text).map(([key2, value2]) => {
-                                if (userData.activity_mvc[key][key2].css.match(check) || userData.activity_mvc[key][key2].css.match(check2)) {
-                                    userData.content[key].response_text[key2].clusterData = {
-                                        id: uuidv4(),
-                                        x: x,
-                                        y: y,
-                                        new_x: 0,
-                                        new_y: 0,
-                                        userClusterIndexA4: -1,
-                                        type: "text",
-                                        height: 0,
-                                    };
-                                    y = y + 140;
-                                }
-                            });
-                        }
-                    });
-                    setSelectedData(userData);
+                    let index = 0;
+
+                    if (userData.content !== null) {
+                        Object.entries(userData.content).forEach(([key, value]) => {
+                            if (value.questioner_tag === undefined) {
+                                Object.entries(value.response_text).forEach(([key2, value2]) => {
+                                    if (userData.activity_mvc[key][key2].css.match(check) || userData.activity_mvc[key][key2].css.match(check2)) {
+                                        let x = (index % perRow) * gridWidth;
+                                        let y = Math.floor(index / perRow) * gridHeight;
+                                        userData.content[key].response_text[key2].clusterData = {
+                                            id: uuidv4(),
+                                            x: x,
+                                            y: y,
+                                            userClusterIndexA4: -1,
+                                            type: "text",
+                                            height: 0,
+                                        };
+                                        index++;
+                                    }
+                                });
+                            }
+                        });
+                        setSelectedData(userData);
+                    } else {
+                        setBlankTemplate(true)
+                    }
+
                 } else if (id === "null") {
                     alert("Before progressing to Activity 4, please complete Activity 3.");
                 }
@@ -96,11 +108,12 @@ const Activity4 = () => {
         let flag = false;
         let flag2 = false;
 
-        Object.entries(userData.content).map(([key, data]) => {
+        // sets all userClusterIndexA4 to -1 irrespective of their initial state
+        Object.entries(userData.content).forEach(([key, data]) => {
             if (data.type === "label") {
                 data.userClusterIndexA4 = -1;
             } else if (data.response_id) {
-                Object.entries(data.response_text).map(([key2, data2]) => {
+                Object.entries(data.response_text).forEach(([key2, data2]) => {
                     if (data2.clusterData) {
                         data2.clusterData.userClusterIndexA4 = -1;
                     }
@@ -108,9 +121,10 @@ const Activity4 = () => {
             }
         });
 
-        Object.entries(userData.content).map(([key, data]) => {
+        // creates an array of relevant components for clustering 
+        Object.entries(userData.content).forEach(([key, data]) => {
             if (data.response_id) {
-                Object.entries(data.response_text).map(([key2, data2]) => {
+                Object.entries(data.response_text).forEach(([key2, data2]) => {
                     if (data2.clusterData) {
                         data2.clusterData.coreKey = key;
                         data2.clusterData.subKey = key2;
@@ -123,18 +137,10 @@ const Activity4 = () => {
             }
         });
 
-        Object.entries(checkClassData).map(([key, value]) => {
-            Object.entries(checkClassData).map(([key2, value2]) => {
-                if (checkProximity(
-                    value.x + value.new_x,
-                    value.y + value.new_y,
-                    value2.x + value2.new_x,
-                    value2.y + value2.new_y,
-                    value.height,
-                    value2.height
-                ) &&
-                    value2.userClusterIndexA4 === -1
-                ) {
+        // checks for proximity between two components
+        Object.entries(checkClassData).forEach(([key, value]) => {
+            Object.entries(checkClassData).forEach(([key2, value2]) => {
+                if (checkProximity(value.x, value.y, value2.x, value2.y, value.height, value2.height) && value2.userClusterIndexA4 === -1) {
                     if (flag === true) {
                         currentClass = currentClass + 1;
                         flag = false;
@@ -161,7 +167,7 @@ const Activity4 = () => {
             flag2 = false;
         });
 
-        Object.entries(checkClassData).map(([key, data]) => {
+        Object.entries(checkClassData).forEach(([key, data]) => {
             if (data.subKey) {
                 userData.content[data.coreKey].response_text[data.subKey].clusterData.userClusterIndexA4 = data.userClusterIndexA4;
             } else {
@@ -175,18 +181,25 @@ const Activity4 = () => {
 
     // checks whether two components are close to each other
     const checkProximity = (x1, y1, x2, y2, height1, height2) => {
-        if (Math.abs(x1 - x2) <= 230) {
-            if (height1 == 120 && height2 == 120) {
-                if (Math.abs(y1 - y2) <= 140) {
+
+        if (Math.abs(x1 - x2) <= 130) {
+            if (height1 === 120 && height2 === 120) {
+                if (Math.abs(y1 - y2) <= 100) {
                     return true;
                 }
             }
-            if (height1 == 40 && height2 == 40) {
+            if (height1 === 40 && height2 === 40) {
                 if (Math.abs(y1 - y2) <= 60) {
                     return true;
                 }
-            } else {
-                if (Math.abs(y1 - y2) <= 110) {
+            }
+            if (height1 === 40 && height2 === 120) {
+                if (Math.abs(y1 - y2) <= 70) {
+                    return true;
+                }
+            }
+            if (height1 === 120 && height2 === 40) {
+                if (Math.abs(y1 - y2) <= 40) {
                     return true;
                 }
             }
@@ -198,14 +211,15 @@ const Activity4 = () => {
     // checks which components are next to each other
     const checkClustering = () => {
 
+        // gets the height of the components - see if its still needed.
         Object.entries(selectedData.content).map(([key, data]) => {
             if (data.type === "label") {
-                const element = document.querySelector(`[height-id="${data.id}"]`);
+                const element = document.querySelector(`[data-height-id="${data.id}"]`);
                 selectedData.content[key].height = element.clientHeight;
             } else if (data.response_id) {
                 Object.entries(data.response_text).map(([key2, data2]) => {
-                    if (data.clusterData) {
-                        const element = document.querySelector(`[height-id="${data2.clusterData.id}"]`);
+                    if (data2.clusterData) {
+                        const element = document.querySelector(`[data-height-id="${data2.clusterData.id}"]`);
                         selectedData.content[key].response_text[key2].clusterData.height = element.clientHeight;
                     }
                 });
@@ -218,15 +232,12 @@ const Activity4 = () => {
         let colorsUsedData = {};
         colorsUsedData = checkClass();
 
-        console.log("after clustering - 2");
-        console.log(colorsUsedData);
-
         replaceLabelNames();
         const updatedSelectedData = { ...selectedData };
 
         Object.entries(updatedSelectedData.content).forEach(([key, value]) => {
             if (value.response_id) {
-                Object.entries(value.response_text).map(([key2, value2]) => {
+                Object.entries(value.response_text).forEach(([key2, value2]) => {
                     if (value2.clusterData) {
                         updatedSelectedData.content[key].response_text[key2].clusterData.color = colorsUsedData[value2.clusterData.userClusterIndexA4];
                     }
@@ -238,7 +249,7 @@ const Activity4 = () => {
     };
 
     const handleDrag = (e, data, coreKey, subKey) => {
-        let userData = selectedData;
+
         checkClustering();
 
         setSelectedData((prevState) => {
@@ -246,15 +257,15 @@ const Activity4 = () => {
             if (subKey !== undefined) {
                 const updatedSubItem = {
                     ...updatedContent[coreKey].response_text[subKey].clusterData,
-                    new_x: data.x,
-                    new_y: data.y,
+                    x: data.x,
+                    y: data.y,
                 };
                 updatedContent[coreKey].response_text[subKey].clusterData = updatedSubItem;
             } else {
                 const updatedItem = {
                     ...updatedContent[coreKey],
-                    new_x: data.x,
-                    new_y: data.y,
+                    x: data.x,
+                    y: data.y,
                 };
                 updatedContent[coreKey] = updatedItem;
             }
@@ -262,254 +273,71 @@ const Activity4 = () => {
         });
     };
 
-    // if the label is blank, it will remove the label from the screen
-    const removeLabel = (idToRemove, key) => {
+    const removeLabel = (key) => {
         setSelectedData((prevData) => {
             const newData = { ...prevData };
-            newData.content[key].removed = true;
-            const labelElement = document.querySelector(`[height-id="${newData.content[key].id}"] > h6`);
-            if (labelElement) {
-                labelElement.contentEditable = "false";
-                labelElement.style.border = "none";
-                labelElement.style.height = 200;
-            }
-            const labelElement2 = document.querySelector(`[height-id="${newData.content[key].id}"]`);
-            if (labelElement2) {
-                labelElement2.style.cursor = "default";
-            }
+            delete newData.content[key];
+            return newData;
+        });
+    };
+
+    const handleDeleteCopy = (coreKey, subKey) => {
+        setSelectedData(prevData => {
+            const newData = { ...prevData };
+            delete newData.content[coreKey].response_text[subKey];
             return newData;
         });
     };
 
     const handleCreateCopy = (coreKey, subKey) => {
-        const dataLength = Object.keys(selectedData.content).length;
-        const key = uuidv4();
-
-        setSelectedData((prevState) => {
-            const newData = {
-                ...prevState,
-                content: {
-                    ...prevState.content[coreKey],
-                    response_text: {
-                        ...prevState.content[coreKey].response_text,
-                        [subKey + 1]: prevState.content[coreKey].response_text[subKey],
-                        clusterData: {
-                            id: uuidv4(),
-                            x: prevState.content[coreKey].response_text[subKey].clusterData.x + 100,
-                            y: prevState.content[coreKey].response_text[subKey].clusterData.y,
-                            new_x: 0,
-                            new_y: 0,
-                            userClusterIndexA4: -1,
-                            type: "text-copy",
-                            height: 0,
-                        }
-                    }
-                },
+        setSelectedData(prevState => {
+            const newData = { ...prevState };
+            const itemToCopy = { ...newData.content[coreKey].response_text[subKey] };
+            itemToCopy.clusterData = {
+                ...itemToCopy.clusterData,
+                id: uuidv4(),
+                x: itemToCopy.clusterData.x,
+                y: itemToCopy.clusterData.y + 10,
+                userClusterIndexA4: -1,
+                type: "text-copy",
+                height: 0,
             };
+            const newSubKey = Object.keys(newData.content[coreKey].response_text).length + 1;
+            newData.content[coreKey].response_text[newSubKey] = itemToCopy;
             return newData;
         });
-
-        scrollNewLabelIntoView(key);
-    }
-
-    // to be implemented
-    const handleDeleteCopy = (coreKey, subKey) => {
-
-    }
-
-    // displays the components on the screen
-    const displayComponents = () => {
-
-        if (Object.keys(selectedData).length !== 0) {
-            return Object.entries(selectedData.content).map(([key, data]) => {
-                if (data.type === "label") {
-                    if (data.removed === true) {
-                        return (
-                            <Draggable
-                                defaultPosition={{ x: data.new_x, y: data.new_y }}
-                                key={data.id}
-                                onDrag={(e, data) => handleDrag(e, data, key)}
-                                bounds="parent"
-                            >
-                                <div
-                                    height-id={data.id}
-                                    style={{
-                                        maxWidth: 200,
-                                        maxHeight: 20,
-                                        padding: 10,
-                                        margin: 10,
-                                        cursor: "move",
-                                        whiteSpace: "nowrap",
-                                    }}
-                                >
-                                    <Typography
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter") {
-                                                e.preventDefault();
-                                            }
-                                        }}
-                                        style={{
-                                            borderRadius: 5,
-                                            padding: 1,
-                                            display: "flex",
-                                            overflowX: "hidden",
-                                        }}
-                                        id={data.id}
-                                        variant="h6"
-                                    >
-                                        {data.clusterLabelA4}
-                                    </Typography>
-                                </div>
-                            </Draggable>
-                        );
-                    } else {
-                        return (
-                            <Draggable
-                                defaultPosition={{ x: data.new_x, y: data.new_y }}
-                                key={data.id}
-                                onDrag={(e, data) => handleDrag(e, data, key)}
-                                bounds="parent"
-                            >
-                                <div
-                                    height-id={data.id}
-                                    style={{
-                                        maxWidth: 200,
-                                        maxHeight: 20,
-                                        padding: 10,
-                                        margin: 10,
-                                        cursor: "move",
-                                        whiteSpace: "nowrap",
-                                    }}
-                                >
-                                    <Typography
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter") {
-                                                e.preventDefault();
-                                            }
-                                        }}
-                                        style={{
-                                            border: "1px solid black",
-                                            backgroundColor: data.color,
-                                            borderRadius: 5,
-                                            padding: 1,
-                                            display: "flex",
-                                            overflowX: "hidden",
-                                        }}
-                                        id={data.id}
-                                        onBlur={() => {
-                                            let text = document.getElementById(data.id).innerHTML;
-                                            text === "" || text === `<br>`
-                                                ? removeLabel(data.id, key)
-                                                : console.log(text);
-                                        }}
-                                        contenteditable="true"
-                                        variant="h6"
-                                    >
-                                        {data.clusterLabelA4}
-                                    </Typography>
-                                </div>
-                            </Draggable>
-                        );
-                    }
-                } else if (data.response_id) {
-                    return Object.entries(data.response_text).map(([key2, data2]) => {
-                        if (data2.clusterData) {
-                            return (
-                                <Draggable
-                                    defaultPosition={{ x: data2.clusterData.new_x, y: data2.clusterData.new_y }}
-                                    key={data2.clusterData.id}
-                                    onDrag={(e, data) => handleDrag(e, data, key, key2)}
-                                    bounds="parent"
-                                >
-                                    <div
-                                        height-id={data2.clusterData.id}
-                                        style={{
-                                            width: 200,
-                                            height: 100,
-                                            backgroundColor: data2.clusterData.color
-                                                ? data2.clusterData.color
-                                                : "lightgrey",
-                                            padding: 10,
-                                            margin: 10,
-                                            cursor: "move",
-                                            borderRadius: 15,
-                                            border: "1px solid black",
-                                            overflow: "hidden",
-                                        }}
-                                    >
-                                        <Tooltip title={data.response_text[key2].text}>
-                                            <Typography id={data2.clusterData.id} fontSize={13}>
-                                                {data.response_text[key2].text}
-                                            </Typography>
-                                            <Button onClick={() => handleCreateCopy(key, key2)}>Create Copy</Button>
-                                            {data2.clusterData.type === "text-copy" && (<Button onClick={() => handleDeleteCopyy(key, key2)}>Delete Copy</Button>)}
-                                        </Tooltip>
-                                    </div>
-                                </Draggable>
-                            );
-                        }
-
-                    });
-                }
-            });
-        }
     };
 
-    // scrolls the screen to where the label has been generated
-    const scrollNewLabelIntoView = (key) => {
-        setTimeout(() => {
-            const labelElement = document.getElementById(key);
-            if (labelElement) {
-                labelElement.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-        }, 0);
+    const handleDoubleClick = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top
+
+        createLabelAtPosition(x / 2, y / 2);
     };
 
-    // creates a new label
-    const createLabel = () => {
-        const dataLength = Object.keys(selectedData.content).length;
-        let data_y = 0;
-        let data = selectedData;
+    const createLabelAtPosition = (x, y) => {
 
-        for (let i = dataLength; i > 1; i -= 2) {
-            if (data.content[i].type === "label") {
-                data_y = data.content[i].y + 60;
-                break;
-            }
-            for (let j = Object.keys(data.content[i].response_text).length; j > 1; j--) {
-                if (data.content[i].response_text[j].clusterData) {
-                    data_y = data.content[i].response_text[j].clusterData.y + 100;
-                    break;
-                }
-            }
-        }
-
-        const key = uuidv4();
-        const currColor = getColor();
         setSelectedData((prevState) => {
             const newData = {
                 ...prevState,
                 content: {
                     ...prevState.content,
-                    [dataLength + 1]: {
-                        id: key,
+                    [Object.keys(prevState.content).length + 1]: {
+                        id: uuidv4(),
                         clusterLabelA4: "Click to edit label",
-                        x: 120,
-                        y: data_y,
-                        new_x: 0,
-                        new_y: 0,
+                        x: x,
+                        y: y,
                         userClusterIndexA4: -1,
                         type: "label",
-                        color: currColor,
+                        color: getColor(),
                     },
                 },
             };
             return newData;
         });
-
-        scrollNewLabelIntoView(key);
-
     };
+
 
     // searches for the current label name and replaces it
     const replaceLabelNames = () => {
@@ -528,25 +356,29 @@ const Activity4 = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        Object.entries(selectedData.content).map(([key, data]) => {
-            if (data.type === "label") {
-                const element = document.querySelector(`[height-id="${data.id}"]`);
-                selectedData.content[key].height = element.clientHeight;
-            } else if (data.response_id) {
-                Object.entries(data.response_text).map(([key2, data2]) => {
-                    if (data2.clusterData) {
-                        const element = document.querySelector(`[height-id="${data2.clusterData.id}"]`);
-                        selectedData.content[key].response_text[key2].clusterData.height = element.clientHeight;
-                    }
-                });
-            }
-        });
+        if (selectedData.content !== undefined) {
+            Object.entries(selectedData.content).map(([key, data]) => {
+                if (data.type === "label") {
+                    const element = document.querySelector(`[data-height-id="${data.id}"]`);
+                    selectedData.content[key].height = element.clientHeight;
+                } else if (data.response_id) {
+                    Object.entries(data.response_text).map(([key2, data2]) => {
+                        if (data2.clusterData) {
+                            const element = document.querySelector(`[data-height-id="${data2.clusterData.id}"]`);
+                            selectedData.content[key].response_text[key2].clusterData.height = element.clientHeight;
+                        }
+                    });
+                }
+            });
+        }
 
         const mainContainer = document.getElementById("main-container");
-        sessionStorage.setItem("mainContainerHeight", mainContainer.clientHeight);
+        !blankTemplate && sessionStorage.setItem("mainContainerHeight", mainContainer.clientHeight);
 
-        checkClass();
-        replaceLabelNames();
+        if (!blankTemplate) {
+            checkClass();
+            replaceLabelNames();
+        }
 
         if (!id) {
             delete selectedData["MLModel"];
@@ -618,104 +450,36 @@ const Activity4 = () => {
     };
 
     return (
-        <Container style={{ marginTop: 20 }}>
-            <div
-                style={{
-                    display: "flex",
-                    direction: "row",
-                    fontFamily: `"Lato", sans-serif`,
-                }}
-            >
-                <h2
-                    dangerouslySetInnerHTML={{ __html: ` ${label}` }}
-                    contentEditable="true"
-                    style={{
-                        minHeight: 1,
-                        borderRight: "solid rgba(0,0,0,0) 1px",
-                        outline: "none",
-                    }}
-                    id="activity-four-label"
-                ></h2>
-                <Button
-                    onClick={() => {
-                        window.location.reload(false);
-                    }}
-                    sx={{
-                        marginLeft: "auto",
-                        "&.MuiButtonBase-root:hover": {
-                            bgcolor: "transparent",
-                        },
-                    }}
-                >
-                    Reset
-                </Button>
+        <Container className="container">
+            <div className="header">
+                <h2 dangerouslySetInnerHTML={{ __html: `${label}` }} contentEditable="true" id="activity-four-label" className="editableLabel"></h2>
+                <Button onClick={() => window.location.reload()} className="resetButton">Reset</Button>
             </div>
             <form onSubmit={handleSubmit}>
-                <Typography
-                    id="activity-four-instruction"
-                    dangerouslySetInnerHTML={{ __html: ` ${instruction}` }}
-                    contentEditable={instructor && true}
-                    style={{
-                        minHeight: 1,
-                        borderRight: "solid rgba(0,0,0,0) 1px",
-                        outline: "none",
-                        fontFamily: `"Lato", sans-serif`,
-                        fontSize: 17,
-                    }}
-                ></Typography>
-                <FormControlLabel
-                    style={{ marginTop: 10 }}
-                    control={
-                        <Switch
-                            checked={newChain}
-                            onChange={() => {
-                                if (!newChain) {
-                                    alert(
-                                        "Caution: Data associated with the next two activities in this sequence will be permanently deleted"
-                                    );
-                                }
+                <Typography id="activity-four-instruction" dangerouslySetInnerHTML={{ __html: `${instruction}` }} contentEditable={true} className="editableInstruction"></Typography>
+                {blankTemplate && <Typography className="infoText">
+                    No transcript has been displayed since no data was entered in Activity 1.
+                </Typography>}
+                <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
+                    <Switch checked={newChain} onChange={() => {
+                        if (!newChain) {
+                            // eslint-disable-next-line no-restricted-globals
+                            if (confirm("Caution: Data associated with the next two activities in this sequence will be permanently deleted")) {
                                 setNewChain((prev) => !prev);
-                            }}
-                        />
-                    }
-                    label="Re-initialise Activity 4 and subsequent activites"
-                />
-                <ButtonGroup fullWidth sx={{ marginTop: 2, marginBottom: 1 }}>
-                    <Button
-                        onClick={() => {
-                            createLabel();
-                        }}
-                        fullWidth
-                        variant="outlined"
-                    >
-                        Add Label
-                    </Button>
-                </ButtonGroup>
-
-                <Box
-                    id="main-container"
-                    style={{
-                        minHeight: containerHeight === 0 ? 900 : containerHeight,
-                        width: "100%",
-                        position: "relative",
-                        overflow: "hidden",
-                        display: "flex",
-                        flexWrap: "wrap",
-                        flexDirection: "column",
-                        backgroundColor: "#E6E6FA",
-                        borderRadius: 2,
+                            }
+                        } else {
+                            setNewChain((prev) => !prev);
+                        }
                     }}
-                >
-                    {displayComponents()}
-                </Box>
-                <Button
-                    sx={{ marginTop: 3, marginBottom: 3 }}
-                    fullWidth
-                    type="submit"
-                    variant="outlined"
-                >
-                    Submit
-                </Button>
+                    />
+                }
+                    label="Re-initialise Activity 4 and subsequent activities"
+                />
+                {!blankTemplate &&
+                    <Box id="main-container" onDoubleClick={handleDoubleClick}>
+                        <DisplayComponents selectedData={selectedData} handleDrag={handleDrag} removeLabel={removeLabel} handleCreateCopy={handleCreateCopy} handleDeleteCopy={handleDeleteCopy} />
+                    </Box>}
+                <Button fullWidth type="submit" variant="outlined" className="submitButton">Submit</Button>
             </form>
         </Container>
     );

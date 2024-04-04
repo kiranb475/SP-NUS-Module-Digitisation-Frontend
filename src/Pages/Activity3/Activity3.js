@@ -14,6 +14,7 @@ const Activity3 = () => {
     const [predefinedHighlighting, setPredefinedHighlighting] = useState(false);
     const [newChain, setNewChain] = useState(false);
     const [predefinedMLSelection, setPredefinedMLSelection] = useState(false);
+    const [blankTemplate, setBlankTemplate] = useState(false)
     const [label, setLabel] = useState("Activity 3 Label");
     const [instruction, setInstruction] = useState(
         `<Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
@@ -70,37 +71,6 @@ const Activity3 = () => {
                     setLabel(response.data.label);
                     setInstruction(response.data.instruction);
 
-                    if (response.data.content) {
-                        if (response.data.content != null) {
-                            let interviewer = response.data.content[1].questioner_tag;
-                            let interviewee = response.data.content[2].response_tag;
-
-                            let activity_mvc_data = {};
-
-                            for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
-                                if (i % 2 !== 0) {
-                                    activity_mvc_data[i] = {
-                                        tag: interviewer,
-                                        activity_mvc: response.data.activity_mvc[i],
-                                    };
-                                } else {
-                                    activity_mvc_data[i] = {
-                                        tag: interviewee,
-                                        activity_mvc: response.data.activity_mvc[i],
-                                    };
-                                }
-                            }
-                            setActivityMVCContent(activity_mvc_data);
-                        }
-                    }
-                }
-            });
-        } else if (id !== "null") {
-
-            // since instance of activity three doesn't exist, get data from activity two.
-
-            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
-                if (response.data !== null) {
                     if (response.data.content != null) {
                         let interviewer = response.data.content[1].questioner_tag;
                         let interviewee = response.data.content[2].response_tag;
@@ -121,8 +91,46 @@ const Activity3 = () => {
                             }
                         }
                         setActivityMVCContent(activity_mvc_data);
+                    } else {
+                        setBlankTemplate(true)
                     }
-                    RandomlyAssign(response.data);
+                }
+            });
+        } else if (id !== "null") {
+
+            // since instance of activity three doesn't exist, get data from activity two.
+
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
+                if (response.data !== null) {
+                    if (response.data.content != null && Object.entries(response.data.content).length !== 0) {
+                        let interviewer = response.data.content[1].questioner_tag;
+                        let interviewee = response.data.content[2].response_tag;
+
+                        let activity_mvc_data = {};
+
+                        for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
+                            if (i % 2 !== 0) {
+                                activity_mvc_data[i] = {
+                                    tag: interviewer,
+                                    activity_mvc: response.data.activity_mvc[i],
+                                };
+                            } else {
+                                activity_mvc_data[i] = {
+                                    tag: interviewee,
+                                    activity_mvc: response.data.activity_mvc[i],
+                                };
+                            }
+                        }
+                        setActivityMVCContent(activity_mvc_data);
+                        // Randomly assign should only be called when instructor allows ML - to be fixed
+                        RandomlyAssign(response.data);
+                        setAllowMLModel(true);
+                        setMLModel("Model 1");
+                        setPredefinedMLSelection(false);
+                        setPredefinedHighlighting(sessionStorage.getItem("predefinedHighlighting") === "false" ? false : true)
+                    } else {
+                        setBlankTemplate(true)
+                    }
                 }
             });
         } else if (id === "null") {
@@ -181,23 +189,25 @@ const Activity3 = () => {
         const check2 = new RegExp("background-color: lightblue", "g");
         const check3 = new RegExp("background-color: lightgreen", "g");
 
-        for (let i = 1; i < Object.keys(userContent.activity_mvc).length + 1; i++) {
-            if (i % 2 != 0) {
-                let activity_mvc_value = getActivityMVC(i.toString());
-                userContent.activity_mvc[i] = activity_mvc_value;
-                userContent.content[i].sentenceUserHighlightA3 = false;
-            } else {
-                for (let j = 1; j < Object.keys(userContent.activity_mvc[i]).length + 1; j++) {
-                    let activity_mvc_value = getActivityMVC(i.toString() + j.toString());
-                    userContent.activity_mvc[i][j] = activity_mvc_value;
-                    if (activity_mvc_value.html.match(check1)) {
-                        userContent.content[i].response_text[j].sentenceUserHighlightA3 = true;
-                    } else if (activity_mvc_value.html.match(check2)) {
-                        userContent.content[i].response_text[j].sentenceUserHighlightA3 = false;
-                    } else if (activity_mvc_value.css.match(check3)) {
-                        userContent.content[i].response_text[j].sentenceUserHighlightA3 = true;
-                    } else {
-                        userContent.content[i].response_text[j].sentenceUserHighlightA3 = false;
+        if (userContent.activity_mvc !== undefined) {
+            for (let i = 1; i < Object.keys(userContent.activity_mvc).length + 1; i++) {
+                if (i % 2 != 0) {
+                    let activity_mvc_value = getActivityMVC(i.toString());
+                    userContent.activity_mvc[i] = activity_mvc_value;
+                    userContent.content[i].sentenceUserHighlightA3 = false;
+                } else {
+                    for (let j = 1; j < Object.keys(userContent.activity_mvc[i]).length + 1; j++) {
+                        let activity_mvc_value = getActivityMVC(i.toString() + j.toString());
+                        userContent.activity_mvc[i][j] = activity_mvc_value;
+                        if (activity_mvc_value.html.match(check1)) {
+                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = true;
+                        } else if (activity_mvc_value.html.match(check2)) {
+                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = false;
+                        } else if (activity_mvc_value.css.match(check3)) {
+                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = true;
+                        } else {
+                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = false;
+                        }
                     }
                 }
             }
@@ -303,7 +313,7 @@ const Activity3 = () => {
         }
         setUserData(userContent);
     };
-    
+
 
     return (
         <Container className="container">
@@ -325,18 +335,30 @@ const Activity3 = () => {
                         The Machine Learning selection for the template has been predefined.
                     </Typography>
                 )}
-                <FormControlLabel className="formControlLabelTop" control={
+                {blankTemplate && <Typography className="infoText">
+                    No transcript has been displayed since no data was entered in Activity 1.
+                </Typography>}
+                {!instructor && AllowMLModel && (
+                    <Typography className="infoText">
+                        The template utilises {MLModel} to generate results to assist you in your decision making.
+                    </Typography>
+                )}
+                <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
                     <Switch checked={newChain} onChange={() => {
                         if (!newChain) {
-                            alert("Caution: Data associated with the next three activities in this sequence will be permanently deleted");
+                            // eslint-disable-next-line no-restricted-globals
+                            if (confirm("Caution: Data associated with the next three activities in this sequence will be permanently deleted")) {
+                                setNewChain((prev) => !prev);
+                            }
+                        } else {
+                            setNewChain((prev) => !prev);
                         }
-                        setNewChain((prev) => !prev);
                     }}
                     />
                 }
                     label="Re-initialise Activity 3 and subsequent activities"
                 />
-                <DisplayTranscript activityMVCContent={activityMVCContent} highlightingNotAllowed={predefinedHighlighting} />
+                {!blankTemplate ? <DisplayTranscript activityMVCContent={activityMVCContent} highlightingNotAllowed={predefinedHighlighting} /> : <></>}
                 <Button className="submitButton" fullWidth type="submit" variant="outlined">
                     Submit
                 </Button>

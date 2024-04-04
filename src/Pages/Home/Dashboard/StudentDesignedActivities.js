@@ -55,6 +55,7 @@ const StudentDesignedActivities = () => {
             alert("Please go back to the previous activity and submit it to continue.");
             return;
         }
+        sessionStorage.setItem("ActivitiesId", value.id);
         storeActivityDetails(value);
         navigate(`/activity${activityNumber}/${activityId}`);
     };

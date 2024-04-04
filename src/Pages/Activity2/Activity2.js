@@ -218,7 +218,7 @@ const Activity2 = () => {
         }
 
         sessionStorage.setItem("predefinedHighlighting", highlightingNotAllowed);
-        if (sessionStorage.getItem("Occupation") === "Instructor") {
+        if (sessionStorage.getItem("custom-activities-instructor") === "true") {
             navigate("/");
         } else if (sessionStorage.getItem("ActivityThreeId") !== "null" && sessionStorage.getItem("ActivityThreeId") !== null) {
             navigate(`/activitythree/${sessionStorage.getItem("ActivityThreeId")}`);
