@@ -496,7 +496,7 @@ const CustomActivitiesInstructor = () => {
         <div>
             {/* button to allow instructors to create a new template */}
             <Button className="create-template-button" fullWidth variant="outlined"
-                onClick={() => { removeActivityDetails(); navigate("/activityone"); }}>
+                onClick={() => { removeActivityDetails(); sessionStorage.setItem("custom-activities-instructor", true); navigate("/activityone"); }}>
                 Create a Template
             </Button>
 
