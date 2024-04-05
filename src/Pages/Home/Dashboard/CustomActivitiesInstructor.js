@@ -11,6 +11,7 @@ const CustomActivitiesInstructor = () => {
     const UserId = sessionStorage.getItem("UserId");
     const [yourActivitiesData, setYourActivitiesData] = useState({});
     const [open, setOpen] = useState(false)
+    const [deleteItem, setDeleteItem] = useState(null);
 
     // enters the relevant data into the yourActivitiesData variable
     const createActivitiesData = (activityId, activityTitle, activityOneUpdate, activityTwoUpdate, activityThreeUpdate, activityFourUpdate, activityFiveUpdate, activitySixUpdate) => {
@@ -412,11 +413,16 @@ const CustomActivitiesInstructor = () => {
     }
 
     const handleDelete = async (value) => {
-        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.id })
+        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.id }).then((response) => {
+            console.log(response)
+        })
+        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity", { activityId: value.ActivityOneId }).then((response) => {
+            console.log(response)
+        })
         window.location.reload(false);
     }
 
-    const confirmDeleteDialog = (value) => {
+    const confirmDeleteDialog = () => {
         return (
             <Dialog open={open} onClose={() => setOpen(false)}
                 BackdropProps={{
@@ -435,13 +441,17 @@ const CustomActivitiesInstructor = () => {
                     <Button onClick={() => setOpen(false)}>
                         No
                     </Button>
-                    <Button onClick={() => { handleDelete(value); setOpen(false); }} autoFocus>
+                    <Button onClick={() => {
+                        if (deleteItem) handleDelete(deleteItem);
+                        setOpen(false);
+                        setDeleteItem(null);
+                    }} autoFocus>
                         Yes
                     </Button>
                 </DialogActions>
             </Dialog>
-        )
-    }
+        );
+    };
 
     // removes all id's of all the activities in sessionStorage
     const removeActivityDetails = () => {
@@ -464,7 +474,7 @@ const CustomActivitiesInstructor = () => {
 
     const handleStartActivity = (value) => {
         storeActivityDetails(value);
-        sessionStorage.setItem("custom-activities-instructor",true);
+        sessionStorage.setItem("custom-activities-instructor", true);
         if (value.activityOne.notEditableTranscript) {
             navigate(`/activitytwo/${value.activityTwo.key}`);
         } else {
@@ -505,11 +515,11 @@ const CustomActivitiesInstructor = () => {
                                 <Button className="start-activity-button" onClick={() => { handleStartActivity(value) }}>
                                     Start Activity
                                 </Button>
-                                <Button onClick={(e) => { e.stopPropagation(); setOpen(true) }} className='activity-button-delete'>
+                                <Button onClick={() => { setOpen(true); setDeleteItem(value); }} className='activity-button-delete'>
                                     <ClearIcon />
                                 </Button>
-
-                                {confirmDeleteDialog(value)}
+                                {confirmDeleteDialog()}
+                                
                             </AccordionSummary>
 
                             <AccordionDetails className='accordian-details'>

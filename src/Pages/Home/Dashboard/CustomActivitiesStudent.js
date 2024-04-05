@@ -11,6 +11,7 @@ const CustomActivitiesStudent = () => {
     const [yourActivitiesData, setYourActivitiesData] = useState({});
     const UserId = sessionStorage.getItem("UserId");
     const [open, setOpen] = useState(false)
+    const [deleteItem, setDeleteItem] = useState(null);
 
     useEffect(() => {
 
@@ -55,11 +56,16 @@ const CustomActivitiesStudent = () => {
     };
 
     const handleDelete = async (value) => {
-        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.id })
+        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.id }).then((response) => {
+            console.log(response)
+        })
+        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity", { activityId: value.ActivityOneId }).then((response) => {
+            console.log(response)
+        })
         window.location.reload(false);
     }
 
-    const confirmDeleteDialog = (value) => {
+    const confirmDeleteDialog = () => {
         return (
             <Dialog open={open} onClose={() => setOpen(false)}
                 BackdropProps={{
@@ -78,13 +84,17 @@ const CustomActivitiesStudent = () => {
                     <Button onClick={() => setOpen(false)}>
                         No
                     </Button>
-                    <Button onClick={() => { handleDelete(value); setOpen(false); }} autoFocus>
+                    <Button onClick={() => {
+                        if (deleteItem) handleDelete(deleteItem);
+                        setOpen(false);
+                        setDeleteItem(null); // Reset the delete item state
+                    }} autoFocus>
                         Yes
                     </Button>
                 </DialogActions>
             </Dialog>
-        )
-    }
+        );
+    };
 
     return (
         <div>
@@ -133,11 +143,10 @@ const CustomActivitiesStudent = () => {
                                 className={`activity-button ${value.ActivitySixId ? "active" : "disabled"}`}>
                                 Activity 6
                             </Button>
-                            <Button onClick={() => { setOpen(true) }} className='activity-button-delete'>
+                            <Button onClick={() => { setOpen(true); setDeleteItem(value); }} className='activity-button-delete'>
                                 <ClearIcon />
                             </Button>
-
-                            {confirmDeleteDialog(value)}
+                            {confirmDeleteDialog()}
 
                         </div>
 
