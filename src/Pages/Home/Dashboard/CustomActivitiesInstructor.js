@@ -25,6 +25,7 @@ const CustomActivitiesInstructor = () => {
                 ["activityFour"]: activityFourUpdate,
                 ["activityFive"]: activityFiveUpdate,
                 ["activitySix"]: activitySixUpdate,
+                ["activityId"]: activityId,
             }
         }))
     }
@@ -413,10 +414,10 @@ const CustomActivitiesInstructor = () => {
     }
 
     const handleDelete = async (value) => {
-        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.id }).then((response) => {
+        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.activityId }).then((response) => {
             console.log(response)
         })
-        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity", { activityId: value.ActivityOneId }).then((response) => {
+        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity", { activityId: value.activityOne.key }).then((response) => {
             console.log(response)
         })
         window.location.reload(false);

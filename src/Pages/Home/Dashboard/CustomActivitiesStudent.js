@@ -87,7 +87,7 @@ const CustomActivitiesStudent = () => {
                     <Button onClick={() => {
                         if (deleteItem) handleDelete(deleteItem);
                         setOpen(false);
-                        setDeleteItem(null); // Reset the delete item state
+                        setDeleteItem(null); 
                     }} autoFocus>
                         Yes
                     </Button>

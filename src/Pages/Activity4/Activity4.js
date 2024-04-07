@@ -182,9 +182,9 @@ const Activity4 = () => {
     // checks whether two components are close to each other
     const checkProximity = (x1, y1, x2, y2, height1, height2) => {
 
-        if (Math.abs(x1 - x2) <= 130) {
+        if (Math.abs(x1 - x2) <= 125) {
             if (height1 === 120 && height2 === 120) {
-                if (Math.abs(y1 - y2) <= 100) {
+                if (Math.abs(y1 - y2) <= 70) {
                     return true;
                 }
             }

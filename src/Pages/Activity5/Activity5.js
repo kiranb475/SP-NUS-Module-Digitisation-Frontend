@@ -13,7 +13,8 @@ const Act5 = () => {
     const [newChain, setNewChain] = useState(false);
     const [alternateView, setAlternateView] = useState(false);
     const [instructor, setInstructor] = useState(false);
-    const [blankTemplate, setBlankTemplate] = useState(false)
+    const [blankTemplate, setBlankTemplate] = useState(false);
+    const [AIColors, setAIColors] = useState({});
     const [label, setLabel] = useState("Activity 5 Label");
     const [instruction, setInstruction] = useState(`
       <Typography>For this activity, you will see two views of your clusters and labels. In the User view, you will see the arrangement you submitted in the previous activity or the arrangement you are currently working on. In the Alternative view, you will see how the AI model would have clustered the sentences you selected. The Alternative view does not provide labels for the clusters, but you might be able to infer them yourself.</Typography>
@@ -93,7 +94,34 @@ const Act5 = () => {
     }, []);
 
     const createAIClustering = () => {
-        AI_clusters();
+
+        let clusters = {};
+        if (Object.entries(AIColors).length === 0) {
+            clusters = {
+                0: getColor(),
+                1: getColor(),
+                2: getColor(),
+                3: getColor(),
+                4: getColor(),
+            };
+            setAIColors(clusters)
+        } else {
+            clusters = AIColors
+        }
+
+        let data = clustData
+
+        Object.entries(data.content).map(([key, value]) => {
+            if (value.response_id) {
+                Object.entries(value.response_text).map(([key2, value2]) => {
+                    if (value2.sentenceAIClassified !== -1 && value2.clusterData) {
+                        data.content[key].response_text[key2].clusterData.AIColor = clusters[value2.sentenceAIClassified]
+                    }
+                });
+            } 
+        });
+
+        setClustData(data)
     };
 
     const handleDoubleClick = (e) => {
@@ -129,9 +157,9 @@ const Act5 = () => {
     // checks whether two components are close to each other
     const checkProximity = (x1, y1, x2, y2, height1, height2) => {
 
-        if (Math.abs(x1 - x2) <= 130) {
+        if (Math.abs(x1 - x2) <= 125) {
             if (height1 === 120 && height2 === 120) {
-                if (Math.abs(y1 - y2) <= 100) {
+                if (Math.abs(y1 - y2) <= 70) {
                     return true;
                 }
             }
@@ -310,28 +338,6 @@ const Act5 = () => {
         });
     };
 
-    const AI_clusters = () => {
-        let clusters = {
-            0: getColor(),
-            1: getColor(),
-            2: getColor(),
-            3: getColor(),
-            4: getColor(),
-        };
-
-        Object.entries(clustData.content).map(([key, value]) => {
-            if (value.response_id) {
-                Object.entries(value.response_text).map(([key2, value2]) => {
-                    if (value2.sentenceAIClassified !== -1) {
-                        clustData.content[key].response_text[key2].clusterData.AIColor = clusters[value2.sentenceAIClassified];
-                    }
-                });
-            }
-        });
-
-        return clusters;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -479,7 +485,7 @@ const Act5 = () => {
                 <Switch checked={newChain} onChange={() => {
                     if (!newChain) {
                         // eslint-disable-next-line no-restricted-globals
-                        if (confirm("Caution: Data associated with the next two activities in this sequence will be permanently deleted")) {
+                        if (confirm("Caution: Data associated with the next activity in this sequence will be permanently deleted")) {
                             setNewChain((prev) => !prev);
                         }
                     } else {
@@ -488,7 +494,7 @@ const Act5 = () => {
                 }}
                 />
             }
-                label="Re-initialise Activity 4 and subsequent activities"
+                label="Re-initialise Activity 5 and subsequent activities"
             />
             <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
                 <Switch 

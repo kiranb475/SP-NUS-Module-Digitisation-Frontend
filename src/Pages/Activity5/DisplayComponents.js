@@ -26,7 +26,7 @@ const DisplayComponents = ({ clustData, handleDrag, removeLabel, handleCreateCop
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") { e.preventDefault(); }
                                 }}
-                                style={{ backgroundColor: data.color }} id={data.id} className='draggable-response-label-child' contentEditable={!data.removed} suppressContentEditableWarning={true} variant="h6"
+                                style={{ backgroundColor: alternateView ? "transparent" : data.color }} id={data.id} className='draggable-response-label-child' contentEditable={!data.removed} suppressContentEditableWarning={true} variant="h6"
                                 onBlur={() => {
                                     let text = document.getElementById(data.id).innerHTML;
                                     text === "" || text === `<br>`
@@ -42,7 +42,7 @@ const DisplayComponents = ({ clustData, handleDrag, removeLabel, handleCreateCop
             } else if (data.response_id) {
                 return Object.entries(data.response_text).map(([key2, data2]) => {
                     if (data2.clusterData) {
-                        const responseBackgroundColor = alternateView ? data2.clusterData.AIColor : data2.clusterData.color ? data2.clusterData.color : "lightgrey";
+                        const responseBackgroundColor = alternateView ? data2.clusterData.AIColor : data2.clusterData.color ? data2.clusterData.color : "#F5F5F4";
                         const style = {
                             position: 'absolute',
                             left: `${data2.clusterData.x}px`,
