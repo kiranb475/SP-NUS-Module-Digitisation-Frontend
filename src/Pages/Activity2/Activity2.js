@@ -41,37 +41,45 @@ const Activity2 = () => {
                         }
                         setLabel(response.data.label);
                         setInstruction(response.data.instruction);
-                        setUserData(response.data);
 
-                        // if transcript data has been entered
-                        if (response.data.content !== null && Object.entries(response.data.content).length !== 0) {
-                            let interviewer = response.data.content[1].questioner_tag;
-                            let interviewee = response.data.content[2].response_tag;
+                        if (sessionStorage.getItem("new-chain") !== "true") {
 
-                            let activity_mvc_data = {};
+                            setUserData(response.data);
 
-                            for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
-                                if (i % 2 !== 0) {
-                                    activity_mvc_data[i] = {
-                                        tag: interviewer,
-                                        activity_mvc: response.data.activity_mvc[i],
-                                    };
-                                } else {
-                                    activity_mvc_data[i] = {
-                                        tag: interviewee,
-                                        activity_mvc: response.data.activity_mvc[i],
-                                    };
+                            // if transcript data has been entered
+                            if (response.data.content !== null && Object.entries(response.data.content).length !== 0) {
+                                let interviewer = response.data.content[1].questioner_tag;
+                                let interviewee = response.data.content[2].response_tag;
+
+                                let activity_mvc_data = {};
+
+                                for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
+                                    if (i % 2 !== 0) {
+                                        activity_mvc_data[i] = {
+                                            tag: interviewer,
+                                            activity_mvc: response.data.activity_mvc[i],
+                                        };
+                                    } else {
+                                        activity_mvc_data[i] = {
+                                            tag: interviewee,
+                                            activity_mvc: response.data.activity_mvc[i],
+                                        };
+                                    }
                                 }
-                            }
-                            setActivityMVCContent(activity_mvc_data);
+                                setActivityMVCContent(activity_mvc_data);
 
-                        } else {
-                            setBlankTemplate(true)
+                            } else {
+                                setBlankTemplate(true)
+                            }
                         }
+
+
                     }
                 });
 
-        } else if (id !== "null") {
+        }
+        
+        if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
 
             // since instance of activity two doesn't exist, get data from activity one.
 
@@ -172,15 +180,18 @@ const Activity2 = () => {
 
         let event;
 
-        if (id) {
+        if (id && sessionStorage.getItem("new-chain") !== "true") {
+            console.log('yay')
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data);
             if (newChain) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                sessionStorage.removeItem("ActivityThreeId");
-                sessionStorage.removeItem("ActivityFourId");
-                sessionStorage.removeItem("ActivityFiveId");
-                sessionStorage.removeItem("ActivitySixId");
+                // sessionStorage.removeItem("ActivityThreeId");
+                // sessionStorage.removeItem("ActivityFourId");
+                // sessionStorage.removeItem("ActivityFiveId");
+                // sessionStorage.removeItem("ActivitySixId");
 
+                sessionStorage.setItem("new-chain",true)
+                
                 event = "Reinitialise";
             } else {
                 event = "Update";
@@ -272,11 +283,11 @@ const Activity2 = () => {
                         if (!newChain) {
                             // eslint-disable-next-line no-restricted-globals
                             if (confirm("Caution: Data associated with the next four activities in this sequence will be permanently deleted")) {
-                              setNewChain((prev) => !prev);
+                                setNewChain((prev) => !prev);
                             }
-                          } else {
+                        } else {
                             setNewChain((prev) => !prev);
-                          }
+                        }
                     }}
                     />
                 }

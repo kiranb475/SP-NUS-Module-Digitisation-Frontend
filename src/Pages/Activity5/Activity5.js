@@ -50,8 +50,8 @@ const Act5 = () => {
 
                         setLabel(response.data.label);
                         setInstruction(response.data.instruction);
-
-                        if (response.data.content) {
+                        
+                        if (response.data.content && sessionStorage.getItem("new-chain") !== "true") {
                             setClustData(response.data.content);
                             if (Object.entries(response.data.content).length === 0) {
                                 setBlankTemplate(true)
@@ -381,12 +381,14 @@ const Act5 = () => {
 
         let event;
 
-        if (id) {
+        if (id && sessionStorage.getItem("new-chain") !== "true") {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`, data)
 
             if (newChain) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                sessionStorage.removeItem("ActivitySixId");
+                //sessionStorage.removeItem("ActivitySixId");
+
+                sessionStorage.setItem("new-chain", true)
 
                 event = "Reinitialise";
             } else {

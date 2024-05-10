@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Typography, Button, Tooltip } from "@mui/material";
 import Draggable from 'react-draggable';
 import './Activity4.css';
 
-const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreateCopy, handleDeleteCopy }) => {
+const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreateCopy, handleDeleteCopy, selectedIds, setSelectedIds }) => {
+
+    const toggleSelect = (id) => {
+        setSelectedIds(prev => 
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
 
     if (Object.keys(selectedData).length !== 0) {
         return Object.entries(selectedData.content).map(([key, data]) => {
@@ -50,6 +56,7 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                             left: `${data2.clusterData.x}px`,
                             top: `${data2.clusterData.y}px`,
                             backgroundColor: responseBackgroundColor,
+                            border: selectedIds.includes(data2.clusterData.id) ? '2px solid blue' : 'none'
                         };
                         return (
                             <Draggable
@@ -58,7 +65,9 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                                 onDrag={(e, d) => handleDrag(e, d, key, key2)}
                                 bounds="parent"
                             >
-                                <div data-height-id={data2.clusterData.id} className={`draggableResponse`} style={style}>
+                                <div data-height-id={data2.clusterData.id} className={`draggableResponse`} style={style} 
+                                //onClick={() => toggleSelect(data2.clusterData.id)}
+                                >
                                     <div style={{ display: "flex" }}>
                                         <Button variant="outlined" onClick={() => handleCreateCopy(key, key2)} className='create-copy-button'>+</Button>
                                         {data2.clusterData.type === "text-copy" && <Button variant="outlined" onClick={() => handleDeleteCopy(key, key2)} className='create-delete-button'>-</Button>}

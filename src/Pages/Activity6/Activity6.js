@@ -37,25 +37,20 @@ const Act6 = () => {
     }
 
     if (id === "null") {
-      alert(
-        "Please go back to the previous activity and submit it to continue."
-      );
+      alert("Please go back to the previous activity and submit it to continue.");
     }
 
     if (id) {
-      axios
-        .get(
-          `https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`
-        )
+      axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`)
         .then((response) => {
           setLabel(response.data.label);
           setInstruction(response.data.instruction);
-          if (response.data.content !== null) {
+
+          if (response.data.content !== null && sessionStorage.getItem("new-chain") !== "true") {
             setClustData(response.data.content);
             let insightsAndNeeds = {};
             if (response.data.content.content !== undefined) {
-              Object.entries(response.data.content.content).map(
-                ([key, value]) => {
+              Object.entries(response.data.content.content).map(([key, value]) => {
                   if (value.type === "label") {
                     insightsAndNeeds[value.userClusterIndexA5] = {
                       content: {},
@@ -69,29 +64,13 @@ const Act6 = () => {
                   }
                 }
               );
-              Object.entries(response.data.content.content).map(
-                ([key, value]) => {
+              Object.entries(response.data.content.content).map(([key, value]) => {
                   if (value.response_id) {
                     Object.entries(value.response_text).map(([key2, value2]) => {
                       if (value2.clusterData) {
-                        console.log("insights n needs");
-                        console.log(
-                          insightsAndNeeds[value2.clusterData.userClusterIndexA5]
-                        );
-                        if (
-                          insightsAndNeeds[
-                          value2.clusterData.userClusterIndexA5
-                          ] !== undefined
-                        ) {
-                          insightsAndNeeds[
-                            value2.clusterData.userClusterIndexA5
-                          ].content[
-                            Object.keys(
-                              insightsAndNeeds[
-                                value2.clusterData.userClusterIndexA5
-                              ].content
-                            ).length
-                          ] = {
+                        if (insightsAndNeeds[value2.clusterData.userClusterIndexA5] !== undefined) {
+                          insightsAndNeeds[value2.clusterData.userClusterIndexA5].content[
+                            Object.keys(insightsAndNeeds[value2.clusterData.userClusterIndexA5].content).length] = {
                             text: value2.text,
                             coreKey: value2.clusterData.coreKey,
                             subKey: value2.clusterData.subKey,
@@ -102,8 +81,7 @@ const Act6 = () => {
                   }
                 }
               );
-              Object.entries(response.data.content.insightsAndNeeds).map(
-                ([key, value]) => {
+              Object.entries(response.data.content.insightsAndNeeds).map(([key, value]) => {
                   insightsAndNeeds[key].needs = value.needs;
                   insightsAndNeeds[key].insights = value.insights;
                 }

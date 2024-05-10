@@ -160,15 +160,19 @@ const Activity1 = () => {
     
     if (id) {
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data);
+      
       // creation of a new chain of activities
 
       if (newChain) {
         await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-        sessionStorage.removeItem("ActivityTwoId");
-        sessionStorage.removeItem("ActivityThreeId");
-        sessionStorage.removeItem("ActivityFourId");
-        sessionStorage.removeItem("ActivityFiveId");
-        sessionStorage.removeItem("ActivitySixId");
+
+        sessionStorage.setItem("new-chain",true)
+
+        // sessionStorage.removeItem("ActivityTwoId");
+        // sessionStorage.removeItem("ActivityThreeId");
+        // sessionStorage.removeItem("ActivityFourId");
+        // sessionStorage.removeItem("ActivityFiveId");
+        // sessionStorage.removeItem("ActivitySixId");
 
         event = "Reinitialise"
       } else {

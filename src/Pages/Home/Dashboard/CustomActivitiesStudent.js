@@ -52,6 +52,7 @@ const CustomActivitiesStudent = () => {
         }
         sessionStorage.setItem("ActivitiesId", value.id);
         storeActivityDetails(value);
+        sessionStorage.setItem("new-chain",false);
         navigate(`/activity${activityNumber}/${activityId}`);
     };
 

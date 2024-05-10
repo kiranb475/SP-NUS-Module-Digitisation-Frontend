@@ -14,6 +14,7 @@ const Activity4 = () => {
     const [newChain, setNewChain] = useState(false);
     const [label, setLabel] = useState("Activity 4 Label");
     const [blankTemplate, setBlankTemplate] = useState(false)
+    const [selectedIds, setSelectedIds] = useState([]);
     const [instruction, setInstruction] = useState(
         `<Typography>The sentences you selected in the previous activity have been arranged on the left side of the pane below. Use the space below to cluster the sentences into themes by arranging the sentences that go together near each other. It’s okay if the sentences in a cluster overlap a bit.</Typography>
       <br />
@@ -50,17 +51,23 @@ const Activity4 = () => {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`).then((response) => {
                 setLabel(response.data.label);
                 setInstruction(response.data.instruction);
-                if (response.data.content !== null) {
-                    setSelectedData(response.data.content);
-                    if (Object.entries(response.data.content).length === 0) {
-                        setBlankTemplate(true)
-                    }
-                    if (height != null) {
-                        setContainerHeight(height);
+
+                if (sessionStorage.getItem("new-chain") !== "true") {
+                    if (response.data.content !== null) {
+                        setSelectedData(response.data.content);
+                        if (Object.entries(response.data.content).length === 0) {
+                            setBlankTemplate(true)
+                        }
+                        if (height != null) {
+                            setContainerHeight(height);
+                        }
                     }
                 }
+
             });
-        } else if (id !== "null") {
+        }
+
+        if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                 if (response.data !== null) {
                     let userData = response.data;
@@ -88,6 +95,7 @@ const Activity4 = () => {
                                 });
                             }
                         });
+                        console.log(userData)
                         setSelectedData(userData);
                     } else {
                         setBlankTemplate(true)
@@ -248,8 +256,8 @@ const Activity4 = () => {
         setSelectedData(updatedSelectedData);
     };
 
-    const handleDrag = (e, data, coreKey, subKey) => {
 
+    const handleDrag = (e, data, coreKey, subKey) => {
         checkClustering();
 
         setSelectedData((prevState) => {
@@ -272,6 +280,84 @@ const Activity4 = () => {
             return { ...prevState, content: updatedContent };
         });
     };
+
+
+    // const findKeyById = (id, content) => {
+    //     for (const [key, value] of Object.entries(content)) {
+    //         if (value.response_text) {
+    //             for (const [subKey, value2] of Object.entries(value.response_text)) {
+    //                 if (value2.clusterData && value2.clusterData.id === id) {
+    //                     console.log({ key, subKey });
+    //                     return { key, subKey };
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return null; 
+    // };
+    
+    
+
+    // const handleDrag = (e, data, coreKey, subKey) => {
+    //     checkClustering();  // Assuming this is necessary prior to updating positions
+    
+    //     if (selectedIds.includes(selectedData.content[coreKey]?.response_text[subKey]?.clusterData.id)) {
+    //         const deltaX = data.deltaX;
+    //         const deltaY = data.deltaY;
+    
+    //         setSelectedData((prevState) => {
+    //             const updatedContent = { ...prevState.content };
+    
+    //             selectedIds.forEach((id) => {
+    //                 const { key, subKey } = findKeyById(id, updatedContent);
+    //                 if (key && subKey !== undefined) {
+    //                     const item = updatedContent[key].response_text[subKey].clusterData;
+    //                     const updatedItem = {
+    //                         ...item,
+    //                         x: item.x + deltaX,
+    //                         y: item.y + deltaY,
+    //                     };
+    //                     updatedContent[key].response_text[subKey].clusterData = updatedItem;
+    //                 } else if (key) {
+    //                     const item = updatedContent[key];
+    //                     const updatedItem = {
+    //                         ...item,
+    //                         x: item.x + deltaX,
+    //                         y: item.y + deltaY,
+    //                     };
+    //                     updatedContent[key] = updatedItem;
+    //                 }
+    //             });
+    
+    //             return { ...prevState, content: updatedContent };
+    //         });
+    //     } else {
+    //         setSelectedData((prevState) => {
+    //             const updatedContent = { ...prevState.content };
+    
+    //             if (subKey !== undefined && coreKey && updatedContent[coreKey]?.response_text[subKey]?.clusterData) {
+    //                 const updatedSubItem = {
+    //                     ...updatedContent[coreKey].response_text[subKey].clusterData,
+    //                     x: data.x,
+    //                     y: data.y,
+    //                 };
+    //                 updatedContent[coreKey].response_text[subKey].clusterData = updatedSubItem;
+    //             } else if (coreKey && updatedContent[coreKey]) {
+    //                 const updatedItem = {
+    //                     ...updatedContent[coreKey],
+    //                     x: data.x,
+    //                     y: data.y,
+    //                 };
+    //                 updatedContent[coreKey] = updatedItem;
+    //             }
+    
+    //             return { ...prevState, content: updatedContent };
+    //         });
+    //     }
+    // };
+    
+    
+
 
     const removeLabel = (key) => {
         setSelectedData((prevData) => {
@@ -400,12 +486,14 @@ const Activity4 = () => {
 
         let event;
 
-        if (id) {
+        if (id && sessionStorage.getItem("new-chain") !== "true") {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`, data);
             if (newChain) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                sessionStorage.removeItem("ActivityFiveId");
-                sessionStorage.removeItem("ActivitySixId");
+                // sessionStorage.removeItem("ActivityFiveId");
+                // sessionStorage.removeItem("ActivitySixId");
+
+                sessionStorage.setItem("new-chain", true)
 
                 event = "Reinitialise";
             } else {
@@ -477,7 +565,7 @@ const Activity4 = () => {
                 />
                 {!blankTemplate &&
                     <Box id="main-container" onDoubleClick={handleDoubleClick}>
-                        <DisplayComponents selectedData={selectedData} handleDrag={handleDrag} removeLabel={removeLabel} handleCreateCopy={handleCreateCopy} handleDeleteCopy={handleDeleteCopy} />
+                        <DisplayComponents selectedData={selectedData} handleDrag={handleDrag} removeLabel={removeLabel} handleCreateCopy={handleCreateCopy} handleDeleteCopy={handleDeleteCopy} selectedIds={selectedIds} setSelectedIds={setSelectedIds} />
                     </Box>}
                 <Button fullWidth type="submit" variant="outlined" className="submitButton">Submit</Button>
             </form>
