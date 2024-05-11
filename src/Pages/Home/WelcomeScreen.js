@@ -1,16 +1,17 @@
-import { Divider, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import './Home.css'
+import { Typewriter } from 'react-simple-typewriter'
+import GridLines from 'react-gridlines';
 
 const WelcomeScreen = () => {
     return (
-        <div>
-            <Typography className="welcome-title">
-                Welcome To Our Platform!
-            </Typography>
-            <Typography className="welcome-message">
-                In order to access or create activities, please Log in or Register to unlock the full experience.
-            </Typography>
-            <Divider className="divider" />
+        <div className="welcome-container">
+            <GridLines className="grid-area" cellWidth={40} strokeWidth={0.2} cellWidth2={40}>
+                <Typography className="welcome-title">
+                    CC1001
+                </Typography>
+                <Typography className="welcome-message">Thinking Critically about the UN SDGs</Typography>
+            </GridLines>
         </div>
     )
 }

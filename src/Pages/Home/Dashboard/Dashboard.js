@@ -11,20 +11,10 @@ const Dashboard = () => {
     const occupation = sessionStorage.getItem("Occupation");
 
     return (
-        <Box>
-            <Typography className="credentials-title" variant="h5">
-                Credentials
-            </Typography>
-            <Typography className="credentials-detail" variant="h5">
-                Username: {username}
-            </Typography>
-            <Typography className="credentials-detail" variant="h5">
-                Role: {occupation}
-            </Typography>
+        <div className='container'>
             {occupation === "Instructor" ? <CustomActivitiesInstructor /> : <CustomActivitiesStudent />}
-            <div style={{marginTop: 50}}></div>
             {occupation === "Instructor" ? <StudentDesignedActivities /> : <InstructorDesignedActivities />}
-        </Box>
+        </div>
     )
 }
 

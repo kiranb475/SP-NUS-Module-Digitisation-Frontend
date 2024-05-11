@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css'
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Button, Dialog, DialogActions, DialogTitle, Divider, FormControlLabel, MenuItem, Select, Switch, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Button, CircularProgress, Dialog, DialogActions, DialogTitle, Divider, FormControlLabel, LinearProgress, MenuItem, Select, Switch, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -12,6 +12,9 @@ const CustomActivitiesInstructor = () => {
     const [yourActivitiesData, setYourActivitiesData] = useState({});
     const [open, setOpen] = useState(false)
     const [deleteItem, setDeleteItem] = useState(null);
+    const [loadingId, setLoadingId] = useState(null)
+    const [loadingIdDelete, setLoadingIdDelete] = useState(null)
+
 
     // enters the relevant data into the yourActivitiesData variable
     const createActivitiesData = (activityId, activityTitle, activityOneUpdate, activityTwoUpdate, activityThreeUpdate, activityFourUpdate, activityFiveUpdate, activitySixUpdate) => {
@@ -195,259 +198,316 @@ const CustomActivitiesInstructor = () => {
 
     const navigate = useNavigate();
 
+    //handles updating/saving of the updated activities
     const handleSubmit = async (key, value) => {
 
-        const activityId = key
-        const activity1Id = value.activityOne.key
-        const activity2Id = value.activityTwo.key
-        const activity3Id = value.activityThree.key
-        const activity4Id = value.activityFour.key
-        const activity5Id = value.activityFive.key
-        const activity6Id = value.activitySix.key
+        setLoadingId(key);
+        try {
+            const activityId = key
+            const activity1Id = value.activityOne.key
+            const activity2Id = value.activityTwo.key
+            const activity3Id = value.activityThree.key
+            const activity4Id = value.activityFour.key
+            const activity5Id = value.activityFive.key
+            const activity6Id = value.activitySix.key
 
-        const activityOneLabel = document.getElementById(`activity-one-${key}-label-${value.activityOne.key}`).innerHTML;
-        const activityTwoLabel = document.getElementById(`activity-two-${key}-label-${value.activityTwo.key}`).innerHTML;
-        const activityThreeLabel = document.getElementById(`activity-three-${key}-label-${value.activityThree.key}`).innerHTML;
-        const activityFourLabel = document.getElementById(`activity-four-${key}-label-${value.activityFour.key}`).innerHTML;
-        const activityFiveLabel = document.getElementById(`activity-five-${key}-label-${value.activityFive.key}`).innerHTML;
-        const activitySixLabel = document.getElementById(`activity-six-${key}-label-${value.activitySix.key}`).innerHTML;
+            const activityOneLabel = document.getElementById(`activity-one-${key}-label-${value.activityOne.key}`).innerHTML;
+            const activityTwoLabel = document.getElementById(`activity-two-${key}-label-${value.activityTwo.key}`).innerHTML;
+            const activityThreeLabel = document.getElementById(`activity-three-${key}-label-${value.activityThree.key}`).innerHTML;
+            const activityFourLabel = document.getElementById(`activity-four-${key}-label-${value.activityFour.key}`).innerHTML;
+            const activityFiveLabel = document.getElementById(`activity-five-${key}-label-${value.activityFive.key}`).innerHTML;
+            const activitySixLabel = document.getElementById(`activity-six-${key}-label-${value.activitySix.key}`).innerHTML;
 
-        const activityOneInstruction = document.getElementById(`activity-one-${key}-instruction-${value.activityOne.key}`).innerHTML;
-        const activityTwoInstruction = document.getElementById(`activity-two-${key}-instruction-${value.activityTwo.key}`).innerHTML;
-        const activityThreeInstruction = document.getElementById(`activity-three-${key}-instruction-${value.activityThree.key}`).innerHTML;
-        const activityFourInstruction = document.getElementById(`activity-four-${key}-instruction-${value.activityFour.key}`).innerHTML;
-        const activityFiveInstruction = document.getElementById(`activity-five-${key}-instruction-${value.activityFive.key}`).innerHTML;
-        const activitySixInstruction = document.getElementById(`activity-six-${key}-instruction-${value.activitySix.key}`).innerHTML;
+            const activityOneInstruction = document.getElementById(`activity-one-${key}-instruction-${value.activityOne.key}`).innerHTML;
+            const activityTwoInstruction = document.getElementById(`activity-two-${key}-instruction-${value.activityTwo.key}`).innerHTML;
+            const activityThreeInstruction = document.getElementById(`activity-three-${key}-instruction-${value.activityThree.key}`).innerHTML;
+            const activityFourInstruction = document.getElementById(`activity-four-${key}-instruction-${value.activityFour.key}`).innerHTML;
+            const activityFiveInstruction = document.getElementById(`activity-five-${key}-instruction-${value.activityFive.key}`).innerHTML;
+            const activitySixInstruction = document.getElementById(`activity-six-${key}-instruction-${value.activitySix.key}`).innerHTML;
 
-        let activity1Event;
-        let activity2Event;
-        let activity3Event;
-        let activity4Event;
-        let activity5Event;
-        let activity6Event;
+            let activity1Event;
+            let activity2Event;
+            let activity3Event;
+            let activity4Event;
+            let activity5Event;
+            let activity6Event;
 
-        if (activity1Id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activity1Id}`,
-                {
-                    transcriptEditable: value.activityOne.notEditableTranscript,
-                    label: activityOneLabel,
-                    instruction: activityOneInstruction,
-                }
-            );
-            activity1Event = "Update";
-        } else {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone",
-                {
-                    transcriptEditable: value.activityOne.notEditableTranscript,
-                    label: activityOneLabel,
-                    instruction: activityOneInstruction,
-                }
-            )
-                .then((response) => {
-                    const ActivitiesID = response.data.ActivitiesId.id;
-                    const ActivityOneId = response.data.ActivityOneId;
-                    sessionStorage.setItem("ActivitiesId", ActivitiesID);
-                    sessionStorage.setItem("ActivityOneId", ActivityOneId);
-                });
-            activity1Event = "Create";
-        }
+            if (activity1Id) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activity1Id}`,
+                    {
+                        transcriptEditable: value.activityOne.notEditableTranscript,
+                        label: activityOneLabel,
+                        instruction: activityOneInstruction,
+                    }
+                );
+                activity1Event = "Update";
+            } else {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone",
+                    {
+                        transcriptEditable: value.activityOne.notEditableTranscript,
+                        label: activityOneLabel,
+                        instruction: activityOneInstruction,
+                    }
+                )
+                    .then((response) => {
+                        const ActivitiesID = response.data.ActivitiesId.id;
+                        const ActivityOneId = response.data.ActivityOneId;
+                        sessionStorage.setItem("ActivitiesId", ActivitiesID);
+                        sessionStorage.setItem("ActivityOneId", ActivityOneId);
+                    });
+                activity1Event = "Create";
+            }
 
-        if (activity2Id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activity2Id}`,
-                {
-                    predefinedHighlighting: value.activityTwo.highlightingNotAllowed,
-                    label: activityTwoLabel,
-                    instruction: activityTwoInstruction,
-                }
-            );
-
-            activity2Event = "Update"
-        } else {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/",
-                {
-                    id: activityId,
-                    content: {
+            if (activity2Id) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activity2Id}`,
+                    {
                         predefinedHighlighting: value.activityTwo.highlightingNotAllowed,
                         label: activityTwoLabel,
                         instruction: activityTwoInstruction,
-                    },
-                }
-            )
-                .then((response) => {
-                    const ActivityTwoId = response.data.id;
-                    sessionStorage.setItem("ActivityTwoId", ActivityTwoId);
-                });
+                    }
+                );
 
-            activity2Event = "Create"
-        }
+                activity2Event = "Update"
+            } else {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/",
+                    {
+                        id: activityId,
+                        content: {
+                            predefinedHighlighting: value.activityTwo.highlightingNotAllowed,
+                            label: activityTwoLabel,
+                            instruction: activityTwoInstruction,
+                        },
+                    }
+                )
+                    .then((response) => {
+                        const ActivityTwoId = response.data.id;
+                        sessionStorage.setItem("ActivityTwoId", ActivityTwoId);
+                    });
 
-        if (activity3Id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activity3Id}`,
-                {
-                    MLModel: value.activityThree.MLModel,
-                    AllowMLModel: value.activityThree.enableMLModel,
-                    predefinedMLSelection: value.activityThree.MLSelectionNotAllowed,
-                    label: activityThreeLabel,
-                    instruction: activityThreeInstruction,
-                }
-            );
+                activity2Event = "Create"
+            }
 
-            activity3Event = "Update"
-        } else {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree",
-                {
-                    id: activityId,
-                    content: {
+            if (activity3Id) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activity3Id}`,
+                    {
                         MLModel: value.activityThree.MLModel,
                         AllowMLModel: value.activityThree.enableMLModel,
                         predefinedMLSelection: value.activityThree.MLSelectionNotAllowed,
                         label: activityThreeLabel,
                         instruction: activityThreeInstruction,
-                    },
-                }
-            )
-                .then((response) => {
-                    const ActivityThreeId = response.data.id;
-                    sessionStorage.setItem("ActivityThreeId", ActivityThreeId);
-                });
-            activity3Event = "Create"
-        }
+                    }
+                );
 
-        if (activity4Id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/home/${activity4Id}`,
-                {
-                    label: activityFourLabel,
-                    instruction: activityFourInstruction
-                }
-            );
-            activity4Event = "Update"
-        } else {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/",
-                {
-                    id: activityId,
-                    content: {
+                activity3Event = "Update"
+            } else {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree",
+                    {
+                        id: activityId,
+                        content: {
+                            MLModel: value.activityThree.MLModel,
+                            AllowMLModel: value.activityThree.enableMLModel,
+                            predefinedMLSelection: value.activityThree.MLSelectionNotAllowed,
+                            label: activityThreeLabel,
+                            instruction: activityThreeInstruction,
+                        },
+                    }
+                )
+                    .then((response) => {
+                        const ActivityThreeId = response.data.id;
+                        sessionStorage.setItem("ActivityThreeId", ActivityThreeId);
+                    });
+                activity3Event = "Create"
+            }
+
+            if (activity4Id) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/home/${activity4Id}`,
+                    {
                         label: activityFourLabel,
-                        instruction: activityFourInstruction,
-                    },
-                }
-            )
-                .then((response) => {
-                    const ActivityFourId = response.data.id;
-                    sessionStorage.setItem("ActivityFourId", ActivityFourId);
-                });
+                        instruction: activityFourInstruction
+                    }
+                );
+                activity4Event = "Update"
+            } else {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/",
+                    {
+                        id: activityId,
+                        content: {
+                            label: activityFourLabel,
+                            instruction: activityFourInstruction,
+                        },
+                    }
+                )
+                    .then((response) => {
+                        const ActivityFourId = response.data.id;
+                        sessionStorage.setItem("ActivityFourId", ActivityFourId);
+                    });
 
-            activity4Event = "Create"
-        }
+                activity4Event = "Create"
+            }
 
-        if (activity5Id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activity5Id}`,
-                {
-                    MLClusters: value.activityFive.allowMLClustering,
-                    label: activityFiveLabel,
-                    instruction: activityFiveInstruction,
-                }
-            );
-
-            activity5Event = "Update"
-        } else {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`,
-                {
-                    id: activityId,
-                    content: {
+            if (activity5Id) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activity5Id}`,
+                    {
                         MLClusters: value.activityFive.allowMLClustering,
                         label: activityFiveLabel,
                         instruction: activityFiveInstruction,
-                    },
-                }
-            )
-                .then((response) => {
-                    const ActivityFiveId = response.data.id;
-                    sessionStorage.setItem("ActivityFiveId", ActivityFiveId);
-                });
+                    }
+                );
 
-            activity5Event = "Create"
-        }
+                activity5Event = "Update"
+            } else {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`,
+                    {
+                        id: activityId,
+                        content: {
+                            MLClusters: value.activityFive.allowMLClustering,
+                            label: activityFiveLabel,
+                            instruction: activityFiveInstruction,
+                        },
+                    }
+                )
+                    .then((response) => {
+                        const ActivityFiveId = response.data.id;
+                        sessionStorage.setItem("ActivityFiveId", ActivityFiveId);
+                    });
 
-        if (activity6Id) {
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/home/${activity6Id}`,
-                {
-                    label: activitySixLabel,
-                    instruction: activitySixInstruction
-                }
-            );
+                activity5Event = "Create"
+            }
 
-            activity6Event = "Update"
-
-        } else {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/",
-                {
-                    id: activityId,
-                    content: {
+            if (activity6Id) {
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/home/${activity6Id}`,
+                    {
                         label: activitySixLabel,
-                        instruction: activitySixInstruction,
-                    },
-                }
-            )
-                .then((response) => {
-                    const ActivitySixId = response.data.id;
-                    sessionStorage.setItem("ActivitySixId", ActivitySixId);
-                });
+                        instruction: activitySixInstruction
+                    }
+                );
 
-            activity6Event = "Create"
+                activity6Event = "Update"
+
+            } else {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/",
+                    {
+                        id: activityId,
+                        content: {
+                            label: activitySixLabel,
+                            instruction: activitySixInstruction,
+                        },
+                    }
+                )
+                    .then((response) => {
+                        const ActivitySixId = response.data.id;
+                        sessionStorage.setItem("ActivitySixId", ActivitySixId);
+                    });
+
+                activity6Event = "Create"
+            }
+
+            for (let i = 1; i <= 6; i++) {
+                let logs_data = {
+                    DateTime: Date.now(),
+                    ActivitySequenceId: activityId,
+                    InstructorId: sessionStorage.getItem("UserId"),
+                    Event: `activity${i}Event`,
+                    ActivityId: `activity${i}Id`,
+                    ActivityType: `Activity ${i}`,
+                };
+
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data);
+            }
+            setLoadingId(null);
+
+        } catch (error) {
+
+            console.error('Failed to update template:', error);
+            setLoadingId(null);
+
         }
-
-        for (let i = 1; i <= 6; i++) {
-            let logs_data = {
-                DateTime: Date.now(),
-                ActivitySequenceId: activityId,
-                InstructorId: sessionStorage.getItem("UserId"),
-                Event: `activity${i}Event`,
-                ActivityId: `activity${i}Id`,
-                ActivityType: `Activity ${i}`,
-            };
-
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data);
-        }
-
-        alert("Successfully updated")
-
     }
 
+    //handle delete of templates
     const handleDelete = async (value) => {
-        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.activityId }).then((response) => {
-            console.log(response)
-        })
-        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity", { activityId: value.activityOne.key }).then((response) => {
-            console.log(response)
-        })
-        window.location.reload(false);
+
+        setLoadingIdDelete(value.activityId)
+
+        try {
+            //removes chain of activities in activities table
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.activityId })
+
+            //deletes activity one id
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity", { activityId: value.activityOne.key })
+
+            //deletes activity two id
+            if (value.activityTwo.key) {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/delete-activity", { activityId: value.activityTwo.key })
+            }
+
+            //deletes activity three id
+            if (value.activityThree.key) {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/delete-activity", { activityId: value.activityThree.key })
+            }
+
+            //deletes activity two id
+            if (value.activityFour.key) {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/delete-activity", { activityId: value.activityFour.key })
+            }
+
+            //deletes activity two id
+            if (value.activityFive.key) {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/delete-activity", { activityId: value.activityFive.key })
+            }
+
+            //deletes activity two id
+            if (value.activitySix.key) {
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/delete-activity", { activityId: value.activitySix.key })
+            }
+
+            setLoadingIdDelete(null);
+
+            setYourActivitiesData(prevActivities => {
+                const updatedActivities = { ...prevActivities };
+                delete updatedActivities[value.activityId];
+                return updatedActivities;
+            });
+
+        } catch (error) {
+
+            console.error('Failed to update template:', error);
+            setLoadingIdDelete  (null);
+
+        }
+
     }
 
+    //dialog for confirming user action for deleting a template
     const confirmDeleteDialog = () => {
         return (
             <Dialog open={open} onClose={() => setOpen(false)}
                 BackdropProps={{
                     style: {
-                        backgroundColor: 'transparent',
+                        opacity: "10%"
                     },
                 }}
                 PaperProps={{
                     style: {
                         boxShadow: 'none',
-                        border: '1px solid black'
+
                     },
                 }}>
-                <DialogTitle>Are you sure you would like to delete the following activity?</DialogTitle>
+                <DialogTitle className='dialog-delete-header'>
+                    <Typography className='dialog-delete-title'><strong>Are you sure?</strong></Typography>
+                    <Typography>Once deleted, retrieval is impossible. Please consult your instructor before proceeding.</Typography>
+                </DialogTitle>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)}>
-                        No
+                    <Button onClick={() => setOpen(false)} >
+                        Cancel
                     </Button>
-                    <Button onClick={() => {
+                    <Button onClick={(e) => {
+                        e.stopPropagation();
                         if (deleteItem) handleDelete(deleteItem);
                         setOpen(false);
                         setDeleteItem(null);
                     }} autoFocus>
-                        Yes
+                        Proceed
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -471,8 +531,10 @@ const CustomActivitiesInstructor = () => {
         sessionStorage.setItem("ActivityFourId", value.activityFour.key);
         sessionStorage.setItem("ActivityFiveId", value.activityFive.key);
         sessionStorage.setItem("ActivitySixId", value.activitySix.key);
+        sessionStorage.setItem("new-chain", false);
     }
 
+    //handles start activity button
     const handleStartActivity = (value) => {
         storeActivityDetails(value);
         sessionStorage.setItem("custom-activities-instructor", true);
@@ -484,416 +546,431 @@ const CustomActivitiesInstructor = () => {
     }
 
     const handleNavigate = (activityId, activityNumber, value) => {
-        if (activityId === null) {
-            alert("Please go back to the previous activity and submit it to continue.");
-            return;
-        }
         sessionStorage.setItem("ActivitiesId", value.id);
         storeActivityDetails(value);
         navigate(`/activity${activityNumber}/${activityId}`);
     };
 
     return (
-        <div>
+        <div >
             {/* button to allow instructors to create a new template */}
             <Button className="create-template-button" fullWidth variant="outlined"
                 onClick={() => { removeActivityDetails(); sessionStorage.setItem("custom-activities-instructor", true); navigate("/activityone"); }}>
                 Create a Template
             </Button>
 
-            <Typography className="custom-activities-title" variant="h5">
-                Your Custom Activities
-            </Typography>
-
-            {Object.entries(yourActivitiesData).map(([key, value]) => {
-                return (
-                    <div key={key} className="activity-accordion">
-                        <Accordion className="accordion">
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`panel-header-${value.id}`} className="accordion-summary">
-                                <div className='activity-container'>
-                                    <Typography className="activity-title">{value.activityTitle}</Typography>
-                                </div>
-                                <Button className="start-activity-button" onClick={() => { handleStartActivity(value) }}>
-                                    Start Activity
-                                </Button>
-                                <Button onClick={() => { setOpen(true); setDeleteItem(value); }} className='activity-button-delete'>
-                                    <ClearIcon />
-                                </Button>
-                                {confirmDeleteDialog()}
-                                
-                            </AccordionSummary>
-
-                            <AccordionDetails className='accordian-details'>
-                                <Alert severity="warning" className="alert-warning">
-                                    To ensure the activities are accessible to users, please click the 'Publish Activities / Save Changes' button.
-                                </Alert>
-
-                                {/* activity one */}
-                                <div>
-                                    <div className='activity-header-section'>
-
-                                        <Typography className="activity-title" variant="h6">
-                                            <strong>Activity 1</strong>
-                                        </Typography>
-
-                                        <Button onClick={() => { handleNavigate(value.activityOne.key, "one", value) }}
-                                            className={`activity-button ${value.activityOne.key ? "active" : "disabled"}`}>
-                                            Activity One
-                                        </Button>
-                                    </div>
-
-                                    <div className='activity-sub-section'>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityOne.label }}
-                                            contentEditable="true"
-                                            className="editable-label"
-                                            id={`activity-one-${key}-label-${value.activityOne.key}`}
-                                        ></Typography>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityOne.instruction }}
-                                            contentEditable="true"
-                                            className="editable-instruction"
-                                            id={`activity-one-${key}-instruction-${value.activityOne.key}`}
-                                        ></Typography>
-
-                                        <Typography className='activity-info-text'>
-                                            To update the transcript, kindly navigate to Activity 1 and implement the necessary modifications.
-                                        </Typography>
-
-                                        <FormControlLabel className='activity-switch'
-                                            control={
-                                                <Switch
-                                                    checked={value.activityOne.notEditableTranscript}
-                                                    onChange={() => setYourActivitiesData(prevValues => {
-                                                        const updatedActivity = {
-                                                            ...prevValues[key],
-                                                            activityOne: {
-                                                                ...prevValues[key].activityOne,
-                                                                notEditableTranscript: !prevValues[key].activityOne.notEditableTranscript
-                                                            }
-                                                        };
-                                                        return {
-                                                            ...prevValues,
-                                                            [key]: updatedActivity
-                                                        };
-                                                    })}
-                                                />
-                                            }
-                                            label="Standardised Script"
-                                        />
-
-                                        <Divider className='activity-divider' />
-
-                                    </div>
-
-                                </div>
-
-                                {/* activity two */}
-
-                                <div>
-                                    <div className='activity-header-section'>
-
-                                        <Typography className="activity-title" variant="h6">
-                                            <strong>Activity 2</strong>
-                                        </Typography>
-
-                                        <Button onClick={() => { handleNavigate(value.activityTwo.key, "two", value) }}
-                                            className={`activity-button ${value.activityTwo.key ? "active" : "disabled"}`}>
-                                            Activity Two
-                                        </Button>
-                                    </div>
-
-                                    <div className='activity-sub-section'>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityTwo.label }}
-                                            contentEditable="true"
-                                            className="editable-label"
-                                            id={`activity-two-${key}-label-${value.activityTwo.key}`}
-                                        ></Typography>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityTwo.instruction }}
-                                            contentEditable="true"
-                                            className="editable-instruction"
-                                            id={`activity-two-${key}-instruction-${value.activityTwo.key}`}
-                                            style={{ marginBottom: 10 }}
-                                        ></Typography>
-
-                                        <FormControlLabel className='activity-switch'
-                                            control={
-                                                <Switch
-                                                    checked={value.activityTwo.highlightingNotAllowed}
-                                                    onChange={() => setYourActivitiesData(prevValues => {
-                                                        const updatedActivity = {
-                                                            ...prevValues[key],
-                                                            activityTwo: {
-                                                                ...prevValues[key].activityTwo,
-                                                                highlightingNotAllowed: !prevValues[key].activityTwo.highlightingNotAllowed
-                                                            }
-                                                        };
-                                                        return {
-                                                            ...prevValues,
-                                                            [key]: updatedActivity
-                                                        };
-                                                    })}
-                                                />
-                                            }
-                                            label="Standardised Script Highlighting"
-                                        />
-
-                                        <Divider className='activity-divider' />
-
-                                    </div>
-
-                                </div>
-
-                                {/* activity three */}
-
-                                <div>
-                                    <div className='activity-header-section'>
-
-                                        <Typography className="activity-title" variant="h6">
-                                            <strong>Activity 3</strong>
-                                        </Typography>
-
-                                    </div>
-
-                                    <div className='activity-sub-section'>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityThree.label }}
-                                            contentEditable="true"
-                                            className="editable-label"
-                                            id={`activity-three-${key}-label-${value.activityThree.key}`}
-                                        ></Typography>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityThree.instruction }}
-                                            contentEditable="true"
-                                            className="editable-instruction"
-                                            id={`activity-three-${key}-instruction-${value.activityThree.key}`}
-                                        ></Typography>
-
-                                        <Typography className='activity-info-text'>
-                                            If a machine learning model isn't chosen, no selections based on machine learning will occur.
-                                        </Typography>
-
-                                        <Typography className='activity-info-text'>
-                                            Currently selected machine learning model: {value.activityThree.MLModel}
-                                        </Typography>
-
-                                        <Typography className='activity-info-text'>
-                                            To choose a different machine learning model, please make your selection from the options below.
-                                        </Typography>
-
-                                        <Select className='activity-switch'
-                                            value={value.activityThree.MLModel}
-                                            onChange={(e) => setYourActivitiesData(prevValues => {
-                                                const updatedActivity = {
-                                                    ...prevValues[key],
-                                                    activityThree: {
-                                                        ...prevValues[key].activityThree,
-                                                        MLModel: e.target.value,
-                                                    }
-                                                };
-                                                return {
-                                                    ...prevValues,
-                                                    [key]: updatedActivity
-                                                };
-                                            })}
-
-                                        >
-                                            <MenuItem value={"None"}>None</MenuItem>
-                                            <MenuItem value={"Model1"}>Model 1</MenuItem>
-                                            <MenuItem value={"Model2"}>Model 2</MenuItem>
-                                            <MenuItem value={"Model3"}>Model 3</MenuItem>
-                                            <MenuItem value={"Model4"}>Model 4</MenuItem>
-                                        </Select>
-
-                                        <FormControlLabel className='activity-switch'
-                                            control={
-                                                <Switch
-                                                    checked={value.activityThree.enableMLModel}
-                                                    onChange={() => setYourActivitiesData(prevValues => {
-                                                        const updatedActivity = {
-                                                            ...prevValues[key],
-                                                            activityThree: {
-                                                                ...prevValues[key].activityThree,
-                                                                enableMLModel: !prevValues[key].activityThree.enableMLModel
-                                                            }
-                                                        };
-                                                        return {
-                                                            ...prevValues,
-                                                            [key]: updatedActivity
-                                                        };
-                                                    })}
-                                                />
-                                            }
-                                            label="Enable Selections Based on Machine Learning Analysis"
-                                        />
-
-                                        <FormControlLabel className='activity-switch'
-                                            control={
-                                                <Switch
-                                                    checked={value.activityThree.MLSelectionNotAllowed}
-                                                    onChange={() => setYourActivitiesData(prevValues => {
-                                                        const updatedActivity = {
-                                                            ...prevValues[key],
-                                                            activityThree: {
-                                                                ...prevValues[key].activityThree,
-                                                                MLSelectionNotAllowed: !prevValues[key].activityThree.MLSelectionNotAllowed
-                                                            }
-                                                        };
-                                                        return {
-                                                            ...prevValues,
-                                                            [key]: updatedActivity
-                                                        };
-                                                    })}
-                                                />
-                                            }
-                                            label="Standardised Machine Learning Selections"
-                                        />
-
-                                        <Divider className='activity-divider' />
-
-                                    </div>
-
-                                </div>
-
-                                {/* activity four */}
-
-                                <div>
-                                    <div className='activity-section'>
-
-                                        <Typography className="activity-title" variant="h6">
-                                            <strong>Activity 4</strong>
-                                        </Typography>
-
-                                    </div>
-
-                                    <div className='activity-sub-section'>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityFour.label }}
-                                            contentEditable="true"
-                                            className="editable-label"
-                                            id={`activity-four-${key}-label-${value.activityFour.key}`}
-                                        ></Typography>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityFour.instruction }}
-                                            contentEditable="true"
-                                            className="editable-instruction"
-                                            id={`activity-four-${key}-instruction-${value.activityFour.key}`}
-                                        ></Typography>
-
-                                        <Divider className='activity-divider' style={{ marginTop: 20 }} />
-
-                                    </div>
-
-                                </div>
-
-                                {/* activity five */}
-
-                                <div>
-                                    <div className='activity-section'>
-
-                                        <Typography className="activity-title" variant="h6">
-                                            <strong>Activity 5</strong>
-                                        </Typography>
-
-                                    </div>
-
-                                    <div className='activity-sub-section'>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityFive.label }}
-                                            contentEditable="true"
-                                            className="editable-label"
-                                            id={`activity-five-${key}-label-${value.activityFive.key}`}
-                                        ></Typography>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activityFive.instruction }}
-                                            contentEditable="true"
-                                            className="editable-instruction"
-                                            id={`activity-five-${key}-instruction-${value.activityFive.key}`}
-                                            style={{ marginBottom: 10 }}
-                                        ></Typography>
-
-                                        <FormControlLabel className='activity-switch'
-                                            control={
-                                                <Switch
-                                                    checked={value.activityFive.allowMLClustering}
-                                                    onChange={() => setYourActivitiesData(prevValues => {
-                                                        const updatedActivity = {
-                                                            ...prevValues[key],
-                                                            activityFive: {
-                                                                ...prevValues[key].activityFive,
-                                                                allowMLClustering: !prevValues[key].activityFive.allowMLClustering
-                                                            }
-                                                        };
-                                                        return {
-                                                            ...prevValues,
-                                                            [key]: updatedActivity
-                                                        };
-                                                    })}
-                                                />
-                                            }
-                                            label="Allow Machine Learning Clustering"
-                                        />
-
-                                        <Divider className='activity-divider' />
-
-                                    </div>
-
-                                </div>
-
-                                {/* activity six */}
-
-                                <div>
-                                    <div className='activity-section'>
-
-                                        <Typography className="activity-title" variant="h6">
-                                            <strong>Activity 6</strong>
-                                        </Typography>
-
-                                    </div>
-
-                                    <div className='activity-sub-section'>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activitySix.label }}
-                                            contentEditable="true"
-                                            className="editable-label"
-                                            id={`activity-six-${key}-label-${value.activitySix.key}`}
-                                        ></Typography>
-
-                                        <Typography
-                                            dangerouslySetInnerHTML={{ __html: value.activitySix.instruction }}
-                                            contentEditable="true"
-                                            className="editable-instruction"
-                                            id={`activity-six-${key}-instruction-${value.activitySix.key}`}
-                                        ></Typography>
-
-                                    </div>
-
-                                </div>
-
-                                <Button fullWidth variant='contained' className='activity-submit-button' onClick={() => handleSubmit(key, value)}>
-                                    Save and Publish Updates
-                                </Button>
-
-                            </AccordionDetails>
-
-                        </Accordion>
+            <div className='custom-activities-container'>
+                <Typography className="custom-activities-title">
+                    Your Custom Activities
+                </Typography>
+
+                {Object.entries(yourActivitiesData).length === 0 ? (
+                    <div className='custom-activities-blank'>
+                        Currently, no templates are available. Please create one using the button above.
                     </div>
-                )
+                ) : (
+                    /*displays set of activities created by the instructor*/
+                    Object.entries(yourActivitiesData).map(([key, value]) => {
+                        return (
+                            <div key={key} className="activity-accordion">
+                                <Accordion className="accordion">
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`panel-header-${value.id}`} className="accordion-summary">
+                                        <div className='activity-container'>
+                                            <Typography className="activity-title">{value.activityTitle === "" ? "No Title Provided" : value.activityTitle}</Typography>
+                                        </div>
+                                        <Button disableRipple className="start-activity-button" onClick={() => { handleStartActivity(value) }}>
+                                            Start Activity
+                                        </Button>
+                                        {loadingIdDelete === value.activityId ? (
+                                            <CircularProgress size={37} className='delete-template-loading' />
+                                        ) : (
+                                            <Button disableRipple onClick={(e) => { e.stopPropagation(); setOpen(true); setDeleteItem(value); }} className='activity-button-delete'>
+                                                <ClearIcon />
+                                            </Button>
+                                        )}
+                                        {confirmDeleteDialog()}
+                                    </AccordionSummary>
 
-            })}
+                                    <AccordionDetails className='accordian-details'>
+                                        <Alert severity="warning" className="alert-warning" style={{ marginTop: "8px" }}>
+                                            Please click the 'Publish Activities / Save Changes' button to make the activities available to all users.
+                                        </Alert>
+
+                                        {/* activity one */}
+                                        <div>
+                                            <div className='activity-header-section'>
+
+                                                <Typography className="activity-sub-title" variant="h6">
+                                                    <strong>Activity 1</strong>
+                                                </Typography>
+
+                                                <Button onClick={() => { handleNavigate(value.activityOne.key, "one", value) }} disabled={!value.activityOne.key}
+                                                    className={`activity-button ${value.activityOne.key ? "active" : "disabled"}`}>
+                                                    Activity One
+                                                </Button>
+                                            </div>
+
+                                            <div className='activity-sub-section'>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityOne.label }}
+                                                    contentEditable="true"
+                                                    className="editable-label"
+                                                    id={`activity-one-${key}-label-${value.activityOne.key}`}
+                                                ></Typography>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityOne.instruction }}
+                                                    contentEditable="true"
+                                                    className="editable-instruction"
+                                                    id={`activity-one-${key}-instruction-${value.activityOne.key}`}
+                                                ></Typography>
+
+                                                <Typography className='activity-info-text'>
+                                                    To update the transcript, kindly navigate to Activity 1 and implement the necessary modifications.
+                                                </Typography>
+
+                                                <FormControlLabel className='activity-switch'
+                                                    control={
+                                                        <Switch
+                                                            checked={value.activityOne.notEditableTranscript}
+                                                            onChange={() => setYourActivitiesData(prevValues => {
+                                                                const updatedActivity = {
+                                                                    ...prevValues[key],
+                                                                    activityOne: {
+                                                                        ...prevValues[key].activityOne,
+                                                                        notEditableTranscript: !prevValues[key].activityOne.notEditableTranscript
+                                                                    }
+                                                                };
+                                                                return {
+                                                                    ...prevValues,
+                                                                    [key]: updatedActivity
+                                                                };
+                                                            })}
+                                                        />
+                                                    }
+                                                    label="Standardised Script"
+                                                />
+
+                                                <Divider className='activity-divider' />
+
+                                            </div>
+
+                                        </div>
+
+                                        {/* activity two */}
+
+                                        <div>
+                                            <div className='activity-header-section'>
+
+                                                <Typography className="activity-title" variant="h6">
+                                                    <strong>Activity 2</strong>
+                                                </Typography>
+
+                                                <Button onClick={() => { handleNavigate(value.activityTwo.key, "two", value) }} disabled={!value.activityTwo.key}
+                                                    className={`activity-button ${value.activityTwo.key ? "active" : "disabled"}`}>
+                                                    Activity Two
+                                                </Button>
+                                            </div>
+
+                                            <div className='activity-sub-section'>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityTwo.label }}
+                                                    contentEditable="true"
+                                                    className="editable-label"
+                                                    id={`activity-two-${key}-label-${value.activityTwo.key}`}
+                                                ></Typography>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityTwo.instruction }}
+                                                    contentEditable="true"
+                                                    className="editable-instruction"
+                                                    id={`activity-two-${key}-instruction-${value.activityTwo.key}`}
+                                                    style={{ marginBottom: 10 }}
+                                                ></Typography>
+
+                                                <FormControlLabel className='activity-switch'
+                                                    control={
+                                                        <Switch
+                                                            checked={value.activityTwo.highlightingNotAllowed}
+                                                            onChange={() => setYourActivitiesData(prevValues => {
+                                                                const updatedActivity = {
+                                                                    ...prevValues[key],
+                                                                    activityTwo: {
+                                                                        ...prevValues[key].activityTwo,
+                                                                        highlightingNotAllowed: !prevValues[key].activityTwo.highlightingNotAllowed
+                                                                    }
+                                                                };
+                                                                return {
+                                                                    ...prevValues,
+                                                                    [key]: updatedActivity
+                                                                };
+                                                            })}
+                                                        />
+                                                    }
+                                                    label="Standardised Script Highlighting"
+                                                />
+
+                                                <Divider className='activity-divider' />
+
+                                            </div>
+
+                                        </div>
+
+                                        {/* activity three */}
+
+                                        <div>
+                                            <div className='activity-header-section'>
+
+                                                <Typography className="activity-title" variant="h6">
+                                                    <strong>Activity 3</strong>
+                                                </Typography>
+
+                                            </div>
+
+                                            <div className='activity-sub-section'>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityThree.label }}
+                                                    contentEditable="true"
+                                                    className="editable-label"
+                                                    id={`activity-three-${key}-label-${value.activityThree.key}`}
+                                                ></Typography>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityThree.instruction }}
+                                                    contentEditable="true"
+                                                    className="editable-instruction"
+                                                    id={`activity-three-${key}-instruction-${value.activityThree.key}`}
+                                                ></Typography>
+
+                                                <Typography className='activity-info-text'>
+                                                    If a machine learning model isn't chosen, no selections based on machine learning will occur.
+                                                </Typography>
+
+                                                <Typography className='activity-info-text'>
+                                                    Currently selected machine learning model: {value.activityThree.MLModel}
+                                                </Typography>
+
+                                                <Typography className='activity-info-text'>
+                                                    To choose a different machine learning model, please make your selection from the options below.
+                                                </Typography>
+
+                                                <Select className='activity-switch'
+                                                    value={value.activityThree.MLModel}
+                                                    onChange={(e) => setYourActivitiesData(prevValues => {
+                                                        const updatedActivity = {
+                                                            ...prevValues[key],
+                                                            activityThree: {
+                                                                ...prevValues[key].activityThree,
+                                                                MLModel: e.target.value,
+                                                            }
+                                                        };
+                                                        return {
+                                                            ...prevValues,
+                                                            [key]: updatedActivity
+                                                        };
+                                                    })}
+
+                                                >
+                                                    <MenuItem value={"None"}>None</MenuItem>
+                                                    <MenuItem value={"Model1"}>Model 1</MenuItem>
+                                                    <MenuItem value={"Model2"}>Model 2</MenuItem>
+                                                    <MenuItem value={"Model3"}>Model 3</MenuItem>
+                                                    <MenuItem value={"Model4"}>Model 4</MenuItem>
+                                                </Select>
+
+                                                <FormControlLabel className='activity-switch'
+                                                    control={
+                                                        <Switch
+                                                            checked={value.activityThree.enableMLModel}
+                                                            onChange={() => setYourActivitiesData(prevValues => {
+                                                                const updatedActivity = {
+                                                                    ...prevValues[key],
+                                                                    activityThree: {
+                                                                        ...prevValues[key].activityThree,
+                                                                        enableMLModel: !prevValues[key].activityThree.enableMLModel
+                                                                    }
+                                                                };
+                                                                return {
+                                                                    ...prevValues,
+                                                                    [key]: updatedActivity
+                                                                };
+                                                            })}
+                                                        />
+                                                    }
+                                                    label="Enable Selections Based on Machine Learning Analysis"
+                                                />
+
+                                                <FormControlLabel className='activity-switch'
+                                                    control={
+                                                        <Switch
+                                                            checked={value.activityThree.MLSelectionNotAllowed}
+                                                            onChange={() => setYourActivitiesData(prevValues => {
+                                                                const updatedActivity = {
+                                                                    ...prevValues[key],
+                                                                    activityThree: {
+                                                                        ...prevValues[key].activityThree,
+                                                                        MLSelectionNotAllowed: !prevValues[key].activityThree.MLSelectionNotAllowed
+                                                                    }
+                                                                };
+                                                                return {
+                                                                    ...prevValues,
+                                                                    [key]: updatedActivity
+                                                                };
+                                                            })}
+                                                        />
+                                                    }
+                                                    label="Standardised Machine Learning Selections"
+                                                />
+
+                                                <Divider className='activity-divider' />
+
+                                            </div>
+
+                                        </div>
+
+                                        {/* activity four */}
+
+                                        <div>
+                                            <div className='activity-section'>
+
+                                                <Typography className="activity-title" variant="h6">
+                                                    <strong>Activity 4</strong>
+                                                </Typography>
+
+                                            </div>
+
+                                            <div className='activity-sub-section'>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityFour.label }}
+                                                    contentEditable="true"
+                                                    className="editable-label"
+                                                    id={`activity-four-${key}-label-${value.activityFour.key}`}
+                                                ></Typography>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityFour.instruction }}
+                                                    contentEditable="true"
+                                                    className="editable-instruction"
+                                                    id={`activity-four-${key}-instruction-${value.activityFour.key}`}
+                                                ></Typography>
+
+                                                <Divider className='activity-divider' style={{ marginTop: 20 }} />
+
+                                            </div>
+
+                                        </div>
+
+                                        {/* activity five */}
+
+                                        <div>
+                                            <div className='activity-section'>
+
+                                                <Typography className="activity-title" variant="h6">
+                                                    <strong>Activity 5</strong>
+                                                </Typography>
+
+                                            </div>
+
+                                            <div className='activity-sub-section'>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityFive.label }}
+                                                    contentEditable="true"
+                                                    className="editable-label"
+                                                    id={`activity-five-${key}-label-${value.activityFive.key}`}
+                                                ></Typography>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activityFive.instruction }}
+                                                    contentEditable="true"
+                                                    className="editable-instruction"
+                                                    id={`activity-five-${key}-instruction-${value.activityFive.key}`}
+                                                    style={{ marginBottom: 10 }}
+                                                ></Typography>
+
+                                                <FormControlLabel className='activity-switch'
+                                                    control={
+                                                        <Switch
+                                                            checked={value.activityFive.allowMLClustering}
+                                                            onChange={() => setYourActivitiesData(prevValues => {
+                                                                const updatedActivity = {
+                                                                    ...prevValues[key],
+                                                                    activityFive: {
+                                                                        ...prevValues[key].activityFive,
+                                                                        allowMLClustering: !prevValues[key].activityFive.allowMLClustering
+                                                                    }
+                                                                };
+                                                                return {
+                                                                    ...prevValues,
+                                                                    [key]: updatedActivity
+                                                                };
+                                                            })}
+                                                        />
+                                                    }
+                                                    label="Allow Machine Learning Clustering"
+                                                />
+
+                                                <Divider className='activity-divider' />
+
+                                            </div>
+
+                                        </div>
+
+                                        {/* activity six */}
+
+                                        <div>
+                                            <div className='activity-section'>
+
+                                                <Typography className="activity-title" variant="h6">
+                                                    <strong>Activity 6</strong>
+                                                </Typography>
+
+                                            </div>
+
+                                            <div className='activity-sub-section'>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activitySix.label }}
+                                                    contentEditable="true"
+                                                    className="editable-label"
+                                                    id={`activity-six-${key}-label-${value.activitySix.key}`}
+                                                ></Typography>
+
+                                                <Typography
+                                                    dangerouslySetInnerHTML={{ __html: value.activitySix.instruction }}
+                                                    contentEditable="true"
+                                                    className="editable-instruction"
+                                                    id={`activity-six-${key}-instruction-${value.activitySix.key}`}
+                                                ></Typography>
+
+                                            </div>
+
+                                        </div>
+
+                                        {loadingId === key ? (
+                                            <LinearProgress className='update-template-loading' />
+                                        ) : (
+                                            <Button fullWidth variant='contained' className='activity-submit-button' onClick={() => handleSubmit(key, value)}>
+                                                Save and Publish Updates
+                                            </Button>
+                                        )}
+
+                                    </AccordionDetails>
+
+                                </Accordion>
+                            </div>
+                        )
+
+                    })
+
+                )}
+            </div>
+
+
 
         </div>
     )

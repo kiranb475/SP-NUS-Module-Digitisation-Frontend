@@ -1,22 +1,8 @@
-import {
-  AppBar,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Toolbar,
-  Typography,
-  alertClasses,
-} from "@mui/material";
+import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, InputLabel, MenuItem, Select, TextField, Toolbar, Typography, } from "@mui/material";
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import './NavBar.css'
 
 function NavBar() {
   const [username, setUsername] = useState("");
@@ -29,8 +15,9 @@ function NavBar() {
   const [openRegister, setOpenRegister] = useState(false);
   const navigate = useNavigate();
 
-  // when the user registers a new account
-  const onSubmitRegister = () => {
+  //user login/registration
+  const onSubmit = (action) => {
+
     setUsernameError(false);
     setPasswordError(false);
     setOccupationError(false);
@@ -56,11 +43,8 @@ function NavBar() {
       password: password,
       occupation: occupation,
     };
-    axios
-      .post(
-        "https://activities-alset-aef528d2fd94.herokuapp.com/activityone/auth/register",
-        data
-      )
+
+    axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/auth/${action}`, data)
       .then((response) => {
         if (response.data.error) {
           alert(response.data.error);
@@ -73,110 +57,64 @@ function NavBar() {
         navigate("home");
         window.location.reload();
       });
-  };
+  }
 
-  // when the user logs in to an exisitng account
-  const onSubmitLogin = () => {
-    setUsernameError(false);
-    setPasswordError(false);
-    setOccupationError(false);
-    let flag = false;
-    if (username === "") {
-      setUsernameError(true);
-      flag = true;
-    }
-    if (password === "") {
-      setPasswordError(true);
-      flag = true;
-    }
-    if (occupation === "") {
-      setOccupationError(true);
-      flag = true;
-    }
-    if (flag) {
-      return;
-    }
-
-    const data = {
-      username: username,
-      password: password,
-      occupation: occupation,
-    };
-    axios
-      .post(
-        "https://activities-alset-aef528d2fd94.herokuapp.com/activityone/auth/login",
-        data
-      )
-      .then((response) => {
-        if (response.data.error) {
-          alert(response.data.error);
-          return;
-        }
-        sessionStorage.setItem("UserId", response.data);
-        sessionStorage.setItem("Username", username);
-        sessionStorage.setItem("Occupation", occupation);
-        setOpenLogin(false);
-        navigate("home");
-        window.location.reload();
-      });
-  };
+  //content displayed within the dialog
+  const dialogContent = () => {
+    return (
+      <>
+        <TextField
+          variant="standard"
+          required
+          margin="normal"
+          label="Username"
+          error={usernameError}
+          fullWidth
+          onChange={(e) => setUsername(e.target.value)}
+          className="username-input"
+        ></TextField>
+        <TextField
+          className="password-input"
+          type="password"
+          variant="standard"
+          required
+          margin="normal"
+          label="Password"
+          fullWidth
+          error={passwordError}
+          onChange={(e) => setPassword(e.target.value)}
+        ></TextField>
+        <InputLabel required className="occupation-input" >
+          Occupation
+        </InputLabel>
+        <Select
+          fullWidth
+          error={occupationError}
+          onChange={(e) => setOccupation(e.target.value)}
+        >
+          <MenuItem value="Student">Student</MenuItem>
+          <MenuItem value="Instructor">Instructor</MenuItem>
+        </Select>
+      </>
+    )
+  }
 
   return (
+
     <AppBar position="static">
       {/*Dialog for user login*/}
       <Dialog open={openLogin} onClose={() => setOpenLogin(false)}>
-        <DialogTitle
-          style={{
-            fontFamily: `"Lato", sans-serif`,
-            fontSize: 25,
-            paddingBottom: 0,
-          }}
-        >
-          Enter your login details
+        <DialogTitle className="login-header">
+          <Typography className="login-title"><strong>Welcome back!</strong></Typography>
         </DialogTitle>
         <DialogContent>
-          <TextField
-            style={{ marginBottom: 0, marginTop: 10 }}
-            variant="standard"
-            required
-            margin="normal"
-            label="Username"
-            error={usernameError}
-            fullWidth
-            onChange={(e) => setUsername(e.target.value)}
-          ></TextField>
-          <TextField
-            type="password"
-            style={{ marginTop: 15 }}
-            variant="standard"
-            required
-            margin="normal"
-            label="Password"
-            fullWidth
-            error={passwordError}
-            onChange={(e) => setPassword(e.target.value)}
-          ></TextField>
-          <InputLabel required style={{ marginTop: 25 }}>
-            Occupation
-          </InputLabel>
-          <Select
-            fullWidth
-            error={occupationError}
-            onChange={(e) => setOccupation(e.target.value)}
-          >
-            <MenuItem value="Student">Student</MenuItem>
-            <MenuItem value="Instructor">Instructor</MenuItem>
-          </Select>
+          {dialogContent()}
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setOpenLogin(false);
-            }}
-          >
+        <DialogActions className="login-action">
+          <Button fullWidth onClick={() => { setOpenLogin(false); }} className="login-button">
             Cancel
           </Button>
-          <Button type="submit" onClick={onSubmitLogin}>
+          <Button fullWidth type="submit" onClick={() => onSubmit("login")} className="login-button">
             Log In
           </Button>
         </DialogActions>
@@ -184,119 +122,55 @@ function NavBar() {
 
       {/*Dialog for user registration*/}
       <Dialog open={openRegister} onClose={() => setOpenRegister(false)}>
-        <DialogTitle
-          style={{
-            fontFamily: `"Lato", sans-serif`,
-            fontSize: 25,
-            paddingBottom: 0,
-          }}
-        >
-          Register with your details
+        <DialogTitle className="register-header">
+          <Typography className="register-title"><strong>Hello there!</strong></Typography>
         </DialogTitle>
         <DialogContent>
-          <TextField
-            style={{ marginBottom: 0, marginTop: 10 }}
-            variant="standard"
-            required
-            margin="normal"
-            label="Username"
-            error={usernameError}
-            fullWidth
-            onChange={(e) => setUsername(e.target.value)}
-          ></TextField>
-          <TextField
-            type="password"
-            style={{ marginTop: 15 }}
-            variant="standard"
-            required
-            margin="normal"
-            label="Password"
-            fullWidth
-            error={passwordError}
-            onChange={(e) => setPassword(e.target.value)}
-          ></TextField>
-          <InputLabel required style={{ marginTop: 25 }}>
-            Occupation
-          </InputLabel>
-          <Select
-            fullWidth
-            error={occupationError}
-            onChange={(e) => setOccupation(e.target.value)}
-          >
-            <MenuItem value="Student">Student</MenuItem>
-            <MenuItem value="Instructor">Instructor</MenuItem>
-          </Select>
+          {dialogContent()}
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setOpenRegister(false);
-            }}
-          >
+        <DialogActions className="register-action">
+          <Button fullWidth onClick={() => { setOpenRegister(false) }} className="register-button">
             Cancel
           </Button>
-          <Button type="submit" onClick={onSubmitRegister}>
+          <Button fullWidth type="submit" onClick={() => onSubmit("register")} className="register-button">
             Register
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Toolbar style={{ backgroundColor: "black" }}>
+      {/*Contents of navigation bar*/}
+      <Toolbar className="toolbar-container">
         <Typography
-          onClick={() => {
-            navigate("/home");
-          }}
+          onClick={() => { navigate("/home"); }}
           variant="h6"
-          sx={{
-            flexGrow: 1,
-            fontFamily: `"Playfair Display", serif`,
-            fontSize: 30,
-            paddingBottom: 1,
-          }}
+          className="toolbar-title"
         >
           Singapore Polytechnic
         </Typography>
         {sessionStorage.getItem("UserId") && (
-          <Typography
-            style={{
-              marginRight: 10,
-              fontFamily: `"Bebas Neue", sans-serif`,
-              fontSize: 25,
-              paddingTop: 5,
-            }}
-          >
+          <Typography className="toolbar-username">
             {sessionStorage.getItem("Username")}
           </Typography>
         )}
         {!sessionStorage.getItem("UserId") && (
-          <Button
-            onClick={() => setOpenLogin(true)}
-            color="inherit"
-            style={{ fontFamily: `"Oswald", sans-serif`, fontSize: 20 }}
-          >
-            Log in
+          <Button disableRipple onClick={() => setOpenLogin(true)} color="inherit" className="toolbar-login">
+            Login
           </Button>
         )}
         {!sessionStorage.getItem("UserId") && (
-          <Button
-            onClick={() => setOpenRegister(true)}
-            color="inherit"
-            style={{ fontFamily: `"Oswald", sans-serif`, fontSize: 20 }}
-          >
+          <Button disableRipple onClick={() => setOpenRegister(true)} color="inherit" className="toolbar-register">
             Register
           </Button>
         )}
         {sessionStorage.getItem("UserId") && (
-          <Button
-            onClick={() => {
-              sessionStorage.clear();
-              localStorage.clear();
-              navigate("/");
-            }}
-            color="inherit"
-            style={{ fontFamily: `"Oswald", sans-serif`, fontSize: 20 }}
+          <Button disableRipple onClick={() => {
+            sessionStorage.clear();
+            localStorage.clear();
+            navigate("/");
+          }}
+            color="inherit" className="toolbar-logout"
           >
-            Log out
+            Logout
           </Button>
         )}
       </Toolbar>
