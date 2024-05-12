@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css'
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Button, CircularProgress, Dialog, DialogActions, DialogTitle, Divider, FormControlLabel, LinearProgress, MenuItem, Select, Switch, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Button, CircularProgress, Dialog, DialogActions, DialogTitle, Divider, FormControlLabel, LinearProgress, MenuItem, Select, Switch, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ClearIcon from '@mui/icons-material/Clear';
+import InfoIcon from '@mui/icons-material/Info';
 
 const CustomActivitiesInstructor = () => {
 
@@ -472,7 +473,7 @@ const CustomActivitiesInstructor = () => {
         } catch (error) {
 
             console.error('Failed to update template:', error);
-            setLoadingIdDelete  (null);
+            setLoadingIdDelete(null);
 
         }
 
@@ -498,7 +499,7 @@ const CustomActivitiesInstructor = () => {
                     <Typography>Once deleted, retrieval is impossible. Please consult your instructor before proceeding.</Typography>
                 </DialogTitle>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)} >
+                    <Button onClick={(e) => { e.stopPropagation(); setOpen(false) }} >
                         Cancel
                     </Button>
                     <Button onClick={(e) => {
@@ -532,6 +533,7 @@ const CustomActivitiesInstructor = () => {
         sessionStorage.setItem("ActivityFiveId", value.activityFive.key);
         sessionStorage.setItem("ActivitySixId", value.activitySix.key);
         sessionStorage.setItem("new-chain", false);
+        sessionStorage.setItem("ActivitiesId", value.activityId);
     }
 
     //handles start activity button
@@ -555,7 +557,7 @@ const CustomActivitiesInstructor = () => {
         <div >
             {/* button to allow instructors to create a new template */}
             <Button className="create-template-button" fullWidth variant="outlined"
-                onClick={() => { removeActivityDetails(); sessionStorage.setItem("custom-activities-instructor", true); navigate("/activityone"); }}>
+                onClick={() => { sessionStorage.setItem("new-chain", false); removeActivityDetails(); sessionStorage.setItem("custom-activities-instructor", true); navigate("/activityone"); }}>
                 Create a Template
             </Button>
 
@@ -649,7 +651,14 @@ const CustomActivitiesInstructor = () => {
                                                             })}
                                                         />
                                                     }
-                                                    label="Standardised Script"
+                                                    label={
+                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                            Standardised Script
+                                                            <Tooltip title="The transcript is standardized and cannot be edited by students across all template copies.">
+                                                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                                                            </Tooltip>
+                                                        </div>
+                                                    }
                                                 />
 
                                                 <Divider className='activity-divider' />
@@ -709,7 +718,14 @@ const CustomActivitiesInstructor = () => {
                                                             })}
                                                         />
                                                     }
-                                                    label="Standardised Script Highlighting"
+                                                    label={
+                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                            Standardised Script Highlighting
+                                                            <Tooltip title="The highlighting of the script is standardized and cannot be edited by students across all template copies.">
+                                                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                                                            </Tooltip>
+                                                        </div>
+                                                    }
                                                 />
 
                                                 <Divider className='activity-divider' />
@@ -800,7 +816,14 @@ const CustomActivitiesInstructor = () => {
                                                             })}
                                                         />
                                                     }
-                                                    label="Enable Selections Based on Machine Learning Analysis"
+                                                    label={
+                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                            Enable Selections Based on Machine Learning Analysis
+                                                            <Tooltip title="Grant the machine learning model permission to highlight text.">
+                                                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                                                            </Tooltip>
+                                                        </div>
+                                                    }
                                                 />
 
                                                 <FormControlLabel className='activity-switch'
@@ -822,7 +845,8 @@ const CustomActivitiesInstructor = () => {
                                                             })}
                                                         />
                                                     }
-                                                    label="Standardised Machine Learning Selections"
+                                                    disabled
+                                                    label="Standardised Machine Learning Selections (Pending Approval)"
                                                 />
 
                                                 <Divider className='activity-divider' />
@@ -911,7 +935,14 @@ const CustomActivitiesInstructor = () => {
                                                             })}
                                                         />
                                                     }
-                                                    label="Allow Machine Learning Clustering"
+                                                    label={
+                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                            Allow Machine Learning Clustering
+                                                            <Tooltip title="Grant the machine learning model permission to cluster text.">
+                                                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                                                            </Tooltip>
+                                                        </div>
+                                                    }
                                                 />
 
                                                 <Divider className='activity-divider' />

@@ -1,10 +1,11 @@
-import { Box, Button, Container, FormControlLabel, Switch, TextField, Typography } from "@mui/material";
+import { Box, Button, ButtonGroup, Container, FormControlLabel, Switch, TextField, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import TranscriptPreview from './TranscriptPreview';
 import './Activity1.css'
+import InfoIcon from '@mui/icons-material/Info';
 
 const Activity1 = () => {
   const [interviewer, setInterviewer] = useState("");
@@ -77,7 +78,7 @@ const Activity1 = () => {
                 } else {
                   transcriptText = transcriptText + "\n\n" + value.response_tag + ": ";
                   Object.entries(value.response_text).map(([key2, value2]) => {
-                    transcriptText = transcriptText + value2.text;
+                    transcriptText = transcriptText + " " + value2.text;
                   });
                 }
               });
@@ -114,7 +115,7 @@ const Activity1 = () => {
 
   // submission of activity one
   const handleSubmit = async (e) => {
-   
+
     e.preventDefault()
 
     let transcript_source_id = transcriptTitle;
@@ -123,7 +124,7 @@ const Activity1 = () => {
     if (transcript) {
       setPreviewClickedError("");
       if (previewClicked === false) {
-        setPreviewClickedError("Please click on the preview button to view the transcript before submitting.");
+        setPreviewClickedError("Please click the 'Preview' button to review the transcript before submitting.");
         return;
       }
 
@@ -157,22 +158,16 @@ const Activity1 = () => {
     let event;
 
     // if id parameter exists
-    
+
     if (id) {
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data);
-      
+
       // creation of a new chain of activities
 
       if (newChain) {
         await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
 
-        sessionStorage.setItem("new-chain",true)
-
-        // sessionStorage.removeItem("ActivityTwoId");
-        // sessionStorage.removeItem("ActivityThreeId");
-        // sessionStorage.removeItem("ActivityFourId");
-        // sessionStorage.removeItem("ActivityFiveId");
-        // sessionStorage.removeItem("ActivitySixId");
+        sessionStorage.setItem("new-chain", true)
 
         event = "Reinitialise"
       } else {
@@ -182,8 +177,8 @@ const Activity1 = () => {
       }
     } else {
       // creating a new instance of activity one
-    
-      await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone",final_data)
+
+      await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", final_data)
         .then((response) => {
           const ActivitiesID = response.data.ActivitiesId.id;
           const ActivityOneId = response.data.ActivityOneId;
@@ -191,30 +186,30 @@ const Activity1 = () => {
           sessionStorage.setItem("ActivityOneId", ActivityOneId);
         });
 
-        event = "Create"
+      event = "Create"
     }
 
     if (!instructor) {
-        let data = {
-          DateTime: Date.now(),
-          StudentTemplateId: sessionStorage.getItem("ActivitiesId"),
-          StudentId: sessionStorage.getItem("UserId"),
-          Event: event,
-          ActivityId: sessionStorage.getItem("ActivityOneId"),
-          ActivityType: "Activity 1",
-        };
-        await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`,data);
-      } else {
-        let data = {
-          DateTime: Date.now(),
-          ActivitySequenceId: sessionStorage.getItem("ActivitiesId"),
-          InstructorId: sessionStorage.getItem("UserId"),
-          Event: event,
-          ActivityId: sessionStorage.getItem("ActivityOneId"),
-          ActivityType: "Activity 1",
-        };
-        await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`,data);
-      }
+      let data = {
+        DateTime: Date.now(),
+        StudentTemplateId: sessionStorage.getItem("ActivitiesId"),
+        StudentId: sessionStorage.getItem("UserId"),
+        Event: event,
+        ActivityId: sessionStorage.getItem("ActivityOneId"),
+        ActivityType: "Activity 1",
+      };
+      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+    } else {
+      let data = {
+        DateTime: Date.now(),
+        ActivitySequenceId: sessionStorage.getItem("ActivitiesId"),
+        InstructorId: sessionStorage.getItem("UserId"),
+        Event: event,
+        ActivityId: sessionStorage.getItem("ActivityOneId"),
+        ActivityType: "Activity 1",
+      };
+      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+    }
 
     if (sessionStorage.getItem("ActivityTwoId") !== "null" && sessionStorage.getItem("ActivityTwoId") !== null && sessionStorage.getItem("ActivityTwoId") !== "undefined") {
       navigate(`/activitytwo/${sessionStorage.getItem("ActivityTwoId")}`);
@@ -239,7 +234,7 @@ const Activity1 = () => {
   const handlePreviewData = (result) => {
     if (result.error) {
       setHelperText(result.error);
-      setPreviewTranscript({}); 
+      setPreviewTranscript({});
     } else {
       setPreviewTranscript(result.data);
       setHelperText('');
@@ -247,46 +242,62 @@ const Activity1 = () => {
   };
 
   return (
-    <Container className="container">
-      <div className="header">
+    <div className="container-activity-1">
+      <div className="header-activity-1">
         <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" id="activity-one-label"></h2>
-        <Button onClick={() => {window.location.reload();}} className="reset-btn">
+        <Button onClick={() => { window.location.reload(); }} className="reset-btn">
           Reset
         </Button>
       </div>
       <form onSubmit={handleSubmit} noValidate autoComplete="off">
         <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} className="instructions"></Typography>
-        
+
         {/* displays toggle button to instructors only for selecting whether trascript is editable */}
-        {instructor && (<FormControlLabel className="switch-label" 
-            control={
-              <Switch checked={notEditableTranscript} onChange={() => setNotEditableTranscript((prev) => !prev)} />
-            }
-            label="Standardised Script"
-          />
+        {instructor && (<FormControlLabel className="switch-label"
+          control={
+            <Switch checked={notEditableTranscript} onChange={() => setNotEditableTranscript((prev) => !prev)} />
+          }
+          label={
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              Standardised Script
+              <Tooltip title="The transcript is standardized and cannot be edited by students across all template copies.">
+                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+              </Tooltip>
+            </div>
+          }
+        />
         )}
         <FormControlLabel className="switch-label"
           control={
             <Switch checked={newChain} onChange={() => {
-                if (!newChain) {
-                  // eslint-disable-next-line no-restricted-globals
-                  if (confirm("Caution: Data associated with the next five activities in this sequence will be permanently deleted")) {
-                    setNewChain((prev) => !prev);
-                  }
-                } else {
+              if (!newChain) {
+                // eslint-disable-next-line no-restricted-globals
+                if (confirm("Please note: Data related to the following five activities will be permanently erased.")) {
                   setNewChain((prev) => !prev);
                 }
-              }}
+              } else {
+                setNewChain((prev) => !prev);
+              }
+            }}
             />
           }
-          label="Re-initialise Activity 1 and subsequent activites"
+          label={
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              Re-initialise Activity 1 and subsequent activites
+              <Tooltip title="Use this switch when you want to edit activity one after you have already saved subsequent activities. It will erase the content of the next five activities.">
+                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+              </Tooltip>
+            </div>
+          }
         />
-        
+
         {/* shows to students whether transcript is editable */}
         {!instructor && notEditableTranscript && (
-          <Typography className="switch-label">The transcript is not editable in this template.</Typography>
+          <Typography className="switch-label">The transcript cannot be edited in this template.</Typography>
         )}
+
         <TextField
+          className="text-field-activity-1"
           margin="normal"
           value={transcriptTitle}
           label="Transcript title"
@@ -294,6 +305,7 @@ const Activity1 = () => {
           onChange={(e) => setTranscriptTitle(e.target.value)}
         ></TextField>
         <TextField
+          className="text-field-activity-1"
           disabled={!instructor && notEditableTranscript}
           error={interviewerError}
           margin="normal"
@@ -304,6 +316,7 @@ const Activity1 = () => {
           onChange={(e) => setInterviewer(e.target.value)}
         ></TextField>
         <TextField
+          className="text-field-activity-1"
           disabled={!instructor && notEditableTranscript}
           error={intervieweeError}
           margin="normal"
@@ -314,6 +327,7 @@ const Activity1 = () => {
           onChange={(e) => setInterviewee(e.target.value)}
         ></TextField>
         <TextField
+          className="text-field-activity-1"
           disabled={!instructor && notEditableTranscript}
           helperText={helperText}
           error={transcriptError}
@@ -326,21 +340,23 @@ const Activity1 = () => {
           label="Transcript"
           onChange={(e) => setTranscript(e.target.value)}
         ></TextField>
-        <Button onClick={() => {setPreviewClicked(true); if (!instructor) {validateInputs()}}} className="preview-btn" variant="outlined" fullWidth>
-          Preview
-        </Button>
         <Box className="preview-box">
-          {!previewClicked && <Typography align="center">Please click the 'Preview' button to view the transcript</Typography>}
-          {previewClicked && <TranscriptPreview interviewer={interviewer} interviewee={interviewee} transcript={transcript} onPreviewGenerated={handlePreviewData}/>}
+          {!previewClicked && <Typography align="center">Please click the 'Preview' button to view the transcript.</Typography>}
+          {previewClicked && <TranscriptPreview interviewer={interviewer} interviewee={interviewee} transcript={transcript} onPreviewGenerated={handlePreviewData} />}
         </Box>
-        <Typography sx={{ marginTop: previewClickedError ? 3 : 1 }}>
+        <Typography sx={{ marginTop: previewClickedError ? 1 : 1 }}>
           {previewClickedError}
         </Typography>
-        <Button className="submit-btn" fullWidth type="submit" variant="outlined">
-          Submit
-        </Button>
+        <ButtonGroup fullWidth>
+          <Button onClick={() => { setPreviewClicked(true); setPreviewClickedError(""); if (!instructor) { validateInputs() } }} className="preview-btn" variant="text" fullWidth>
+            Preview
+          </Button>
+          <Button className="submit-btn" fullWidth type="submit" variant="outlined">
+            Submit
+          </Button>
+        </ButtonGroup>
       </form>
-    </Container>
+    </div>
   );
 };
 

@@ -1,9 +1,10 @@
-import { Button, Container, FormControlLabel, Switch, Typography } from "@mui/material";
+import { Button, Container, FormControlLabel, Switch, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import DisplayTranscript from "./DisplayTranscript";
 import './Activity3.css'
+import InfoIcon from '@mui/icons-material/Info';
 
 const Activity3 = () => {
     const [activityMVCContent, setActivityMVCContent] = useState({});
@@ -229,7 +230,7 @@ const Activity3 = () => {
         let event;
 
         if (id && sessionStorage.getItem("new-chain") !== "true") {
-            
+
             console.log(data)
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data);
 
@@ -328,8 +329,8 @@ const Activity3 = () => {
 
 
     return (
-        <Container className="container">
-            <div className="header">
+        <div className="container-activity-3">
+            <div className="header-activity-3">
                 <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" id="activity-three-label" className="editableLabel"></h2>
                 <Button onClick={() => { window.location.reload(); }} className="resetButton">
                     Reset
@@ -368,14 +369,21 @@ const Activity3 = () => {
                     }}
                     />
                 }
-                    label="Re-initialise Activity 3 and subsequent activities"
+                    label={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            Re-initialise Activity 3 and subsequent activites
+                            <Tooltip title="Use this switch when you want to edit activity three after you have already saved subsequent activities. It will erase the content of the next three activities.">
+                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                            </Tooltip>
+                        </div>
+                    }
                 />
                 {!blankTemplate ? <DisplayTranscript activityMVCContent={activityMVCContent} highlightingNotAllowed={predefinedHighlighting} /> : <></>}
                 <Button className="submitButton" fullWidth type="submit" variant="outlined">
                     Submit
                 </Button>
             </form>
-        </Container>
+        </div>
     );
 };
 

@@ -4,7 +4,7 @@ import './Activity2.css'
 const DisplayTranscript = ({activityMVCContent, highlightingNotAllowed}) => {
 
     const highlightedStyle = {
-        backgroundColor: "yellow",
+        backgroundColor: "rgb(255, 199, 44)",
     };
 
     // displays interviewee text
@@ -22,10 +22,14 @@ const DisplayTranscript = ({activityMVCContent, highlightingNotAllowed}) => {
     const handleClick = (event) => {
         if (!highlightingNotAllowed || sessionStorage.getItem("Occupation") === "Instructor") {
             const currentStyle = event.target.style;
-            if (currentStyle.backgroundColor === "yellow") {
+            if (currentStyle.backgroundColor === "rgb(255, 199, 44)") {
                 currentStyle.backgroundColor = "";
+                currentStyle.borderRadius = "";
+                currentStyle.padding = "";
             } else {
                 currentStyle.backgroundColor = highlightedStyle.backgroundColor;
+                currentStyle.borderRadius = "4px";
+                currentStyle.padding = "2px"; 
             }
         }
     };

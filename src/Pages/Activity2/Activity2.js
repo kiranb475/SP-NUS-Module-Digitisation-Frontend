@@ -1,9 +1,10 @@
-import { Container, Typography, Box, Button, FormControlLabel, Switch, Divider } from "@mui/material";
+import { Container, Typography, Box, Button, FormControlLabel, Switch, Divider, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import DisplayTranscript from "./DisplayTranscript";
 import './Activity2.css'
+import InfoIcon from '@mui/icons-material/Info';
 
 const Activity2 = () => {
     const [activityMVCContent, setActivityMVCContent] = useState({});
@@ -78,7 +79,7 @@ const Activity2 = () => {
                 });
 
         }
-        
+
         if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
 
             // since instance of activity two doesn't exist, get data from activity one.
@@ -144,8 +145,9 @@ const Activity2 = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         let userContent = userData;
-        const check = new RegExp("background-color: yellow", "g");
+        const check = new RegExp("background-color: rgb(255, 199, 44);", "g");
 
+        //gets activity mvc after user changes
         for (let i = 1; i < Object.keys(userContent.activity_mvc).length + 1; i++) {
             if (i % 2 != 0) {
                 let activity_mvc_value = getActivityMVC(i.toString());
@@ -169,10 +171,12 @@ const Activity2 = () => {
             delete userContent["transcriptEditable"];
         }
         delete userContent["id"];
+
         userContent.predefinedHighlighting = highlightingNotAllowed;
         userContent.UserId = sessionStorage.getItem("UserId");
         userContent.label = document.getElementById("activity-two-label").innerHTML;
         userContent.instruction = document.getElementById("activity-two-instruction").innerHTML;
+
         let data = {
             id: sessionStorage.getItem("ActivitiesId"),
             content: userContent,
@@ -180,18 +184,12 @@ const Activity2 = () => {
 
         let event;
 
+        //stores data 
         if (id && sessionStorage.getItem("new-chain") !== "true") {
-            console.log('yay')
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data);
             if (newChain) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                // sessionStorage.removeItem("ActivityThreeId");
-                // sessionStorage.removeItem("ActivityFourId");
-                // sessionStorage.removeItem("ActivityFiveId");
-                // sessionStorage.removeItem("ActivitySixId");
-
-                sessionStorage.setItem("new-chain",true)
-                
+                sessionStorage.setItem("new-chain", true)
                 event = "Reinitialise";
             } else {
                 event = "Update";
@@ -201,11 +199,13 @@ const Activity2 = () => {
                 .then((response) => {
                     const ActivityTwoId = response.data.id;
                     sessionStorage.setItem("ActivityTwoId", ActivityTwoId);
+                    console.log(ActivityTwoId)
                 });
 
             event = "Create";
         }
 
+        //updates logs
         if (!instructor) {
             let data = {
                 DateTime: Date.now(),
@@ -229,6 +229,8 @@ const Activity2 = () => {
         }
 
         sessionStorage.setItem("predefinedHighlighting", highlightingNotAllowed);
+
+        //navigates to next activity
         if (sessionStorage.getItem("custom-activities-instructor") === "true") {
             navigate("/");
         } else if (sessionStorage.getItem("ActivityThreeId") !== "null" && sessionStorage.getItem("ActivityThreeId") !== null) {
@@ -239,8 +241,8 @@ const Activity2 = () => {
     };
 
     return (
-        <Container className='container'>
-            <div className="header">
+        <div className='container-activity-2'>
+            <div className="header-activity-2">
                 <h2
                     dangerouslySetInnerHTML={{ __html: label }}
                     contentEditable={true}
@@ -269,7 +271,15 @@ const Activity2 = () => {
                     <FormControlLabel className="formControlLabel" control={
                         <Switch checked={highlightingNotAllowed} onChange={() => setHighlightingNotAllowed((prev) => !prev)} />
                     }
-                        label="Standardised Script Highlighting"
+                        label={
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                Standardised Script Highlighting
+                                <Tooltip title="The highlighting of the script is standardized and cannot be edited by students across all template copies.">
+                                    <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                                </Tooltip>
+                            </div>
+                        }
+
                     />
                 )}
                 {!instructor && highlightingNotAllowed && (
@@ -291,14 +301,21 @@ const Activity2 = () => {
                     }}
                     />
                 }
-                    label="Re-initialise Activity 2 and subsequent activities"
+                    label={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            Re-initialise Activity 2 and subsequent activites
+                            <Tooltip title="Use this switch when you want to edit activity two after you have already saved subsequent activities. It will erase the content of the next four activities.">
+                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                            </Tooltip>
+                        </div>
+                    }
                 />
                 {!blankTemplate ? <DisplayTranscript activityMVCContent={activityMVCContent} highlightingNotAllowed={highlightingNotAllowed} /> : <></>}
                 <Button className="submitButton" fullWidth type="submit" variant="outlined">
                     Submit
                 </Button>
             </form>
-        </Container>
+        </div>
     );
 };
 

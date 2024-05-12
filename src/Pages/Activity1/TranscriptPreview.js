@@ -109,7 +109,7 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
     if (Object.keys(previewData).length === 0) {
         return (
             <>
-                <Typography align="center">No transcript data has been entered yet.</Typography>
+                <Typography align="center">No valid transcript data has been entered yet.</Typography>
             </>
         );
     } else {

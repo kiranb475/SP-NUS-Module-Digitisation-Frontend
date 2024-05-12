@@ -1,24 +1,32 @@
-.container {
-  padding: 20px 0px 20px 0px !important;
+.container-activity-2 {
+  height: calc(100vh - 80px);
+  margin: 0px;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0px !important;
+  background-color: #f8f8f8;
+  padding: 30px 10vw 30px 10vw !important;
   font-family: "Lato", sans-serif !important;
 }
 
-.header {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+.header-activity-2 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.header h2 {
+.header-activity-2 h2 {
   min-height: 1 !important;
   border-right: solid rgba(0, 0, 0, 0) 1px !important;
   outline: none !important;
+  font-family: "Lato", sans-serif !important;
 }
-
 
 .resetButton {
   margin-left: auto !important;
+  color: #af5f02 !important;
 }
 
 .resetButton .MuiButtonBase-root:hover {
@@ -28,13 +36,15 @@
 /* can be abstracted */
 .editableInstruction {
   min-height: 1 !important;
-  border-right: solid rgba(0,0,0,0) 1px !important;
+  border-right: solid rgba(0, 0, 0, 0) 1px !important;
   outline: none !important;
-  font-family: "Lato", sans-serif !important;
   font-size: 17px !important;
+  font-family: "Lato", sans-serif !important;
 }
 
-.divider, .formControlLabel, .infoText {
+.divider,
+.formControlLabel,
+.infoText {
   margin-top: 10px !important;
 }
 
@@ -46,12 +56,15 @@
 .contentContainer {
   margin-top: 10px !important;
   padding: 10px !important;
-  border: 1px solid black !important;
-  border-radius: 2px !important;
+  border: 1px solid #af5f02 !important;
+  border-radius: 10px !important;
+
 }
 
 .submitButton {
   margin-top: 20px !important;
   margin-bottom: 3px !important;
+  background-color: rgba(135, 146, 137, 255) !important;
+  color: whitesmoke !important;
+  border: none !important;
 }
-
