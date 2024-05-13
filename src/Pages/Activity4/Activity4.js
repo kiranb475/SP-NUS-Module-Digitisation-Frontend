@@ -1,11 +1,12 @@
 import './Activity4.css'
-import { Box, Button, Container, FormControlLabel, Switch, Typography } from "@mui/material";
+import { Box, Button, Container, FormControlLabel, Switch, Typography, Tooltip} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { getColor } from "../../Components/Colors.js";
 import DisplayComponents from './DisplayComponents.js';
+import InfoIcon from '@mui/icons-material/Info';
 
 const Activity4 = () => {
     const [selectedData, setSelectedData] = useState({});
@@ -52,6 +53,10 @@ const Activity4 = () => {
                 setLabel(response.data.label);
                 setInstruction(response.data.instruction);
 
+                if (response.data.lastAuthored === "instructor") {
+                    sessionStorage.setItem("new-chain", true)
+                }
+
                 if (sessionStorage.getItem("new-chain") !== "true") {
                     if (response.data.content !== null) {
                         setSelectedData(response.data.content);
@@ -71,8 +76,10 @@ const Activity4 = () => {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                 if (response.data !== null) {
                     let userData = response.data;
-                    const check = new RegExp("background-color: yellow", "g");
-                    const check2 = new RegExp("background-color: lightgreen", "g");
+                    //checks for yellow
+                    const check = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
+                    //checks for green
+                    const check2 = new RegExp("background-color: rgb\\(\\s*23\\s*,\\s*177\\s*,\\s*105\\s*\\)", "g");
                     let index = 0;
 
                     if (userData.content !== null) {
@@ -281,6 +288,7 @@ const Activity4 = () => {
         });
     };
 
+    // failed attempt at moving multiple selected components together
 
     // const findKeyById = (id, content) => {
     //     for (const [key, value] of Object.entries(content)) {
@@ -295,19 +303,19 @@ const Activity4 = () => {
     //     }
     //     return null; 
     // };
-    
-    
+
+
 
     // const handleDrag = (e, data, coreKey, subKey) => {
     //     checkClustering();  // Assuming this is necessary prior to updating positions
-    
+
     //     if (selectedIds.includes(selectedData.content[coreKey]?.response_text[subKey]?.clusterData.id)) {
     //         const deltaX = data.deltaX;
     //         const deltaY = data.deltaY;
-    
+
     //         setSelectedData((prevState) => {
     //             const updatedContent = { ...prevState.content };
-    
+
     //             selectedIds.forEach((id) => {
     //                 const { key, subKey } = findKeyById(id, updatedContent);
     //                 if (key && subKey !== undefined) {
@@ -328,13 +336,13 @@ const Activity4 = () => {
     //                     updatedContent[key] = updatedItem;
     //                 }
     //             });
-    
+
     //             return { ...prevState, content: updatedContent };
     //         });
     //     } else {
     //         setSelectedData((prevState) => {
     //             const updatedContent = { ...prevState.content };
-    
+
     //             if (subKey !== undefined && coreKey && updatedContent[coreKey]?.response_text[subKey]?.clusterData) {
     //                 const updatedSubItem = {
     //                     ...updatedContent[coreKey].response_text[subKey].clusterData,
@@ -350,13 +358,13 @@ const Activity4 = () => {
     //                 };
     //                 updatedContent[coreKey] = updatedItem;
     //             }
-    
+
     //             return { ...prevState, content: updatedContent };
     //         });
     //     }
     // };
-    
-    
+
+
 
 
     const removeLabel = (key) => {
@@ -478,6 +486,8 @@ const Activity4 = () => {
         finalData.label = document.getElementById("activity-four-label").innerHTML;
         finalData.instruction = document.getElementById("activity-four-instruction").innerHTML;
         finalData.activity_mvc = {};
+        finalData.lastAuthored = "student"
+
         delete finalData["id"];
         let data = {
             id: sessionStorage.getItem("ActivitiesId"),
@@ -490,8 +500,6 @@ const Activity4 = () => {
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`, data);
             if (newChain) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                // sessionStorage.removeItem("ActivityFiveId");
-                // sessionStorage.removeItem("ActivitySixId");
 
                 sessionStorage.setItem("new-chain", true)
 
@@ -538,8 +546,8 @@ const Activity4 = () => {
     };
 
     return (
-        <Container className="container">
-            <div className="header">
+        <div className="container-activity-3">
+            <div className="header-activity-3">
                 <h2 dangerouslySetInnerHTML={{ __html: `${label}` }} contentEditable="true" id="activity-four-label" className="editableLabel"></h2>
                 <Button onClick={() => window.location.reload()} className="resetButton">Reset</Button>
             </div>
@@ -561,7 +569,14 @@ const Activity4 = () => {
                     }}
                     />
                 }
-                    label="Re-initialise Activity 4 and subsequent activities"
+                    label={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            Re-initialise Activity 4 and subsequent activites
+                            <Tooltip title="Use this switch when you want to edit activity four after you have already saved subsequent activities. It will erase the content of the next two activities.">
+                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                            </Tooltip>
+                        </div>
+                    }
                 />
                 {!blankTemplate &&
                     <Box id="main-container" onDoubleClick={handleDoubleClick}>
@@ -569,7 +584,7 @@ const Activity4 = () => {
                     </Box>}
                 <Button fullWidth type="submit" variant="outlined" className="submitButton">Submit</Button>
             </form>
-        </Container>
+        </div>
     );
 };
 

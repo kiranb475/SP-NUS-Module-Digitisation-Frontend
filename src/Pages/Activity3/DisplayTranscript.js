@@ -17,14 +17,23 @@ const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
     // handles highlighting
     const handleClick = (event) => {
         if (!highlightingNotAllowed) {
-            if (event.target.style.backgroundColor === "lightgreen") {
-                event.target.style.backgroundColor = "lightblue";
-            } else if (event.target.style.backgroundColor === "lightblue") {
-                event.target.style.backgroundColor = "lightgreen";
+            //checks if background color is green
+            if (event.target.style.backgroundColor === "rgb(23, 177, 105)") {
+                //changes it to blue
+                event.target.style.backgroundColor = "rgb(108, 180, 238)";
+            //checks if background color is blue
+            } else if (event.target.style.backgroundColor === "rgb(108, 180, 238)") {
+                //changes it to green
+                event.target.style.backgroundColor = "rgb(23, 177, 105)";
             } else if (event.target.style.backgroundColor === "") {
-                event.target.style.backgroundColor = "yellow";
+                //background color changed to yellow
+                event.target.style.backgroundColor = "rgb(255, 199, 44)";
+                event.target.style.borderRadius = "4px";
+                event.target.style.padding = "2px"; 
             } else {
                 event.target.style.backgroundColor = "";
+                event.target.style.borderRadius = "";
+                event.target.style.padding = ""; 
             }
         }
     };

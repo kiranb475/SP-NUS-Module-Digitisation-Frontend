@@ -16,20 +16,22 @@ const InstructorDesignedActivities = () => {
                         await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home", { UserId: parseInt(value.id) }).then((response) => {
                             if (response.data) {
                                 Object.entries(response.data).forEach(([key2, value2]) => {
-                                    (async () => {
-                                        await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(value2.ActivityOneId)}`).then((response) => {
-                                            if (response.data) {
-                                                setListOfActivities((prevValues) => ({
-                                                    ...prevValues,
-                                                    [value2.id]: {
-                                                        ...value2,
-                                                        ["username"]: value.username,
-                                                        ["activityTitle"]: response.data.transcript_source_id,
-                                                    }
-                                                }));
-                                            }
-                                        })
-                                    })()
+                                    if (value2.Published !== false) {
+                                        (async () => {
+                                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(value2.ActivityOneId)}`).then((response) => {
+                                                if (response.data) {
+                                                    setListOfActivities((prevValues) => ({
+                                                        ...prevValues,
+                                                        [value2.id]: {
+                                                            ...value2,
+                                                            ["username"]: value.username,
+                                                            ["activityTitle"]: response.data.transcript_source_id,
+                                                        }
+                                                    }));
+                                                }
+                                            })
+                                        })()
+                                    }
                                 })
 
                             }
@@ -212,7 +214,7 @@ const InstructorDesignedActivities = () => {
                                 <CircularProgress size={37} className='copy-template-loading' />
                             ) : (
                                 <Button disableRipple className="copy-template-button" onClick={() => handleCopyTemplate(value)}>
-                                    Copy Template
+                                    Launch Activity
                                 </Button>
                             )}
                         </div>

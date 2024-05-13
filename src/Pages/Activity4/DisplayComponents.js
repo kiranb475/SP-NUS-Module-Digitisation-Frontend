@@ -34,7 +34,7 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") { e.preventDefault(); }
                                 }}
-                                style={{ backgroundColor: data.color }} id={data.id} className='draggable-response-label-child' contentEditable={!data.removed} suppressContentEditableWarning={true} variant="h6"
+                                style={{ backgroundColor: data.color, padding:"0px 10px 0px 10px",borderRadius:"20px", border:"none"}} id={data.id} className='draggable-response-label-child' contentEditable={!data.removed} suppressContentEditableWarning={true} variant="h6"
                               onBlur={() => {
                                 let text = document.getElementById(data.id).innerHTML;
                                 text === "" || text === `<br>`
@@ -56,7 +56,8 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                             left: `${data2.clusterData.x}px`,
                             top: `${data2.clusterData.y}px`,
                             backgroundColor: responseBackgroundColor,
-                            border: selectedIds.includes(data2.clusterData.id) ? '2px solid blue' : 'none'
+                            //border: selectedIds.includes(data2.clusterData.id) ? '2px solid blue' : 'none'
+                            border: 'none',
                         };
                         return (
                             <Draggable
@@ -73,7 +74,7 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                                         {data2.clusterData.type === "text-copy" && <Button variant="outlined" onClick={() => handleDeleteCopy(key, key2)} className='create-delete-button'>-</Button>}
                                     </div>
                                     <Tooltip title={data.response_text[key2].text}>
-                                        <Typography id={data2.clusterData.id} fontSize={13}>
+                                        <Typography style={{paddingTop:"5px"}} id={data2.clusterData.id} fontSize={13}>
                                             {data.response_text[key2].text}
                                         </Typography>
                                     </Tooltip>

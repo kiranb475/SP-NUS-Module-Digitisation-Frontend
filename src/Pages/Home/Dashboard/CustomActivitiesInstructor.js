@@ -15,10 +15,11 @@ const CustomActivitiesInstructor = () => {
     const [deleteItem, setDeleteItem] = useState(null);
     const [loadingId, setLoadingId] = useState(null)
     const [loadingIdDelete, setLoadingIdDelete] = useState(null)
+    const [loadingIdRemovalStudents, setLoadingIdRemovalStudents] = useState(null)
 
 
     // enters the relevant data into the yourActivitiesData variable
-    const createActivitiesData = (activityId, activityTitle, activityOneUpdate, activityTwoUpdate, activityThreeUpdate, activityFourUpdate, activityFiveUpdate, activitySixUpdate) => {
+    const createActivitiesData = (activityId, activityTitle, activityOneUpdate, activityTwoUpdate, activityThreeUpdate, activityFourUpdate, activityFiveUpdate, activitySixUpdate, published) => {
         setYourActivitiesData((prevValues) => ({
             ...prevValues,
             [activityId]: {
@@ -30,6 +31,7 @@ const CustomActivitiesInstructor = () => {
                 ["activityFive"]: activityFiveUpdate,
                 ["activitySix"]: activitySixUpdate,
                 ["activityId"]: activityId,
+                ["published"]: published
             }
         }))
     }
@@ -42,6 +44,7 @@ const CustomActivitiesInstructor = () => {
 
                     (async () => {
                         let activityId = value.id;
+                        let published = value.Published
                         let activityTitle;
                         let activityOneUpdate = null;
                         let activityTwoUpdate = null;
@@ -189,7 +192,7 @@ const CustomActivitiesInstructor = () => {
                             }
                         }
 
-                        createActivitiesData(activityId, activityTitle, activityOneUpdate, activityTwoUpdate, activityThreeUpdate, activityFourUpdate, activityFiveUpdate, activitySixUpdate)
+                        createActivitiesData(activityId, activityTitle, activityOneUpdate, activityTwoUpdate, activityThreeUpdate, activityFourUpdate, activityFiveUpdate, activitySixUpdate, published)
 
                     })();
                 })
@@ -248,6 +251,7 @@ const CustomActivitiesInstructor = () => {
                         transcriptEditable: value.activityOne.notEditableTranscript,
                         label: activityOneLabel,
                         instruction: activityOneInstruction,
+                        lastAuthored: "instructor"
                     }
                 )
                     .then((response) => {
@@ -277,6 +281,7 @@ const CustomActivitiesInstructor = () => {
                             predefinedHighlighting: value.activityTwo.highlightingNotAllowed,
                             label: activityTwoLabel,
                             instruction: activityTwoInstruction,
+                            lastAuthored: "instructor"
                         },
                     }
                 )
@@ -310,6 +315,7 @@ const CustomActivitiesInstructor = () => {
                             predefinedMLSelection: value.activityThree.MLSelectionNotAllowed,
                             label: activityThreeLabel,
                             instruction: activityThreeInstruction,
+                            lastAuthored: "instructor",
                         },
                     }
                 )
@@ -335,6 +341,7 @@ const CustomActivitiesInstructor = () => {
                         content: {
                             label: activityFourLabel,
                             instruction: activityFourInstruction,
+                            lastAuthored: "instructor"
                         },
                     }
                 )
@@ -364,6 +371,7 @@ const CustomActivitiesInstructor = () => {
                             MLClusters: value.activityFive.allowMLClustering,
                             label: activityFiveLabel,
                             instruction: activityFiveInstruction,
+                            lastAuthored: "instructor"
                         },
                     }
                 )
@@ -392,6 +400,7 @@ const CustomActivitiesInstructor = () => {
                         content: {
                             label: activitySixLabel,
                             instruction: activitySixInstruction,
+                            lastAuthored: "instructor"
                         },
                     }
                 )
@@ -402,6 +411,8 @@ const CustomActivitiesInstructor = () => {
 
                 activity6Event = "Create"
             }
+
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${activityId}`, { Published: true });
 
             for (let i = 1; i <= 6; i++) {
                 let logs_data = {
@@ -423,6 +434,23 @@ const CustomActivitiesInstructor = () => {
             setLoadingId(null);
 
         }
+    }
+
+    const handleRemovalStudentsInterface = async (value) => {
+
+        setLoadingIdRemovalStudents(value.activityId);
+
+        try {
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${value.activityId}`, { Published: false });
+
+            setLoadingIdRemovalStudents(null);
+
+        } catch (error) {
+            console.error('Failed to update template:', error);
+
+            setLoadingIdRemovalStudents(null);
+        }
+
     }
 
     //handle delete of templates
@@ -583,6 +611,17 @@ const CustomActivitiesInstructor = () => {
                                         <Button disableRipple className="start-activity-button" onClick={() => { handleStartActivity(value) }}>
                                             Start Activity
                                         </Button>
+                                        {value.published === true ? (
+                                            loadingIdRemovalStudents === value.activityId ? (
+                                                <CircularProgress size={37} className='delete-template-loading' />
+                                            ) : (
+                                                <Button disableRipple onClick={(e) => { e.stopPropagation(); handleRemovalStudentsInterface(value); }}>
+                                                    Remove from student interface
+                                                </Button>
+                                            )
+                                        ) : (
+                                        <></>
+                                        )}
                                         {loadingIdDelete === value.activityId ? (
                                             <CircularProgress size={37} className='delete-template-loading' />
                                         ) : (

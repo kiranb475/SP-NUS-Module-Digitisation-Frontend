@@ -153,6 +153,7 @@ const Activity1 = () => {
       label: document.getElementById("activity-one-label").innerHTML,
       instruction: document.getElementById("activity-one-instruction").innerHTML,
       activity_mvc: activity_mvc_content,
+      lastAuthored: instructor ? "instructor" : "student",
     };
 
     let event;

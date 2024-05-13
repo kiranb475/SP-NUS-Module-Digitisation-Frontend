@@ -1,10 +1,12 @@
-import {Box, Button, Container, FormControlLabel, Switch, Typography,} from "@mui/material";
+import './Activity5.css'
+import { Box, Button, Container, FormControlLabel, Switch, Tooltip, Typography, } from "@mui/material";
 import { useEffect, useState } from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { getColor } from "../../Components/Colors.js";
 import DisplayComponents from "./DisplayComponents.js";
+import InfoIcon from '@mui/icons-material/Info';
 
 const Act5 = () => {
     const [clustData, setClustData] = useState({});
@@ -50,7 +52,11 @@ const Act5 = () => {
 
                         setLabel(response.data.label);
                         setInstruction(response.data.instruction);
-                        
+
+                        if (response.data.lastAuthored === "instructor") {
+                            sessionStorage.setItem("new-chain", true)
+                        }
+
                         if (response.data.content && sessionStorage.getItem("new-chain") !== "true") {
                             setClustData(response.data.content);
                             if (Object.entries(response.data.content).length === 0) {
@@ -118,7 +124,7 @@ const Act5 = () => {
                         data.content[key].response_text[key2].clusterData.AIColor = clusters[value2.sentenceAIClassified]
                     }
                 });
-            } 
+            }
         });
 
         setClustData(data)
@@ -372,6 +378,8 @@ const Act5 = () => {
         delete final_data["id"];
         final_data.label = document.getElementById("activity-five-label").innerHTML;
         final_data.instruction = document.getElementById("activity-five-instruction").innerHTML;
+        final_data.lastAuthored = "student"
+
         final_data.activity_mvc = {};
 
         let data = {
@@ -386,7 +394,6 @@ const Act5 = () => {
 
             if (newChain) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                //sessionStorage.removeItem("ActivitySixId");
 
                 sessionStorage.setItem("new-chain", true)
 
@@ -401,7 +408,7 @@ const Act5 = () => {
                     sessionStorage.setItem("ActivityFiveId", ActivityFiveId);
                 });
 
-                event = "Create";
+            event = "Create";
         }
 
         if (!instructor) {
@@ -423,8 +430,7 @@ const Act5 = () => {
                 ActivityId: sessionStorage.getItem("ActivityFiveId"),
                 ActivityType: "Activity 5",
             };
-            await axios.post(
-                `https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
         }
 
         if (sessionStorage.getItem("ActivitySixId") !== "null" && sessionStorage.getItem("ActivitySixId") !== null) {
@@ -470,53 +476,67 @@ const Act5 = () => {
     };
 
     return (
-    <Container className="container">
-        <div className="header">
-            <h2 dangerouslySetInnerHTML={{ __html: `${label}` }} contentEditable="true" id="activity-five-label" className="editableLabel"></h2>
-            <Button onClick={() => window.location.reload()} className="resetButton">Reset</Button>
-        </div>
-        <form onSubmit={handleSubmit}>
-            <Typography id="activity-five-instruction" dangerouslySetInnerHTML={{ __html: `${instruction}` }} contentEditable={true} className="editableInstruction"></Typography>
-            {!MLClusters && <Typography className="infoText">
-                The instructor has disabled viewing alternate AI clustering.
-            </Typography>}
-            {blankTemplate && <Typography className="infoText">
-                No transcript has been displayed since no data was entered in Activity 1.
-            </Typography>}
-            <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
-                <Switch checked={newChain} onChange={() => {
-                    if (!newChain) {
-                        // eslint-disable-next-line no-restricted-globals
-                        if (confirm("Caution: Data associated with the next activity in this sequence will be permanently deleted")) {
+        <div className="container-activity-5">
+            <div className="header-activity-5">
+                <h2 dangerouslySetInnerHTML={{ __html: `${label}` }} contentEditable="true" id="activity-five-label" className="editableLabel"></h2>
+                <Button onClick={() => window.location.reload()} className="resetButton">Reset</Button>
+            </div>
+            <form onSubmit={handleSubmit}>
+                <Typography id="activity-five-instruction" dangerouslySetInnerHTML={{ __html: `${instruction}` }} contentEditable={true} className="editableInstruction"></Typography>
+                {!MLClusters && <Typography className="infoText">
+                    The instructor has disabled viewing alternate AI clustering.
+                </Typography>}
+                {blankTemplate && <Typography className="infoText">
+                    No transcript has been displayed since no data was entered in Activity 1.
+                </Typography>}
+                <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
+                    <Switch checked={newChain} onChange={() => {
+                        if (!newChain) {
+                            // eslint-disable-next-line no-restricted-globals
+                            if (confirm("Caution: Data associated with the next activity in this sequence will be permanently deleted")) {
+                                setNewChain((prev) => !prev);
+                            }
+                        } else {
                             setNewChain((prev) => !prev);
                         }
-                    } else {
-                        setNewChain((prev) => !prev);
-                    }
-                }}
-                />
-            }
-                label="Re-initialise Activity 5 and subsequent activities"
-            />
-            <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
-                <Switch 
-                    checked={alternateView}
-                    disabled={!MLClusters}
-                    onChange={() => {
-                        createAIClustering();
-                        setAlternateView((prev) => !prev);
                     }}
+                    />
+                }
+                    label={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            Re-initialise Activity 5 and subsequent activites
+                            <Tooltip title="Use this switch when you want to edit activity five after you have already saved subsequent activities. It will erase the content of the next activity.">
+                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                            </Tooltip>
+                        </div>
+                    }
                 />
-            }
-                label="View AI Clustering"
-            />
-            {!blankTemplate &&
-                <Box id="main-container" onDoubleClick={handleDoubleClick}>
-                    <DisplayComponents clustData={clustData} handleDrag={handleDrag} removeLabel={removeLabel} handleCreateCopy={handleCreateCopy} handleDeleteCopy={handleDeleteCopy} alternateView={alternateView} />
-                </Box>}
-            <Button fullWidth type="submit" variant="outlined" className="submitButton">Submit</Button>
-        </form>
-    </Container>
+                <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
+                    <Switch
+                        checked={alternateView}
+                        disabled={!MLClusters}
+                        onChange={() => {
+                            createAIClustering();
+                            setAlternateView((prev) => !prev);
+                        }}
+                    />
+                }
+                    label={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            View AI Clustering
+                            <Tooltip title="Use this switch when you would like to view clusters generated by the ML model.">
+                                <InfoIcon style={{ marginLeft: 4 }} fontSize="small" />
+                            </Tooltip>
+                        </div>
+                    }
+                />
+                {!blankTemplate &&
+                    <Box id="main-container" onDoubleClick={handleDoubleClick}>
+                        <DisplayComponents clustData={clustData} handleDrag={handleDrag} removeLabel={removeLabel} handleCreateCopy={handleCreateCopy} handleDeleteCopy={handleDeleteCopy} alternateView={alternateView} />
+                    </Box>}
+                <Button fullWidth type="submit" variant="outlined" className="submitButton">Submit</Button>
+            </form>
+        </div>
     );
 };
 

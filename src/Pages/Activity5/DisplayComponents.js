@@ -26,7 +26,7 @@ const DisplayComponents = ({ clustData, handleDrag, removeLabel, handleCreateCop
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") { e.preventDefault(); }
                                 }}
-                                style={{ backgroundColor: alternateView ? "transparent" : data.color }} id={data.id} className='draggable-response-label-child' contentEditable={!data.removed} suppressContentEditableWarning={true} variant="h6"
+                                style={{ backgroundColor: alternateView ? "transparent" : data.color, padding: "0px 10px 0px 10px", borderRadius: "20px", border: "none" }} id={data.id} className='draggable-response-label-child' contentEditable={!data.removed} suppressContentEditableWarning={true} variant="h6"
                                 onBlur={() => {
                                     let text = document.getElementById(data.id).innerHTML;
                                     text === "" || text === `<br>`
@@ -48,6 +48,7 @@ const DisplayComponents = ({ clustData, handleDrag, removeLabel, handleCreateCop
                             left: `${data2.clusterData.x}px`,
                             top: `${data2.clusterData.y}px`,
                             backgroundColor: responseBackgroundColor,
+                            border: "none"
                         };
                         return (
                             <Draggable

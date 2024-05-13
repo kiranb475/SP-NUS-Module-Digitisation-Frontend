@@ -145,7 +145,8 @@ const Activity2 = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         let userContent = userData;
-        const check = new RegExp("background-color: rgb(255, 199, 44);", "g");
+        //checks for yellow
+        const check = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
 
         //gets activity mvc after user changes
         for (let i = 1; i < Object.keys(userContent.activity_mvc).length + 1; i++) {
@@ -176,6 +177,7 @@ const Activity2 = () => {
         userContent.UserId = sessionStorage.getItem("UserId");
         userContent.label = document.getElementById("activity-two-label").innerHTML;
         userContent.instruction = document.getElementById("activity-two-instruction").innerHTML;
+        userContent.lastAuthored = instructor ? "instructor" : "student";
 
         let data = {
             id: sessionStorage.getItem("ActivitiesId"),

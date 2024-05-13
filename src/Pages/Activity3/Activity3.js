@@ -17,6 +17,7 @@ const Activity3 = () => {
     const [predefinedMLSelection, setPredefinedMLSelection] = useState(false);
     const [blankTemplate, setBlankTemplate] = useState(false)
     const [label, setLabel] = useState("Activity 3 Label");
+    const [author, setAuthor] = useState("")
     const [instruction, setInstruction] = useState(
         `<Typography>The transcript you submitted was passed through an AI model trained to identify important sentences. The model’s sentence selection was then compared with yours. The sentences you and the model both selected are now highlighted in green. Sentences that the model classified as being important but you did not are highlighted in blue. Sentences you selected as being important but the model did not are highlighted in yellow.</Typography>
         <br/> <br/>
@@ -56,8 +57,10 @@ const Activity3 = () => {
                 if (response.data !== null) {
                     if (response.data.AllowMLModel) {
                         setAllowMLModel(response.data.AllowMLModel);
+                        sessionStorage.setItem("allowMLModel", response.data.AllowMLModel)
                     } else {
                         setAllowMLModel(false);
+                        sessionStorage.setItem("allowMLModel", false)
                     }
                     if (response.data.MLModel) {
                         setMLModel(response.data.MLModel);
@@ -71,6 +74,10 @@ const Activity3 = () => {
                     }
                     setLabel(response.data.label);
                     setInstruction(response.data.instruction);
+
+                    if (response.data.lastAuthored === "instructor") {
+                        sessionStorage.setItem("new-chain", true)
+                    }
 
                     if (sessionStorage.getItem("new-chain") !== "true") {
                         if (response.data.content != null) {
@@ -100,10 +107,10 @@ const Activity3 = () => {
                 }
             });
         }
+
         if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
             // since instance of activity three doesn't exist, get data from activity two.
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
-                console.log(response.data)
                 if (response.data !== null) {
                     if (response.data.content != null && Object.entries(response.data.content).length !== 0) {
                         let interviewer = response.data.content[1].questioner_tag;
@@ -127,11 +134,12 @@ const Activity3 = () => {
                         setActivityMVCContent(activity_mvc_data);
 
                         // Randomly assign should only be called when instructor allows ML - to be fixed
-                        RandomlyAssign(response.data);
+                        if (sessionStorage.getItem("allowMLModel") === "true") {
+                            RandomlyAssign(response.data);
+                        }
 
                         if (sessionStorage.getItem("new-chain") !== "true") {
-                            setAllowMLModel(true);
-                            setMLModel("Model 1");
+                            setAllowMLModel(false);
                             setPredefinedMLSelection(false);
                             setPredefinedHighlighting(sessionStorage.getItem("predefinedHighlighting") === "false" ? false : true)
                         }
@@ -193,11 +201,13 @@ const Activity3 = () => {
 
         delete userContent["id"];
 
-        const check1 = new RegExp("background-color: yellow", "g");
-        const check2 = new RegExp("background-color: lightblue", "g");
-        const check3 = new RegExp("background-color: lightgreen", "g");
+        //check for yellow
+        const check1 = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
+        //check for blue
+        const check2 = new RegExp("background-color: rgb\\(\\s*108\\s*,\\s*180\\s*,\\s*238\\s*\\)", "g");
+        //check for green
+        const check3 = new RegExp("background-color: rgb\\(\\s*23\\s*,\\s*177\\s*,\\s*105\\s*\\)", "g");
 
-        console.log(userContent.activity_mvc)
         if (userContent.activity_mvc !== undefined) {
             for (let i = 1; i < Object.keys(userContent.activity_mvc).length + 1; i++) {
                 if (i % 2 != 0) {
@@ -222,6 +232,8 @@ const Activity3 = () => {
             }
         }
 
+        userContent.lastAuthored = "student"
+
         let data = {
             id: sessionStorage.getItem("ActivitiesId"),
             content: userContent,
@@ -231,16 +243,11 @@ const Activity3 = () => {
 
         if (id && sessionStorage.getItem("new-chain") !== "true") {
 
-            console.log(data)
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data);
 
 
             if (newChain) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                // sessionStorage.removeItem("ActivityFourId");
-                // sessionStorage.removeItem("ActivityFiveId");
-                // sessionStorage.removeItem("ActivitySixId");
-
                 sessionStorage.setItem("new-chain", true)
 
                 event = "Reinitialise";
@@ -297,24 +304,30 @@ const Activity3 = () => {
                     userContent.content[i].response_text[j].sentenceAIClassified = rand;
                     if (rand !== -1) {
                         userContent.content[i].response_text[j].sentenceMLHighlightA3 = true;
-                        if (userContent.activity_mvc[i][j].css === "display: inline; background-color: yellow;") {
+                        //checks whether background color is yellow
+                        if (userContent.activity_mvc[i][j].css === "display: inline; background-color: rgb(255, 199, 44); border-radius: 4px; padding: 2px;") {
                             userContent.activity_mvc[i][j].html = userContent.activity_mvc[i][j].html.replace(
                                 /background-color:.*?;/gi,
-                                "background-color: lightgreen;"
+                                //changes the background color to green since it was selected by the user and ML model
+                                "background-color: rgb(23, 177, 105); border-radius: 4px; padding: 2px;"
                             );
                         } else {
                             userContent.activity_mvc[i][j].html = userContent.activity_mvc[i][j].html.replace(
                                 /style="display:\s*inline;"/g,
-                                'style="display: inline; background-color: lightblue;"'
+                                //changes the background color to blue since it was selected only by the ML model
+                                'style="display: inline; background-color: rgb(108, 180, 238); border-radius: 4px; padding: 2px;"'
                             );
                         }
                     } else {
-                        if (userContent.activity_mvc[i][j].css === "display: inline; background-color: lightgreen;") {
+                        //checks if the background color is green
+                        if (userContent.activity_mvc[i][j].css === "display: inline; background-color: rgb(23, 177, 105); border-radius: 4px; padding: 2px;") {
                             userContent.activity_mvc[i][j].html = userContent.activity_mvc[i][j].html.replace(
                                 /background-color:.*?;/gi,
-                                "background-color: yellow;"
+                                //changes the background color to yellow
+                                "background-color: background-color: rgb(255, 199, 44); border-radius: 4px; padding: 2px;"
                             );
-                        } else if (userContent.activity_mvc[i][j].css === "display: inline; background-color: lightblue;") {
+                            //checks if the background color is blue
+                        } else if (userContent.activity_mvc[i][j].css === "display: inline; background-color: rgb(108, 180, 238); border-radius: 4px; padding: 2px;") {
                             userContent.activity_mvc[i][j].html = userContent.activity_mvc[i][j].html.replace(/background-color:.*?;/gi, "");
                         }
                         userContent.content[i].response_text[j].sentenceMLHighlightA3 = false;
