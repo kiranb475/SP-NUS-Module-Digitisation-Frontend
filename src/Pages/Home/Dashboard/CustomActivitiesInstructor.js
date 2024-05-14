@@ -207,13 +207,13 @@ const CustomActivitiesInstructor = () => {
 
         setLoadingId(key);
         try {
-            const activityId = key
-            const activity1Id = value.activityOne.key
-            const activity2Id = value.activityTwo.key
-            const activity3Id = value.activityThree.key
-            const activity4Id = value.activityFour.key
-            const activity5Id = value.activityFive.key
-            const activity6Id = value.activitySix.key
+            let activityId = key
+            let activity1Id = value.activityOne.key
+            let activity2Id = value.activityTwo.key
+            let activity3Id = value.activityThree.key
+            let activity4Id = value.activityFour.key
+            let activity5Id = value.activityFive.key
+            let activity6Id = value.activitySix.key
 
             const activityOneLabel = document.getElementById(`activity-one-${key}-label-${value.activityOne.key}`).innerHTML;
             const activityTwoLabel = document.getElementById(`activity-two-${key}-label-${value.activityTwo.key}`).innerHTML;
@@ -235,6 +235,7 @@ const CustomActivitiesInstructor = () => {
             let activity4Event;
             let activity5Event;
             let activity6Event;
+            
 
             if (activity1Id) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activity1Id}`,
@@ -255,10 +256,10 @@ const CustomActivitiesInstructor = () => {
                     }
                 )
                     .then((response) => {
-                        const ActivitiesID = response.data.ActivitiesId.id;
-                        const ActivityOneId = response.data.ActivityOneId;
-                        sessionStorage.setItem("ActivitiesId", ActivitiesID);
-                        sessionStorage.setItem("ActivityOneId", ActivityOneId);
+                        activityId = response.data.ActivitiesId.id;
+                        activity1Id = response.data.ActivityOneId;
+                        sessionStorage.setItem("ActivitiesId", activityId);
+                        sessionStorage.setItem("ActivityOneId", activity1Id);
                     });
                 activity1Event = "Create";
             }
@@ -286,8 +287,8 @@ const CustomActivitiesInstructor = () => {
                     }
                 )
                     .then((response) => {
-                        const ActivityTwoId = response.data.id;
-                        sessionStorage.setItem("ActivityTwoId", ActivityTwoId);
+                        activity2Id = response.data.id;
+                        sessionStorage.setItem("ActivityTwoId", activity2Id);
                     });
 
                 activity2Event = "Create"
@@ -320,8 +321,8 @@ const CustomActivitiesInstructor = () => {
                     }
                 )
                     .then((response) => {
-                        const ActivityThreeId = response.data.id;
-                        sessionStorage.setItem("ActivityThreeId", ActivityThreeId);
+                        activity3Id = response.data.id;
+                        sessionStorage.setItem("ActivityThreeId", activity3Id);
                     });
                 activity3Event = "Create"
             }
@@ -346,8 +347,8 @@ const CustomActivitiesInstructor = () => {
                     }
                 )
                     .then((response) => {
-                        const ActivityFourId = response.data.id;
-                        sessionStorage.setItem("ActivityFourId", ActivityFourId);
+                        activity4Id = response.data.id;
+                        sessionStorage.setItem("ActivityFourId", activity4Id);
                     });
 
                 activity4Event = "Create"
@@ -376,8 +377,8 @@ const CustomActivitiesInstructor = () => {
                     }
                 )
                     .then((response) => {
-                        const ActivityFiveId = response.data.id;
-                        sessionStorage.setItem("ActivityFiveId", ActivityFiveId);
+                        activity5Id = response.data.id;
+                        sessionStorage.setItem("ActivityFiveId", activity5Id);
                     });
 
                 activity5Event = "Create"
@@ -405,12 +406,15 @@ const CustomActivitiesInstructor = () => {
                     }
                 )
                     .then((response) => {
-                        const ActivitySixId = response.data.id;
-                        sessionStorage.setItem("ActivitySixId", ActivitySixId);
+                        activity6Id = response.data.id;
+                        sessionStorage.setItem("ActivitySixId", activity6Id);
                     });
 
                 activity6Event = "Create"
             }
+
+            let events = [activity1Event, activity2Event, activity3Event, activity4Event, activity5Event, activity6Event]
+            let activityIds = [activity1Id, activity2Id, activity3Id, activity4Id, activity5Id, activity6Id]
 
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${activityId}`, { Published: true });
 
@@ -419,8 +423,8 @@ const CustomActivitiesInstructor = () => {
                     DateTime: Date.now(),
                     ActivitySequenceId: activityId,
                     InstructorId: sessionStorage.getItem("UserId"),
-                    Event: `activity${i}Event`,
-                    ActivityId: `activity${i}Id`,
+                    Event: events[i - 1],
+                    ActivityId: activityIds[i - 1],
                     ActivityType: `Activity ${i}`,
                 };
 
@@ -441,9 +445,12 @@ const CustomActivitiesInstructor = () => {
         setLoadingIdRemovalStudents(value.activityId);
 
         try {
+
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${value.activityId}`, { Published: false });
 
             setLoadingIdRemovalStudents(null);
+
+            window.location.reload(false);
 
         } catch (error) {
             console.error('Failed to update template:', error);
@@ -582,7 +589,7 @@ const CustomActivitiesInstructor = () => {
     };
 
     return (
-        <div >
+        <div style={{backgroundColor:"#f8f8f8"}}>
             {/* button to allow instructors to create a new template */}
             <Button className="create-template-button" fullWidth variant="outlined"
                 onClick={() => { sessionStorage.setItem("new-chain", false); removeActivityDetails(); sessionStorage.setItem("custom-activities-instructor", true); navigate("/activityone"); }}>
@@ -620,7 +627,7 @@ const CustomActivitiesInstructor = () => {
                                                 </Button>
                                             )
                                         ) : (
-                                        <></>
+                                            <></>
                                         )}
                                         {loadingIdDelete === value.activityId ? (
                                             <CircularProgress size={37} className='delete-template-loading' />

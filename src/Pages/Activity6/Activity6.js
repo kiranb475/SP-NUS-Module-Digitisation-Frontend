@@ -36,50 +36,99 @@ const Act6 = () => {
           setLabel(response.data.label);
           setInstruction(response.data.instruction);
 
-          if (response.data.content !== null && sessionStorage.getItem("new-chain") !== "true") {
-            setClustData(response.data.content);
-            let insightsAndNeeds = {};
-            if (response.data.content.content !== undefined) {
-              Object.entries(response.data.content.content).map(([key, value]) => {
-                if (value.type === "label") {
-                  insightsAndNeeds[value.userClusterIndexA5] = {
-                    content: {},
-                    insights: {},
-                    needs: {},
-                    label: { text: value.clusterLabelA5, coreKey: value.coreKey },
-                  };
-                }
-              }
-              );
-              Object.entries(response.data.content.content).map(([key, value]) => {
-                if (value.response_id) {
-                  Object.entries(value.response_text).map(([key2, value2]) => {
-                    if (value2.clusterData) {
-                      if (insightsAndNeeds[value2.clusterData.userClusterIndexA5] !== undefined) {
-                        insightsAndNeeds[value2.clusterData.userClusterIndexA5].content[Object.keys(insightsAndNeeds[value2.clusterData.userClusterIndexA5].content).length] = {
-                          text: value2.text,
-                          coreKey: value2.clusterData.coreKey,
-                          subKey: value2.clusterData.subKey,
-                        };
+          // if the activity was last authored by an instructor, it gets it data from activity five
+          if (response.data.lastAuthored === "instructor") {
+            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`)
+              .then((response) => {
+                if (response.data !== null) {
+                  let insightsAndNeeds = {};
+                  if (Object.entries(response.data.content).length !== 0) {
+                    Object.entries(response.data.content.content).map(
+                      ([key, value]) => {
+                        if (value.type === "label") {
+                          insightsAndNeeds[value.userClusterIndexA5] = {
+                            content: {},
+                            insights: {},
+                            needs: {},
+                            label: {
+                              text: value.clusterLabelA5,
+                              coreKey: value.coreKey,
+                            },
+                          };
+                        }
+                      }
+                    );
+
+                    Object.entries(response.data.content.content).map(([key, value]) => {
+                      if (value.response_id) {
+                        Object.entries(value.response_text).map(([key2, value2]) => {
+                          if (value2.clusterData) {
+                            if (insightsAndNeeds[value2.clusterData.userClusterIndexA5] !== undefined) {
+                              insightsAndNeeds[value2.clusterData.userClusterIndexA5].content[Object.keys(insightsAndNeeds[value2.clusterData.userClusterIndexA5].content).length] = {
+                                text: value2.text,
+                                coreKey: value2.clusterData.coreKey,
+                                subKey: value2.clusterData.subKey,
+                              };
+                            }
+                          }
+                        });
                       }
                     }
-                  });
+                    );
+                  } else {
+                    setBlankTemplate(true)
+                  }
+                  setInsightsAndNeeds(insightsAndNeeds);
+                  setClustData(response.data.content);
                 }
-              }
-              );
-              Object.entries(response.data.content.insightsAndNeeds).map(([key, value]) => {
-                insightsAndNeeds[key].needs = value.needs;
-                insightsAndNeeds[key].insights = value.insights;
-              }
-              );
+              })
+          } else {
+            if (response.data.content !== null && sessionStorage.getItem("new-chain") !== "true") {
+              setClustData(response.data.content);
+              let insightsAndNeeds = {};
+              if (response.data.content.content !== undefined) {
+                Object.entries(response.data.content.content).map(([key, value]) => {
+                  if (value.type === "label") {
+                    insightsAndNeeds[value.userClusterIndexA5] = {
+                      content: {},
+                      insights: {},
+                      needs: {},
+                      label: { text: value.clusterLabelA5, coreKey: value.coreKey },
+                    };
+                  }
+                }
+                );
+                Object.entries(response.data.content.content).map(([key, value]) => {
+                  if (value.response_id) {
+                    Object.entries(value.response_text).map(([key2, value2]) => {
+                      if (value2.clusterData) {
+                        if (insightsAndNeeds[value2.clusterData.userClusterIndexA5] !== undefined) {
+                          insightsAndNeeds[value2.clusterData.userClusterIndexA5].content[Object.keys(insightsAndNeeds[value2.clusterData.userClusterIndexA5].content).length] = {
+                            text: value2.text,
+                            coreKey: value2.clusterData.coreKey,
+                            subKey: value2.clusterData.subKey,
+                          };
+                        }
+                      }
+                    });
+                  }
+                }
+                );
+                Object.entries(response.data.content.insightsAndNeeds).map(([key, value]) => {
+                  insightsAndNeeds[key].needs = value.needs;
+                  insightsAndNeeds[key].insights = value.insights;
+                }
+                );
 
-              setInsightsAndNeeds(insightsAndNeeds);
-            } else {
-              setBlankTemplate(true)
+                setInsightsAndNeeds(insightsAndNeeds);
+              } else {
+                setBlankTemplate(true)
+              }
             }
           }
         });
     }
+    
     if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
       axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`)
         .then((response) => {
@@ -231,7 +280,7 @@ const Act6 = () => {
 
     // create a suitable alternative for the summaries table
     // current version below is not suitable
-    
+
     let summary_data = {};
 
     const correspondingLabelA4 = (index) => {

@@ -53,16 +53,8 @@ const Act5 = () => {
                         setLabel(response.data.label);
                         setInstruction(response.data.instruction);
 
+                        //if the activity was last authored by an instructors, gets it data from activity 4
                         if (response.data.lastAuthored === "instructor") {
-                            sessionStorage.setItem("new-chain", true)
-                        }
-
-                        if (response.data.content && sessionStorage.getItem("new-chain") !== "true") {
-                            setClustData(response.data.content);
-                            if (Object.entries(response.data.content).length === 0) {
-                                setBlankTemplate(true)
-                            }
-                        } else {
                             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
                                 .then((response) => {
                                     if (response.data !== null) {
@@ -70,8 +62,33 @@ const Act5 = () => {
                                         if (Object.entries(response.data.content).length === 0) {
                                             setBlankTemplate(true)
                                         }
+                                        if (height != null) {
+                                            setContainerHeight(parseInt(height) + 50);
+                                        }
+                                    } else {
+                                        alert("Before progressing to Activity 5, please complete Activity 4.");
                                     }
+                                    // at the moment ML clustering has been enabled has true
+                                    setMLClusters(true);
                                 });
+                            // gets it data from database activity 5
+                        } else {
+                            if (response.data.content && sessionStorage.getItem("new-chain") !== "true") {
+                                setClustData(response.data.content);
+                                if (Object.entries(response.data.content).length === 0) {
+                                    setBlankTemplate(true)
+                                }
+                            } else {
+                                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
+                                    .then((response) => {
+                                        if (response.data !== null) {
+                                            setClustData(response.data.content);
+                                            if (Object.entries(response.data.content).length === 0) {
+                                                setBlankTemplate(true)
+                                            }
+                                        }
+                                    });
+                            }
                         }
 
                         if (height != null) {

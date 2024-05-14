@@ -1,5 +1,5 @@
 import './Activity4.css'
-import { Box, Button, Container, FormControlLabel, Switch, Typography, Tooltip} from "@mui/material";
+import { Box, Button, Container, FormControlLabel, Switch, Typography, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -53,22 +53,61 @@ const Activity4 = () => {
                 setLabel(response.data.label);
                 setInstruction(response.data.instruction);
 
+                // checks if the activity was last edited by an instructor, gets data from activity three instead
                 if (response.data.lastAuthored === "instructor") {
-                    sessionStorage.setItem("new-chain", true)
-                }
+                    axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
+                        if (response.data !== null) {
+                            let userData = response.data;
+                            //checks for yellow
+                            const check = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
+                            //checks for green
+                            const check2 = new RegExp("background-color: rgb\\(\\s*23\\s*,\\s*177\\s*,\\s*105\\s*\\)", "g");
+                            let index = 0;
 
-                if (sessionStorage.getItem("new-chain") !== "true") {
-                    if (response.data.content !== null) {
-                        setSelectedData(response.data.content);
-                        if (Object.entries(response.data.content).length === 0) {
-                            setBlankTemplate(true)
+                            console.log(response.data)
+
+                            if (userData.content !== null) {
+                                Object.entries(userData.content).forEach(([key, value]) => {
+                                    if (value.questioner_tag === undefined) {
+                                        Object.entries(value.response_text).forEach(([key2, value2]) => {
+                                            if (userData.activity_mvc[key][key2].css.match(check) || userData.activity_mvc[key][key2].css.match(check2)) {
+                                                let x = (index % perRow) * gridWidth;
+                                                let y = Math.floor(index / perRow) * gridHeight;
+                                                userData.content[key].response_text[key2].clusterData = {
+                                                    id: uuidv4(),
+                                                    x: x,
+                                                    y: y,
+                                                    userClusterIndexA4: -1,
+                                                    type: "text",
+                                                    height: 0,
+                                                };
+                                                index++;
+                                            }
+                                        });
+                                    }
+                                });
+                                console.log(userData)
+                                setSelectedData(userData);
+                            } else {
+                                setBlankTemplate(true)
+                            }
                         }
-                        if (height != null) {
-                            setContainerHeight(height);
+                    })
+                } else {
+                    // retrrives data from database activity 4
+                    if (sessionStorage.getItem("new-chain") !== "true") {
+                        if (response.data.content !== null) {
+                            setSelectedData(response.data.content);
+                            if (Object.entries(response.data.content).length === 0) {
+                                setBlankTemplate(true)
+                            }
+                            if (height != null) {
+                                setContainerHeight(height);
+                            }
                         }
                     }
-                }
 
+                }
             });
         }
 

@@ -161,6 +161,9 @@ const Activity1 = () => {
     // if id parameter exists
 
     if (id) {
+
+      console.log(final_data)
+
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data);
 
       // creation of a new chain of activities

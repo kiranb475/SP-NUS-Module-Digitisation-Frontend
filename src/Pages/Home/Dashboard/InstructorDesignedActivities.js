@@ -46,9 +46,15 @@ const InstructorDesignedActivities = () => {
     const handleCopyTemplate = async (data) => {
 
         setLoadingId(data.id);
-        
+
         try {
             let ActivitiesID;
+            let Activity1Id;
+            let Activity2Id;
+            let Activity3Id;
+            let Activity4Id;
+            let Activity5Id;
+            let Activity6Id;
 
             if (data.ActivityOneId) {
                 const response = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${data.ActivityOneId}`);
@@ -65,7 +71,7 @@ const InstructorDesignedActivities = () => {
                     };
                     const ActivityOneIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/fromtemplate", data);
                     ActivitiesID = ActivityOneIdResponse.data.ActivitiesId.id;
-                    const Activity1Id = ActivityOneIdResponse.data.ActivityOneId;
+                    Activity1Id = ActivityOneIdResponse.data.ActivityOneId;
                     sessionStorage.setItem("ActivitiesId", ActivitiesID);
                     sessionStorage.setItem("ActivityOneId", Activity1Id);
                 }
@@ -84,7 +90,7 @@ const InstructorDesignedActivities = () => {
                         content: ActivityTwoData,
                     };
                     const ActivityTwoIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data);
-                    const Activity2Id = ActivityTwoIdResponse.data.id;
+                    Activity2Id = ActivityTwoIdResponse.data.id;
                     sessionStorage.setItem("ActivityTwoId", Activity2Id);
                 }
             }
@@ -102,7 +108,7 @@ const InstructorDesignedActivities = () => {
                         content: ActivityThreeData,
                     };
                     const ActivityThreeIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data);
-                    const Activity3Id = ActivityThreeIdResponse.data.id;
+                    Activity3Id = ActivityThreeIdResponse.data.id;
                     sessionStorage.setItem("ActivityThreeId", Activity3Id);
                 }
             }
@@ -120,7 +126,7 @@ const InstructorDesignedActivities = () => {
                         content: ActivityFourData,
                     };
                     const ActivityFourIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data);
-                    const Activity4Id = ActivityFourIdResponse.data.id;
+                    Activity4Id = ActivityFourIdResponse.data.id;
                     sessionStorage.setItem("ActivityFourId", Activity4Id);
                 }
             }
@@ -138,7 +144,7 @@ const InstructorDesignedActivities = () => {
                         content: ActivityFiveData,
                     };
                     const ActivityFiveIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive", data);
-                    const Activity5Id = ActivityFiveIdResponse.data.id;
+                    Activity5Id = ActivityFiveIdResponse.data.id;
                     sessionStorage.setItem("ActivityFiveId", Activity5Id);
                 }
             }
@@ -156,26 +162,29 @@ const InstructorDesignedActivities = () => {
                         content: ActivitySixData,
                     };
                     const ActivitySixIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data);
-                    const Activity6Id = ActivitySixIdResponse.data.id;
+                    Activity6Id = ActivitySixIdResponse.data.id;
                     sessionStorage.setItem("ActivityFourId", Activity6Id);
                 }
             }
 
+            let activityIds = [Activity1Id, Activity2Id, Activity3Id, Activity4Id, Activity5Id, Activity6Id]
+
             for (let i = 1; i <= 6; i++) {
                 let logs_data = {
-                    DateTime: Date.now(),
-                    ActivitySequenceId: ActivitiesID,
                     StudentId: sessionStorage.getItem("UserId"),
                     Event: "Create",
-                    ActivityId: `Activity${i}Id`,
+                    DateTime: Date.now(),
+                    StudentTemplateId: ActivitiesID,
                     ActivityType: `Activity ${i}`,
+                    ActivityId: activityIds[i - 1],
                 };
 
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, logs_data);
-
-                setLoadingId(null); 
-                window.location.reload(false);
             }
+
+            setLoadingId(null);
+            window.location.reload(false);
+
         } catch (error) {
             console.error('Failed to copy template:', error);
             setLoadingId(null);

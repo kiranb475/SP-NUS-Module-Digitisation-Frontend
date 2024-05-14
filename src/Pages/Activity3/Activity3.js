@@ -75,35 +75,72 @@ const Activity3 = () => {
                     setLabel(response.data.label);
                     setInstruction(response.data.instruction);
 
+                    //check if its been last authored by an instructor, gets its data from previous activity
                     if (response.data.lastAuthored === "instructor") {
-                        sessionStorage.setItem("new-chain", true)
-                    }
+                        sessionStorage.setItem("lastAuthoredActivity3", "instructor");
+                        axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
+                            if (response.data !== null) {
+                                if (response.data.content != null && Object.entries(response.data.content).length !== 0) {
+                                    let interviewer = response.data.content[1].questioner_tag;
+                                    let interviewee = response.data.content[2].response_tag;
 
-                    if (sessionStorage.getItem("new-chain") !== "true") {
-                        if (response.data.content != null) {
-                            let interviewer = response.data.content[1].questioner_tag;
-                            let interviewee = response.data.content[2].response_tag;
+                                    let activity_mvc_data = {};
 
-                            let activity_mvc_data = {};
+                                    for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
+                                        if (i % 2 !== 0) {
+                                            activity_mvc_data[i] = {
+                                                tag: interviewer,
+                                                activity_mvc: response.data.activity_mvc[i],
+                                            };
+                                        } else {
+                                            activity_mvc_data[i] = {
+                                                tag: interviewee,
+                                                activity_mvc: response.data.activity_mvc[i],
+                                            };
+                                        }
+                                    }
+                                    setActivityMVCContent(activity_mvc_data);
 
-                            for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
-                                if (i % 2 !== 0) {
-                                    activity_mvc_data[i] = {
-                                        tag: interviewer,
-                                        activity_mvc: response.data.activity_mvc[i],
-                                    };
+                                    // Randomly assign should only be called when instructor allows ML - to be fixed
+                                    if (sessionStorage.getItem("allowMLModel") === "true") {
+                                        RandomlyAssign(response.data);
+                                    }
+
                                 } else {
-                                    activity_mvc_data[i] = {
-                                        tag: interviewee,
-                                        activity_mvc: response.data.activity_mvc[i],
-                                    };
+                                    setBlankTemplate(true)
                                 }
                             }
-                            setActivityMVCContent(activity_mvc_data);
-                        } else {
-                            setBlankTemplate(true)
+                        });
+                        // gets it data from database activity 3    
+                    } else {
+                        if (sessionStorage.getItem("new-chain") !== "true") {
+                            if (response.data.content != null) {
+                                let interviewer = response.data.content[1].questioner_tag;
+                                let interviewee = response.data.content[2].response_tag;
+
+                                let activity_mvc_data = {};
+
+                                for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
+                                    if (i % 2 !== 0) {
+                                        activity_mvc_data[i] = {
+                                            tag: interviewer,
+                                            activity_mvc: response.data.activity_mvc[i],
+                                        };
+                                    } else {
+                                        activity_mvc_data[i] = {
+                                            tag: interviewee,
+                                            activity_mvc: response.data.activity_mvc[i],
+                                        };
+                                    }
+                                }
+                                setActivityMVCContent(activity_mvc_data);
+                            } else {
+                                setBlankTemplate(true)
+                            }
                         }
                     }
+
+
                 }
             });
         }
@@ -199,6 +236,9 @@ const Activity3 = () => {
         userContent.label = document.getElementById("activity-three-label").innerHTML;
         userContent.instruction = document.getElementById("activity-three-instruction").innerHTML;
 
+
+        console.log(userContent)
+
         delete userContent["id"];
 
         //check for yellow
@@ -239,58 +279,60 @@ const Activity3 = () => {
             content: userContent,
         };
 
-        let event;
+        console.log(data)
 
-        if (id && sessionStorage.getItem("new-chain") !== "true") {
+        // let event;
 
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data);
+        // if (id && sessionStorage.getItem("new-chain") !== "true") {
+
+        //     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data);
 
 
-            if (newChain) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                sessionStorage.setItem("new-chain", true)
+        //     if (newChain) {
+        //         await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
+        //         sessionStorage.setItem("new-chain", true)
 
-                event = "Reinitialise";
-            } else {
-                event = "Update";
-            }
-        } else {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
-                const ActivityThreeId = response.data.id;
-                sessionStorage.setItem("ActivityThreeId", ActivityThreeId);
-            });
+        //         event = "Reinitialise";
+        //     } else {
+        //         event = "Update";
+        //     }
+        // } else {
+        //     await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
+        //         const ActivityThreeId = response.data.id;
+        //         sessionStorage.setItem("ActivityThreeId", ActivityThreeId);
+        //     });
 
-            event = "Create";
+        //     event = "Create";
 
-        }
+        // }
 
-        if (!instructor) {
-            let data = {
-                DateTime: Date.now(),
-                StudentTemplateId: sessionStorage.getItem("ActivitiesId"),
-                StudentId: sessionStorage.getItem("UserId"),
-                Event: event,
-                ActivityId: sessionStorage.getItem("ActivityThreeId"),
-                ActivityType: "Activity 3",
-            };
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
-        } else {
-            let data = {
-                DateTime: Date.now(),
-                ActivitySequenceId: sessionStorage.getItem("ActivitiesId"),
-                InstructorId: sessionStorage.getItem("UserId"),
-                Event: event,
-                ActivityId: sessionStorage.getItem("ActivityThreeId"),
-                ActivityType: "Activity 3",
-            };
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
-        }
+        // if (!instructor) {
+        //     let data = {
+        //         DateTime: Date.now(),
+        //         StudentTemplateId: sessionStorage.getItem("ActivitiesId"),
+        //         StudentId: sessionStorage.getItem("UserId"),
+        //         Event: event,
+        //         ActivityId: sessionStorage.getItem("ActivityThreeId"),
+        //         ActivityType: "Activity 3",
+        //     };
+        //     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+        // } else {
+        //     let data = {
+        //         DateTime: Date.now(),
+        //         ActivitySequenceId: sessionStorage.getItem("ActivitiesId"),
+        //         InstructorId: sessionStorage.getItem("UserId"),
+        //         Event: event,
+        //         ActivityId: sessionStorage.getItem("ActivityThreeId"),
+        //         ActivityType: "Activity 3",
+        //     };
+        //     await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+        // }
 
-        if (sessionStorage.getItem("ActivityFourId") !== "null" && sessionStorage.getItem("ActivityFourId") !== null) {
-            navigate(`/activityfour/${sessionStorage.getItem("ActivityFourId")}`);
-        } else {
-            navigate("/activityfour");
-        }
+        // if (sessionStorage.getItem("ActivityFourId") !== "null" && sessionStorage.getItem("ActivityFourId") !== null) {
+        //     navigate(`/activityfour/${sessionStorage.getItem("ActivityFourId")}`);
+        // } else {
+        //     navigate("/activityfour");
+        // }
     };
 
     const RandomlyAssign = (data) => {
