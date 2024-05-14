@@ -1,7 +1,7 @@
 import { Typography, Box } from '@mui/material';
 import './Activity2.css'
 
-const DisplayTranscript = ({activityMVCContent, highlightingNotAllowed}) => {
+const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
 
     const highlightedStyle = {
         backgroundColor: "rgb(255, 199, 44)",
@@ -11,7 +11,7 @@ const DisplayTranscript = ({activityMVCContent, highlightingNotAllowed}) => {
     const displayInterviewee = (data, key) => {
         return Object.entries(data).map(([key2, value]) => (
             <Typography
-                display="inline"
+                sx={{ display: 'inline' }}
                 onClick={handleClick}
                 dangerouslySetInnerHTML={{ __html: value.html }}
             ></Typography>
@@ -29,7 +29,7 @@ const DisplayTranscript = ({activityMVCContent, highlightingNotAllowed}) => {
             } else {
                 currentStyle.backgroundColor = highlightedStyle.backgroundColor;
                 currentStyle.borderRadius = "4px";
-                currentStyle.padding = "2px"; 
+                currentStyle.padding = "2px";
             }
         }
     };
@@ -39,18 +39,18 @@ const DisplayTranscript = ({activityMVCContent, highlightingNotAllowed}) => {
             {Object.entries(activityMVCContent).map(([key, value]) => {
                 if (key % 2 !== 0) {
                     return (
-                        <div style={{marginBottom:"20px"}}>
-                            <Typography display="inline">{value.tag}: </Typography>
+                        <div style={{ marginBottom: "20px" }}>
+                            <Typography sx={{ display: 'inline' }}>{value.tag}: </Typography>
                             <Typography
-                                display="inline"
-                                dangerouslySetInnerHTML={{__html: value.activity_mvc.html,}}
+                                sx={{ display: 'inline' }}
+                                dangerouslySetInnerHTML={{ __html: value.activity_mvc.html, }}
                             ></Typography>
                         </div>
                     );
                 } else {
                     return (
-                        <div style={{marginBottom:"20px"}}>
-                            <Typography display="inline">
+                        <div style={{ marginBottom: "20px" }}>
+                            <Typography sx={{ display: 'inline' }}>
                                 <strong>{value.tag}</strong>:{" "}
                             </Typography>
                             {displayInterviewee(value.activity_mvc, key)}
