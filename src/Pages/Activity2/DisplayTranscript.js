@@ -38,10 +38,12 @@ const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
         <Box id="content-container" className="contentContainer">
             {Object.entries(activityMVCContent).map(([key, value]) => {
                 if (key % 2 !== 0) {
+                    value.activity_mvc.html = value.activity_mvc.html.replace('<p', '<span').replace('</p>', '</span>');
                     return (
                         <div style={{ marginBottom: "20px" }}>
+                            {console.log(value.activity_mvc.html)}
                             <Typography
-                                sx={{ display: 'inline' }}
+                                sx={{ display: 'inline-block' }}
                                 dangerouslySetInnerHTML={{ __html: `${value.tag}: ${value.activity_mvc.html}` }}
                             ></Typography>
 
