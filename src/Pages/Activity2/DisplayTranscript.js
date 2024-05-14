@@ -39,25 +39,21 @@ const DisplayTranscript = ({activityMVCContent, highlightingNotAllowed}) => {
             {Object.entries(activityMVCContent).map(([key, value]) => {
                 if (key % 2 !== 0) {
                     return (
-                        <div>
+                        <div style={{marginBottom:"20px"}}>
                             <Typography display="inline">{value.tag}: </Typography>
                             <Typography
                                 display="inline"
                                 dangerouslySetInnerHTML={{__html: value.activity_mvc.html,}}
                             ></Typography>
-                            <br />
-                            <br />
                         </div>
                     );
                 } else {
                     return (
-                        <div>
+                        <div style={{marginBottom:"20px"}}>
                             <Typography display="inline">
                                 <strong>{value.tag}</strong>:{" "}
                             </Typography>
                             {displayInterviewee(value.activity_mvc, key)}
-                            <br />
-                            <br />
                         </div>
                     );
                 }
