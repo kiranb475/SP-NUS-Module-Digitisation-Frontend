@@ -5,11 +5,11 @@ import './Activity4.css';
 
 const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreateCopy, handleDeleteCopy, selectedIds, setSelectedIds }) => {
 
-    const toggleSelect = (id) => {
-        setSelectedIds(prev => 
-            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-        );
-    };
+    // const toggleSelect = (id) => {
+    //     setSelectedIds(prev => 
+    //         prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    //     );
+    // };
 
     if (Object.keys(selectedData).length !== 0) {
         return Object.entries(selectedData.content).map(([key, data]) => {

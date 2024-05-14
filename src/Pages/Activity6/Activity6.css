@@ -106,4 +106,5 @@
 .cluster-accordian-insight-text, .cluster-accordian-need-text {
     font-family: "Lato", sans-serif !important;
     font-size: 17px !important;
+    outline: none;
 }
