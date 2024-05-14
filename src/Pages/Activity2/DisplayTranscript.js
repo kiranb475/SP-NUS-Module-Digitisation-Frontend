@@ -40,10 +40,9 @@ const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
                 if (key % 2 !== 0) {
                     return (
                         <div style={{ marginBottom: "20px" }}>
-                            <Typography sx={{ display: 'inline' }}>{value.tag}: </Typography>
                             <Typography
                                 sx={{ display: 'inline' }}
-                                dangerouslySetInnerHTML={{ __html: value.activity_mvc.html, }}
+                                dangerouslySetInnerHTML={{ __html: `${value.tag}: ${value.activity_mvc.html}` }}
                             ></Typography>
                         </div>
                     );
