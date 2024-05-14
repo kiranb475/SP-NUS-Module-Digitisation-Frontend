@@ -41,12 +41,10 @@ const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
                     value.activity_mvc.html = value.activity_mvc.html.replace('<p', '<span').replace('</p>', '</span>');
                     return (
                         <div style={{ marginBottom: "20px" }}>
-                            {console.log(value.activity_mvc.html)}
                             <Typography
                                 sx={{ display: 'inline-block' }}
                                 dangerouslySetInnerHTML={{ __html: `${value.tag}: ${value.activity_mvc.html}` }}
                             ></Typography>
-
                         </div>
                     );
                 } else {
