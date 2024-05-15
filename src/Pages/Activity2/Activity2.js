@@ -43,34 +43,69 @@ const Activity2 = () => {
                         setLabel(response.data.label);
                         setInstruction(response.data.instruction);
 
-                        if (sessionStorage.getItem("new-chain") !== "true") {
+                        console.log(response.data)
 
-                            setUserData(response.data);
+                        if (Object.entries(response.data.content).length === 0) {
+                            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`)
+                                .then((response) => {
+                                    if (response.data !== null) {
+                                        setUserData(response.data);
+                                        if (response.data.content !== null && Object.entries(response.data.content).length !== 0) {
+                                            let interviewer = response.data.content[1].questioner_tag;
+                                            let interviewee = response.data.content[2].response_tag;
 
-                            // if transcript data has been entered
-                            if (response.data.content !== null && Object.entries(response.data.content).length !== 0) {
-                                let interviewer = response.data.content[1].questioner_tag;
-                                let interviewee = response.data.content[2].response_tag;
+                                            let activity_mvc_data = {};
 
-                                let activity_mvc_data = {};
+                                            for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
+                                                if (i % 2 !== 0) {
+                                                    activity_mvc_data[i] = {
+                                                        tag: interviewer,
+                                                        activity_mvc: response.data.activity_mvc[i],
+                                                    };
+                                                } else {
+                                                    activity_mvc_data[i] = {
+                                                        tag: interviewee,
+                                                        activity_mvc: response.data.activity_mvc[i],
+                                                    };
+                                                }
+                                            }
+                                            setActivityMVCContent(activity_mvc_data);
+                                        } else {
+                                            setBlankTemplate(true)
+                                        }
 
-                                for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
-                                    if (i % 2 !== 0) {
-                                        activity_mvc_data[i] = {
-                                            tag: interviewer,
-                                            activity_mvc: response.data.activity_mvc[i],
-                                        };
-                                    } else {
-                                        activity_mvc_data[i] = {
-                                            tag: interviewee,
-                                            activity_mvc: response.data.activity_mvc[i],
-                                        };
                                     }
-                                }
-                                setActivityMVCContent(activity_mvc_data);
+                                })
+                        } else {
+                            if (sessionStorage.getItem("new-chain") !== "true") {
 
-                            } else {
-                                setBlankTemplate(true)
+                                setUserData(response.data);
+
+                                // if transcript data has been entered
+                                if (response.data.content !== null && Object.entries(response.data.content).length !== 0) {
+                                    let interviewer = response.data.content[1].questioner_tag;
+                                    let interviewee = response.data.content[2].response_tag;
+
+                                    let activity_mvc_data = {};
+
+                                    for (let i = 1; i < Object.keys(response.data.activity_mvc).length + 1; i++) {
+                                        if (i % 2 !== 0) {
+                                            activity_mvc_data[i] = {
+                                                tag: interviewer,
+                                                activity_mvc: response.data.activity_mvc[i],
+                                            };
+                                        } else {
+                                            activity_mvc_data[i] = {
+                                                tag: interviewee,
+                                                activity_mvc: response.data.activity_mvc[i],
+                                            };
+                                        }
+                                    }
+                                    setActivityMVCContent(activity_mvc_data);
+
+                                } else {
+                                    setBlankTemplate(true)
+                                }
                             }
                         }
 

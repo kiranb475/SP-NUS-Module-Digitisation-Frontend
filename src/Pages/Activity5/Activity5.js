@@ -68,8 +68,6 @@ const Act5 = () => {
                                     } else {
                                         alert("Before progressing to Activity 5, please complete Activity 4.");
                                     }
-                                    // at the moment ML clustering has been enabled has true
-                                    setMLClusters(true);
                                 });
                             // gets it data from database activity 5
                         } else {
@@ -110,8 +108,6 @@ const Act5 = () => {
                     } else {
                         alert("Before progressing to Activity 5, please complete Activity 4.");
                     }
-                    // at the moment ML clustering has been enabled has true
-                    setMLClusters(true);
                 });
         }
     }, []);
