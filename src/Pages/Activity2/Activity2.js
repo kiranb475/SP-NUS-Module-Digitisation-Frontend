@@ -45,7 +45,8 @@ const Activity2 = () => {
 
                         console.log(response.data)
 
-                        if (Object.entries(response.data.content).length === 0) {
+                        //in the case the instructor defines a blank template or transcript is editable
+                        if (Object.entries(response.data.content).length === 0 || sessionStorage.getItem("setNotEditableTranscript") !== "true") {
                             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`)
                                 .then((response) => {
                                     if (response.data !== null) {
@@ -76,6 +77,7 @@ const Activity2 = () => {
 
                                     }
                                 })
+
                         } else {
                             if (sessionStorage.getItem("new-chain") !== "true") {
 
@@ -106,10 +108,9 @@ const Activity2 = () => {
                                 } else {
                                     setBlankTemplate(true)
                                 }
+
                             }
                         }
-
-
                     }
                 });
 

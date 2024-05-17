@@ -77,7 +77,6 @@ const Activity3 = () => {
 
                     //check if its been last authored by an instructor, gets its data from previous activity
                     if (response.data.lastAuthored === "instructor") {
-                        sessionStorage.setItem("lastAuthoredActivity3", "instructor");
                         axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
                             if (response.data !== null) {
                                 if (response.data.content != null && Object.entries(response.data.content).length !== 0) {
@@ -100,8 +99,7 @@ const Activity3 = () => {
                                         }
                                     }
                                     setActivityMVCContent(activity_mvc_data);
-
-                                    // Randomly assign should only be called when instructor allows ML - to be fixed
+                                    
                                     if (sessionStorage.getItem("allowMLModel") === "true") {
                                         RandomlyAssign(response.data);
                                     } else {
@@ -114,7 +112,7 @@ const Activity3 = () => {
                             }
                         });
 
-                        setPredefinedMLSelection(sessionStorage.getItem("predefinedHighlighting"))
+                        setPredefinedHighlighting(sessionStorage.getItem("predefinedHighlighting"))
 
                         // gets it data from database activity 3    
                     } else {

@@ -1032,7 +1032,7 @@ const CustomActivitiesInstructor = () => {
                                             <LinearProgress className='update-template-loading' />
                                         ) : (
                                             <Button fullWidth variant='contained' className='activity-submit-button' onClick={() => handleSubmit(key, value)}>
-                                                Save and Publish Updates
+                                                Save / Publish Updates
                                             </Button>
                                         )}
 

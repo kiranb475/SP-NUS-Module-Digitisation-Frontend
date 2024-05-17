@@ -223,7 +223,7 @@ const InstructorDesignedActivities = () => {
                                 <CircularProgress size={37} className='copy-template-loading' />
                             ) : (
                                 <Button disableRipple className="copy-template-button" onClick={() => handleCopyTemplate(value)}>
-                                    Launch Activity
+                                    Launch
                                 </Button>
                             )}
                         </div>

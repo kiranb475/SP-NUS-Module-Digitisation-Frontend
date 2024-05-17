@@ -92,37 +92,37 @@ const StudentDesignedActivities = () => {
 
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityOneId, "one", value) }}
                                     className={`activity-button ${value.ActivityOneId ? "active" : "disabled"}`}>
-                                    Activity 1
+                                    One
                                 </Button>
 
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityTwoId, "two", value) }}
                                     disabled={!value.ActivityTwoId}
                                     className={`activity-button ${value.ActivityTwoId ? "active" : "disabled"}`}>
-                                    Activity 2
+                                    Two
                                 </Button>
 
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityThreeId, "three", value) }}
                                     disabled={!value.ActivityThreeId}
                                     className={`activity-button ${value.ActivityThreeId ? "active" : "disabled"}`}>
-                                    Activity 3
+                                    Three
                                 </Button>
 
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityFourId, "four", value) }}
                                     disabled={!value.ActivityFourId}
                                     className={`activity-button ${value.ActivityFourId ? "active" : "disabled"}`}>
-                                    Activity 4
+                                    Four
                                 </Button>
 
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityFiveId, "five", value) }}
                                     disabled={!value.ActivityFiveId}
                                     className={`activity-button ${value.ActivityFiveId ? "active" : "disabled"}`}>
-                                    Activity 5
+                                    Five
                                 </Button>
 
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivitySixId, "six", value) }}
                                     disabled={!value.ActivitySixId}
                                     className={`activity-button ${value.ActivitySixId ? "active" : "disabled"}`}>
-                                    Activity 6
+                                    Six
                                 </Button>
 
                             </div>

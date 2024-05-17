@@ -16,7 +16,8 @@ const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
 
     // handles highlighting
     const handleClick = (event) => {
-        if (highlightingNotAllowed !== false) {
+        console.log(highlightingNotAllowed)
+        if (highlightingNotAllowed === "false") {
             //checks if background color is green
             if (event.target.style.backgroundColor === "rgb(23, 177, 105)") {
                 //changes it to blue

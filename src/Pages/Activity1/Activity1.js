@@ -60,6 +60,7 @@ const Activity1 = () => {
             if (response.data.transcriptEditable) {
               setNotEditableTranscript(response.data.transcriptEditable);
             }
+            sessionStorage.setItem("setNotEditableTranscript",response.data.transcriptEditable);
             if (response.data.label) {
               setLabel(response.data.label);
             }
