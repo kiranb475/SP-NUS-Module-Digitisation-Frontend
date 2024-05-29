@@ -1,5 +1,5 @@
 import './Activity4.css'
-import { Box, Button, Container, FormControlLabel, Switch, Typography, Tooltip } from "@mui/material";
+import { Box, Button, FormControlLabel, Switch, Typography, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -9,13 +9,13 @@ import DisplayComponents from './DisplayComponents.js';
 import InfoIcon from '@mui/icons-material/Info';
 
 const Activity4 = () => {
+
+    //use state hooks to store relevant values
     const [selectedData, setSelectedData] = useState({});
-    const [containerHeight, setContainerHeight] = useState(0);
     const [instructor, setInstructor] = useState(false);
     const [newChain, setNewChain] = useState(false);
     const [label, setLabel] = useState("Activity 4 Label");
     const [blankTemplate, setBlankTemplate] = useState(false)
-    const [selectedIds, setSelectedIds] = useState([]);
     const [instruction, setInstruction] = useState(
         `<Typography>The sentences you selected in the previous activity have been arranged on the left side of the pane below. Use the space below to cluster the sentences into themes by arranging the sentences that go together near each other. It’s okay if the sentences in a cluster overlap a bit.</Typography>
       <br />
@@ -25,46 +25,52 @@ const Activity4 = () => {
       <br />
       <Typography>Once you are satisfied with your clusters and their labels, you can save everything by clicking the Submit button. Once submitted, your clusters and labels will be used in the next activity.</Typography>`
     );
+
     const navigate = useNavigate();
     const { id } = useParams();
 
     useEffect(() => {
 
-        // checks if id passed in the url is null
+        //checks if id passed in the url is null
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.");
             navigate("/")
         }
 
-        // checks occupation of the user
+        //checks occupation of the user
         if (sessionStorage.getItem("Occupation") == "Instructor") {
             setInstructor(true);
         }
 
-        let height = sessionStorage.getItem("mainContainerHeight");
-
         let gridWidth = 120;
         let gridHeight = 70;
+
+        //number of components to be displayed in each row
         let perRow = 2;
 
-        // if valid id exists, fetch data from activity 4 table
+        //if valid id exists, fetch data from activity four
         if (id) {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`).then((response) => {
+
+                //label 
                 setLabel(response.data.label);
+
+                //instruction
                 setInstruction(response.data.instruction);
 
-                // checks if the activity was last edited by an instructor, gets data from activity three instead
+                //checks if the activity was last edited by an instructor, gets data from activity three instead
                 if (response.data.lastAuthored === "instructor") {
                     axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                         if (response.data !== null) {
                             let userData = response.data;
-                            //checks for yellow
-                            const check = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
-                            //checks for green
-                            const check2 = new RegExp("background-color: rgb\\(\\s*23\\s*,\\s*177\\s*,\\s*105\\s*\\)", "g");
-                            let index = 0;
 
-                            console.log(response.data)
+                            //checks for yellow background color
+                            const check = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
+
+                            //checks for green background color
+                            const check2 = new RegExp("background-color: rgb\\(\\s*23\\s*,\\s*177\\s*,\\s*105\\s*\\)", "g");
+
+                            let index = 0;
 
                             if (userData.content !== null) {
                                 Object.entries(userData.content).forEach(([key, value]) => {
@@ -86,23 +92,20 @@ const Activity4 = () => {
                                         });
                                     }
                                 });
-                                console.log(userData)
                                 setSelectedData(userData);
+
                             } else {
                                 setBlankTemplate(true)
                             }
                         }
                     })
                 } else {
-                    // retrrives data from database activity 4
+                    //uses data from activity four
                     if (sessionStorage.getItem("new-chain") !== "true") {
                         if (response.data.content !== null) {
                             setSelectedData(response.data.content);
                             if (Object.entries(response.data.content).length === 0) {
                                 setBlankTemplate(true)
-                            }
-                            if (height != null) {
-                                setContainerHeight(height);
                             }
                         }
                     }
@@ -111,13 +114,18 @@ const Activity4 = () => {
             });
         }
 
+        //if an id is not provided or user has created a new chain
         if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
+
+            //retrieve data from activity three since activity two instance does not exist
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                 if (response.data !== null) {
                     let userData = response.data;
-                    //checks for yellow
+
+                    //checks for yellow background color
                     const check = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
-                    //checks for green
+
+                    //checks for green background color
                     const check2 = new RegExp("background-color: rgb\\(\\s*23\\s*,\\s*177\\s*,\\s*105\\s*\\)", "g");
                     let index = 0;
 
@@ -141,19 +149,47 @@ const Activity4 = () => {
                                 });
                             }
                         });
-                        console.log(userData)
                         setSelectedData(userData);
+
                     } else {
                         setBlankTemplate(true)
                     }
 
-                } else if (id === "null") {
-                    alert("Before progressing to Activity 4, please complete Activity 3.");
                 }
             });
         }
     }, []);
 
+    //checks whether two components are close to each other
+    const checkProximity = (x1, y1, x2, y2, height1, height2) => {
+
+        if (Math.abs(x1 - x2) <= 125) {
+            if (height1 === 120 && height2 === 120) {
+                if (Math.abs(y1 - y2) <= 70) {
+                    return true;
+                }
+            }
+            if (height1 === 40 && height2 === 40) {
+                if (Math.abs(y1 - y2) <= 60) {
+                    return true;
+                }
+            }
+            if (height1 === 40 && height2 === 120) {
+                if (Math.abs(y1 - y2) <= 70) {
+                    return true;
+                }
+            }
+            if (height1 === 120 && height2 === 40) {
+                if (Math.abs(y1 - y2) <= 40) {
+                    return true;
+                }
+            }
+        } else {
+            return false;
+        }
+    };
+
+    //clusters relevant components based on their proximity and assigns them colors
     const checkClass = () => {
         let colorsUsedData = {};
         let checkClassData = {};
@@ -162,7 +198,7 @@ const Activity4 = () => {
         let flag = false;
         let flag2 = false;
 
-        // sets all userClusterIndexA4 to -1 irrespective of their initial state
+        //sets all userClusterIndexA4 to -1 irrespective of their initial state
         Object.entries(userData.content).forEach(([key, data]) => {
             if (data.type === "label") {
                 data.userClusterIndexA4 = -1;
@@ -175,7 +211,7 @@ const Activity4 = () => {
             }
         });
 
-        // creates an array of relevant components for clustering 
+        //creates an array of relevant components for clustering 
         Object.entries(userData.content).forEach(([key, data]) => {
             if (data.response_id) {
                 Object.entries(data.response_text).forEach(([key2, data2]) => {
@@ -191,7 +227,7 @@ const Activity4 = () => {
             }
         });
 
-        // checks for proximity between two components
+        //calls a function to check proximity between all the components and assigns their class and color accordingly
         Object.entries(checkClassData).forEach(([key, value]) => {
             Object.entries(checkClassData).forEach(([key2, value2]) => {
                 if (checkProximity(value.x, value.y, value2.x, value2.y, value.height, value2.height) && value2.userClusterIndexA4 === -1) {
@@ -233,39 +269,10 @@ const Activity4 = () => {
         return colorsUsedData;
     };
 
-    // checks whether two components are close to each other
-    const checkProximity = (x1, y1, x2, y2, height1, height2) => {
-
-        if (Math.abs(x1 - x2) <= 125) {
-            if (height1 === 120 && height2 === 120) {
-                if (Math.abs(y1 - y2) <= 70) {
-                    return true;
-                }
-            }
-            if (height1 === 40 && height2 === 40) {
-                if (Math.abs(y1 - y2) <= 60) {
-                    return true;
-                }
-            }
-            if (height1 === 40 && height2 === 120) {
-                if (Math.abs(y1 - y2) <= 70) {
-                    return true;
-                }
-            }
-            if (height1 === 120 && height2 === 40) {
-                if (Math.abs(y1 - y2) <= 40) {
-                    return true;
-                }
-            }
-        } else {
-            return false;
-        }
-    };
-
-    // checks which components are next to each other
+    //checks which components are next to each other
     const checkClustering = () => {
 
-        // gets the height of the components - see if its still needed.
+        //gets the height of the components (not needed anymore since they have fixed height)
         Object.entries(selectedData.content).map(([key, data]) => {
             if (data.type === "label") {
                 const element = document.querySelector(`[data-height-id="${data.id}"]`);
@@ -302,7 +309,7 @@ const Activity4 = () => {
         setSelectedData(updatedSelectedData);
     };
 
-
+    //handles dragging of components
     const handleDrag = (e, data, coreKey, subKey) => {
         checkClustering();
 
@@ -327,85 +334,7 @@ const Activity4 = () => {
         });
     };
 
-    // failed attempt at moving multiple selected components together
-
-    // const findKeyById = (id, content) => {
-    //     for (const [key, value] of Object.entries(content)) {
-    //         if (value.response_text) {
-    //             for (const [subKey, value2] of Object.entries(value.response_text)) {
-    //                 if (value2.clusterData && value2.clusterData.id === id) {
-    //                     console.log({ key, subKey });
-    //                     return { key, subKey };
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return null; 
-    // };
-
-
-
-    // const handleDrag = (e, data, coreKey, subKey) => {
-    //     checkClustering();  // Assuming this is necessary prior to updating positions
-
-    //     if (selectedIds.includes(selectedData.content[coreKey]?.response_text[subKey]?.clusterData.id)) {
-    //         const deltaX = data.deltaX;
-    //         const deltaY = data.deltaY;
-
-    //         setSelectedData((prevState) => {
-    //             const updatedContent = { ...prevState.content };
-
-    //             selectedIds.forEach((id) => {
-    //                 const { key, subKey } = findKeyById(id, updatedContent);
-    //                 if (key && subKey !== undefined) {
-    //                     const item = updatedContent[key].response_text[subKey].clusterData;
-    //                     const updatedItem = {
-    //                         ...item,
-    //                         x: item.x + deltaX,
-    //                         y: item.y + deltaY,
-    //                     };
-    //                     updatedContent[key].response_text[subKey].clusterData = updatedItem;
-    //                 } else if (key) {
-    //                     const item = updatedContent[key];
-    //                     const updatedItem = {
-    //                         ...item,
-    //                         x: item.x + deltaX,
-    //                         y: item.y + deltaY,
-    //                     };
-    //                     updatedContent[key] = updatedItem;
-    //                 }
-    //             });
-
-    //             return { ...prevState, content: updatedContent };
-    //         });
-    //     } else {
-    //         setSelectedData((prevState) => {
-    //             const updatedContent = { ...prevState.content };
-
-    //             if (subKey !== undefined && coreKey && updatedContent[coreKey]?.response_text[subKey]?.clusterData) {
-    //                 const updatedSubItem = {
-    //                     ...updatedContent[coreKey].response_text[subKey].clusterData,
-    //                     x: data.x,
-    //                     y: data.y,
-    //                 };
-    //                 updatedContent[coreKey].response_text[subKey].clusterData = updatedSubItem;
-    //             } else if (coreKey && updatedContent[coreKey]) {
-    //                 const updatedItem = {
-    //                     ...updatedContent[coreKey],
-    //                     x: data.x,
-    //                     y: data.y,
-    //                 };
-    //                 updatedContent[coreKey] = updatedItem;
-    //             }
-
-    //             return { ...prevState, content: updatedContent };
-    //         });
-    //     }
-    // };
-
-
-
-
+    //handles removal of labels
     const removeLabel = (key) => {
         setSelectedData((prevData) => {
             const newData = { ...prevData };
@@ -414,6 +343,7 @@ const Activity4 = () => {
         });
     };
 
+    //handles deletion of copy of components
     const handleDeleteCopy = (coreKey, subKey) => {
         setSelectedData(prevData => {
             const newData = { ...prevData };
@@ -422,6 +352,7 @@ const Activity4 = () => {
         });
     };
 
+    //hanldes creation of copies of components
     const handleCreateCopy = (coreKey, subKey) => {
         setSelectedData(prevState => {
             const newData = { ...prevState };
@@ -441,6 +372,7 @@ const Activity4 = () => {
         });
     };
 
+    //handles double click to create a new label
     const handleDoubleClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -449,6 +381,7 @@ const Activity4 = () => {
         createLabelAtPosition(x / 2, y / 2);
     };
 
+    //creates a new label at the position of the double click
     const createLabelAtPosition = (x, y) => {
 
         setSelectedData((prevState) => {
@@ -472,7 +405,7 @@ const Activity4 = () => {
     };
 
 
-    // searches for the current label name and replaces it
+    //searches for the current label name and replaces it
     const replaceLabelNames = () => {
         let data = selectedData;
 
@@ -486,6 +419,7 @@ const Activity4 = () => {
         setSelectedData(data);
     };
 
+    //handles user submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -536,17 +470,24 @@ const Activity4 = () => {
         let event;
 
         if (id && sessionStorage.getItem("new-chain") !== "true") {
+
+            //updates activity four
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`, data);
+
             if (newChain) {
+
+                //deletes activity id for future activities
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
 
                 sessionStorage.setItem("new-chain", true)
-
                 event = "Reinitialise";
+
             } else {
                 event = "Update";
             }
         } else {
+
+            //create a new entry of activity four
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data).then((response) => {
                 const ActivityFourId = response.data.id;
                 sessionStorage.setItem("ActivityFourId", ActivityFourId);
@@ -564,6 +505,7 @@ const Activity4 = () => {
                 ActivityId: sessionStorage.getItem("ActivityFourId"),
                 ActivityType: "Activity 4",
             };
+            //update student logs
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
         } else {
             let data = {
@@ -574,6 +516,7 @@ const Activity4 = () => {
                 ActivityId: sessionStorage.getItem("ActivityFourId"),
                 ActivityType: "Activity 4",
             };
+            //update instructor logs
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
         }
 
@@ -586,16 +529,27 @@ const Activity4 = () => {
 
     return (
         <div className="container-activity-3">
+
             <div className="header-activity-3">
-                <h2 dangerouslySetInnerHTML={{ __html: `${label}` }} contentEditable="true" id="activity-four-label" className="editableLabel"></h2>
-                <Button onClick={() => window.location.reload()} className="resetButton">Reset</Button>
+
+                {/*activity four label*/}
+                <h2 dangerouslySetInnerHTML={{ __html: `${label}` }} contentEditable="true" id="activity-four-label" className="editable-lable"></h2>
+                <Button onClick={() => window.location.reload()} className="reset-button">Reset</Button>
+
             </div>
+
             <form onSubmit={handleSubmit}>
-                <Typography id="activity-four-instruction" dangerouslySetInnerHTML={{ __html: `${instruction}` }} contentEditable={true} className="editableInstruction"></Typography>
-                <Typography className="infoText">Labels can be generated by right clicking twice within the lavender box.</Typography>
-                {blankTemplate && <Typography className="infoText">
+
+                {/*activity four instruction*/}
+                <Typography id="activity-four-instruction" dangerouslySetInnerHTML={{ __html: `${instruction}` }} contentEditable={true} className="editable-instruction"></Typography>
+                <Typography className="info-text">Labels can be generated by right clicking twice within the lavender box.</Typography>
+
+                {/*if no transcript has been provided*/}
+                {blankTemplate && <Typography className="info-text">
                     No transcript has been displayed since no data was entered in Activity 1.
                 </Typography>}
+
+                {/*switch to create new chain*/}
                 <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
                     <Switch checked={newChain} onChange={() => {
                         if (!newChain) {
@@ -618,12 +572,16 @@ const Activity4 = () => {
                         </div>
                     }
                 />
+
+                {/*displays components*/}
                 {!blankTemplate &&
                     <Box id="main-container" onDoubleClick={handleDoubleClick}>
-                        <DisplayComponents selectedData={selectedData} handleDrag={handleDrag} removeLabel={removeLabel} handleCreateCopy={handleCreateCopy} handleDeleteCopy={handleDeleteCopy} selectedIds={selectedIds} setSelectedIds={setSelectedIds} />
+                        <DisplayComponents selectedData={selectedData} handleDrag={handleDrag} removeLabel={removeLabel} handleCreateCopy={handleCreateCopy} handleDeleteCopy={handleDeleteCopy}/>
                     </Box>}
-                <Button fullWidth type="submit" variant="outlined" className="submitButton">Submit</Button>
+                <Button fullWidth type="submit" variant="outlined" className="submit-button">Submit</Button>
+
             </form>
+
         </div>
     );
 };

@@ -24,17 +24,17 @@
   font-family: "Lato", sans-serif !important;
 }
 
-.resetButton {
+.reset-button {
   margin-left: auto !important;
   color: #af5f02 !important;
 }
 
-.resetButton .MuiButtonBase-root:hover {
+.reset-button .MuiButtonBase-root:hover {
   background-color: transparent !important;
 }
 
 /* can be abstracted */
-.editableInstruction {
+.editable-instruction {
   min-height: 1 !important;
   border-right: solid rgba(0, 0, 0, 0) 1px !important;
   outline: none !important;
@@ -44,16 +44,16 @@
 
 .divider,
 .formControlLabel,
-.infoText {
+.info-text {
   margin-top: 10px !important;
 }
 
-.infoText {
+.info-text {
   font-family: "Lato", sans-serif !important;
   font-size: 17px !important;
 }
 
-.contentContainer {
+.content-container {
   margin-top: 10px !important;
   padding: 10px !important;
   border: 1px solid #af5f02 !important;
@@ -61,7 +61,7 @@
 
 }
 
-.submitButton {
+.submit-button {
   margin-top: 20px !important;
   margin-bottom: 3px !important;
   background-color: rgba(135, 146, 137, 255) !important;

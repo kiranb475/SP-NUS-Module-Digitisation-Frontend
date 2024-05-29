@@ -3,19 +3,12 @@ import { Typography, Button, Tooltip } from "@mui/material";
 import Draggable from 'react-draggable';
 import './Activity4.css';
 
-const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreateCopy, handleDeleteCopy, selectedIds, setSelectedIds }) => {
-
-    // const toggleSelect = (id) => {
-    //     setSelectedIds(prev => 
-    //         prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    //     );
-    // };
+const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreateCopy, handleDeleteCopy}) => {
 
     if (Object.keys(selectedData).length !== 0) {
         return Object.entries(selectedData.content).map(([key, data]) => {
+            //label
             if (data.type === "label") {
-                const labelClasses = data.removed ? 'draggableItemLabel removedLabel' : 'draggableItemLabel activeLabel';
-                const backgroundColor = data.color;
                 const style = {
                     position: 'absolute',
                     left: `${data.x}px`,
@@ -28,9 +21,9 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                         onDrag={(e, dragData) => handleDrag(e, dragData, key)}
                         bounds="parent"
                     >
-                        <div data-height-id={data.id} className='draggableResponseLabel' style={style}>
+                        <div data-height-id={data.id} className='draggable-response-label' style={style}>
                             <Typography
-                                // prevents creation of a new line when pressing the 'enter' button
+                                //prevents creation of a new line when pressing the 'enter' button
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") { e.preventDefault(); }
                                 }}
@@ -47,6 +40,7 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                         </div>
                     </Draggable>
                 );
+            //interviewee text
             } else if (data.response_id) {
                 return Object.entries(data.response_text).map(([key2, data2]) => {
                     if (data2.clusterData) {
@@ -56,7 +50,6 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                             left: `${data2.clusterData.x}px`,
                             top: `${data2.clusterData.y}px`,
                             backgroundColor: responseBackgroundColor,
-                            //border: selectedIds.includes(data2.clusterData.id) ? '2px solid blue' : 'none'
                             border: 'none',
                         };
                         return (
@@ -66,9 +59,7 @@ const DisplayComponents = ({ selectedData, handleDrag, removeLabel, handleCreate
                                 onDrag={(e, d) => handleDrag(e, d, key, key2)}
                                 bounds="parent"
                             >
-                                <div data-height-id={data2.clusterData.id} className={`draggableResponse`} style={style} 
-                                //onClick={() => toggleSelect(data2.clusterData.id)}
-                                >
+                                <div data-height-id={data2.clusterData.id} className={`draggable-response`} style={style} >
                                     <div style={{ display: "flex" }}>
                                         <Button variant="outlined" onClick={() => handleCreateCopy(key, key2)} className='create-copy-button'>+</Button>
                                         {data2.clusterData.type === "text-copy" && <Button variant="outlined" onClick={() => handleDeleteCopy(key, key2)} className='create-delete-button'>-</Button>}

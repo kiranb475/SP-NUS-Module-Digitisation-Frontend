@@ -4,6 +4,7 @@ import './Activity6.css'
 
 const DisplayComponents = ({ insightsAndNeeds, deleteInsight, deleteNeeds, addInsight, addNeed }) => {
 
+    //gets list of content for each cluster
     const getContent = (data) => {
         return Object.entries(data.content).map(([key, value]) => {
             if (value.type !== "label") {
@@ -16,6 +17,7 @@ const DisplayComponents = ({ insightsAndNeeds, deleteInsight, deleteNeeds, addIn
         });
     };
 
+    //gets list of insights for each cluster
     const getInsight = (data, baseKey) => {
         return Object.entries(data.insights).map(([key, value]) => {
             return (
@@ -38,6 +40,7 @@ const DisplayComponents = ({ insightsAndNeeds, deleteInsight, deleteNeeds, addIn
         });
     };
 
+    //gets list of needs for each cluster
     const getNeed = (data, baseKey) => {
         return Object.entries(data.needs).map(([key, value]) => {
             return (
@@ -63,32 +66,37 @@ const DisplayComponents = ({ insightsAndNeeds, deleteInsight, deleteNeeds, addIn
     return (
         Object.entries(insightsAndNeeds).map(([key, value]) => {
             return (
-                <>
-                    <div key={key} className='cluster-details-container'>
-                        <div style={{ width: "100%" }}>
-                            <Accordion className='cluster-accordian'>
-                                <AccordionSummary className='cluster-accordian-header' expandIcon={<ExpandMoreIcon />}>
-                                    <Typography className='cluster-accordian-label'>
-                                        {value.label.text}
-                                    </Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>{getContent(value)}</AccordionDetails>
-                            </Accordion>
-                        </div>
-                        <div style={{ width: "100%" }}>
-                            {getInsight(value, key)}
-                            <Button variant="outlined" onClick={() => addInsight(key)} className='cluster-button'>
-                                +
-                            </Button>
-                        </div>
-                        <div style={{ width: "100%" }}>
-                            {getNeed(value, key)}
-                            <Button variant="outlined" onClick={() => addNeed(key)} className='cluster-button'>
-                                +
-                            </Button>
-                        </div>
+                <div key={key} className='cluster-details-container'>
+
+                    {/*displays selected components for each label*/}
+                    <div style={{ width: "100%" }}>
+                        <Accordion className='cluster-accordian'>
+                            <AccordionSummary className='cluster-accordian-header' expandIcon={<ExpandMoreIcon />}>
+                                <Typography className='cluster-accordian-label'>
+                                    {value.label.text}
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>{getContent(value)}</AccordionDetails>
+                        </Accordion>
                     </div>
-                </>
+
+                    {/*displays insights*/}
+                    <div style={{ width: "100%" }}>
+                        {getInsight(value, key)}
+                        <Button variant="outlined" onClick={() => addInsight(key)} className='cluster-button'>
+                            +
+                        </Button>
+                    </div>
+
+                    {/*displays needs*/}
+                    <div style={{ width: "100%" }}>
+                        {getNeed(value, key)}
+                        <Button variant="outlined" onClick={() => addNeed(key)} className='cluster-button'>
+                            +
+                        </Button>
+                    </div>
+
+                </div>
             );
         })
     )

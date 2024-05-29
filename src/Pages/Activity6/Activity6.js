@@ -1,15 +1,16 @@
 import './Activity6.css'
-import { Accordion, AccordionDetails, AccordionSummary, Button, Container, Divider, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import DisplayComponents from './DisplayComponents';
 
 const Act6 = () => {
+
+  //use state hooks to store relevant values
   const [clustData, setClustData] = useState({});
   const [instructor, setInstructor] = useState(false);
   const [label, setLabel] = useState("Activity 6 Label");
-  const [newChain, setNewChain] = useState(false);
   const [insightsAndNeeds, setInsightsAndNeeds] = useState({});
   const [blankTemplate, setBlankTemplate] = useState(false)
   const [instruction, setInstruction] = useState(`
@@ -22,41 +23,48 @@ const Act6 = () => {
 
   useEffect(() => {
 
-    if (sessionStorage.getItem("Occupation") == "Instructor") {
-      setInstructor(true);
-    }
-
+    // checks if id passed in the url is null
     if (id === "null") {
       alert("Please go back to the previous activity and submit it to continue.");
     }
 
+    // checks occupation of the user
+    if (sessionStorage.getItem("Occupation") == "Instructor") {
+      setInstructor(true);
+    }
+
+    //if valid id exists, fetch data from activity six
     if (id) {
       axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`)
         .then((response) => {
+
+          //label
           setLabel(response.data.label);
+
+          //instruction
           setInstruction(response.data.instruction);
 
-          // if the activity was last authored by an instructor, it gets it data from activity five
+          //if the activity was last authored by an instructor, it gets it data from activity five
           if (response.data.lastAuthored === "instructor") {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`)
               .then((response) => {
                 if (response.data !== null) {
+                  //creates placeholders for insights and needs
                   let insightsAndNeeds = {};
                   if (Object.entries(response.data.content).length !== 0) {
-                    Object.entries(response.data.content.content).map(
-                      ([key, value]) => {
-                        if (value.type === "label") {
-                          insightsAndNeeds[value.userClusterIndexA5] = {
-                            content: {},
-                            insights: {},
-                            needs: {},
-                            label: {
-                              text: value.clusterLabelA5,
-                              coreKey: value.coreKey,
-                            },
-                          };
-                        }
+                    Object.entries(response.data.content.content).map(([key, value]) => {
+                      if (value.type === "label") {
+                        insightsAndNeeds[value.userClusterIndexA5] = {
+                          content: {},
+                          insights: {},
+                          needs: {},
+                          label: {
+                            text: value.clusterLabelA5,
+                            coreKey: value.coreKey,
+                          },
+                        };
                       }
+                    }
                     );
 
                     Object.entries(response.data.content.content).map(([key, value]) => {
@@ -83,8 +91,10 @@ const Act6 = () => {
                 }
               })
           } else {
+            //if an id is not provided or user has created a new chain
             if (response.data.content !== null && sessionStorage.getItem("new-chain") !== "true") {
               setClustData(response.data.content);
+              //creates placeholders for insights and needs
               let insightsAndNeeds = {};
               if (response.data.content.content !== undefined) {
                 Object.entries(response.data.content.content).map(([key, value]) => {
@@ -128,11 +138,13 @@ const Act6 = () => {
           }
         });
     }
-    
+
+    //if an id is not provided or user has created a new chain
     if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
       axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`)
         .then((response) => {
           if (response.data !== null) {
+            //creates placeholders for insights and needs
             let insightsAndNeeds = {};
             if (Object.entries(response.data.content).length !== 0) {
               Object.entries(response.data.content.content).map(
@@ -179,6 +191,7 @@ const Act6 = () => {
     }
   }, []);
 
+  //handles deletion of insights
   const deleteInsight = (baseKey, key) => {
     setInsightsAndNeeds((prevData) => {
       const newData = JSON.parse(JSON.stringify(prevData));
@@ -187,6 +200,7 @@ const Act6 = () => {
     });
   };
 
+  //handles deletion of needs
   const deleteNeeds = (baseKey, key) => {
     setInsightsAndNeeds((prevData) => {
       const newData = JSON.parse(JSON.stringify(prevData));
@@ -195,6 +209,7 @@ const Act6 = () => {
     });
   };
 
+  //handles creation of insights
   const addInsight = (key) => {
     setInsightsAndNeeds((prevData) => {
       const newData = JSON.parse(JSON.stringify(prevData));
@@ -203,6 +218,7 @@ const Act6 = () => {
     });
   };
 
+  //handles creation of needs
   const addNeed = (key) => {
     setInsightsAndNeeds((prevData) => {
       const newData = JSON.parse(JSON.stringify(prevData));
@@ -211,6 +227,7 @@ const Act6 = () => {
     });
   };
 
+  //handles submission of data
   const handleSubmit = async (e) => {
     e.preventDefault();
     replaceName();
@@ -245,15 +262,21 @@ const Act6 = () => {
     let event;
 
     if (id && sessionStorage.getItem("new-chain") !== "true") {
+
+      //updates activity six
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`, data);
       event = "Update";
+
     } else {
+
+      //create new entry of activity six
       await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data)
         .then((response) => {
           const ActivitySixId = response.data.id;
           sessionStorage.setItem("ActivitySixId", ActivitySixId);
         });
       event = "Create";
+
     }
 
     if (!instructor) {
@@ -265,6 +288,7 @@ const Act6 = () => {
         ActivityId: sessionStorage.getItem("ActivitySixId"),
         ActivityType: "Activity 6",
       };
+      //updates student logs
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
     } else {
       let data = {
@@ -275,11 +299,9 @@ const Act6 = () => {
         ActivityId: sessionStorage.getItem("ActivitySixId"),
         ActivityType: "Activity 6",
       };
+      //updates instructor logs
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
     }
-
-    // create a suitable alternative for the summaries table
-    // current version below is not suitable
 
     let summary_data = {};
 
@@ -441,6 +463,7 @@ const Act6 = () => {
     navigate("/home");
   };
 
+  //replace names of insight and needs after they are edited
   const replaceName = () => {
     Object.entries(insightsAndNeeds).map(([key, value]) => {
       Object.entries(value.insights).map(([key2, value2]) => {
@@ -456,22 +479,27 @@ const Act6 = () => {
 
   return (
     <div className="container-activity-6">
+
       <div className='header-activity-6'>
-        <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" id="activity-six-label"></h2>
-        <Button onClick={() => { window.location.reload(false); }} className="resetButton">
+
+        {/*activity six label*/}
+        <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" id="activity-six-label" className="editable-lable"></h2>
+        <Button onClick={() => { window.location.reload(false); }} className="reset-button">
           Reset
         </Button>
       </div>
       <form onSubmit={handleSubmit}>
 
-        <Typography id="activity-six-instruction" className="editableInstruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true}></Typography>
-        {blankTemplate && <Typography className="infoText">
+        {/*activity six instruction*/}
+        <Typography id="activity-six-instruction" className="editable-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true}></Typography>
+        {blankTemplate && <Typography className="info-text">
           No transcript has been displayed since no data was entered in Activity 1.
         </Typography>}
+
         {!blankTemplate && (
           <div>
-            <div className='clusters-header-container'
-            >
+
+            <div className='clusters-header-container'>
               <Typography className='clusters-header'>
                 Clusters
               </Typography>
@@ -482,10 +510,14 @@ const Act6 = () => {
                 Needs
               </Typography>
             </div>
+
+            {/*displays components*/}
             <DisplayComponents insightsAndNeeds={insightsAndNeeds} deleteInsight={deleteInsight} deleteNeeds={deleteNeeds} addInsight={addInsight} addNeed={addNeed} />
+
           </div>
         )}
-        <Button fullWidth type="submit" variant="outlined" className="submitButton">Submit</Button>
+
+        <Button fullWidth type="submit" variant="outlined" className="submit-button">Submit</Button>
       </form>
     </div>
   );

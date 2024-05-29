@@ -24,8 +24,8 @@
     font-family: "Lato", sans-serif !important;
 }
 
-.editableLabel,
-.editableInstruction {
+.editable-label,
+.editable-instruction {
     min-height: 1;
     border-right: solid rgba(0, 0, 0, 0) 1px;
     outline: none;
@@ -107,4 +107,26 @@
     font-family: "Lato", sans-serif !important;
     font-size: 17px !important;
     outline: none;
+}
+
+.submit-button {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.reset-button {
+    margin-left: auto;
+}
+
+.reset-button:hover {
+    background-color: transparent;
+}
+
+.info-text {
+    min-height: 1;
+    border-right: solid rgba(0, 0, 0, 0) 1px;
+    outline: none;
+    font-family: "Lato", sans-serif;
+    font-size: 17px;
+    margin-top: 10px;
 }

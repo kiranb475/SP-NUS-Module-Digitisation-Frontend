@@ -1,4 +1,4 @@
-import { Button, Container, FormControlLabel, Switch, Tooltip, Typography } from "@mui/material";
+import { Button, FormControlLabel, Switch, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -7,6 +7,8 @@ import './Activity3.css'
 import InfoIcon from '@mui/icons-material/Info';
 
 const Activity3 = () => {
+
+    //use state hooks to store relevant variables
     const [activityMVCContent, setActivityMVCContent] = useState({});
     const [userData, setUserData] = useState({});
     const [AllowMLModel, setAllowMLModel] = useState(false);
@@ -14,7 +16,6 @@ const Activity3 = () => {
     const [MLModel, setMLModel] = useState("");
     const [predefinedHighlighting, setPredefinedHighlighting] = useState(false);
     const [newChain, setNewChain] = useState(false);
-    const [predefinedMLSelection, setPredefinedMLSelection] = useState(false);
     const [blankTemplate, setBlankTemplate] = useState(false)
     const [label, setLabel] = useState("Activity 3 Label");
     const [author, setAuthor] = useState("")
@@ -30,6 +31,7 @@ const Activity3 = () => {
             <li><Typography>Both you and the model selected - green</Typography></li>
         </ul>`
     );
+
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -51,10 +53,12 @@ const Activity3 = () => {
             setPredefinedHighlighting(true);
         }
 
-        // if valid id exists, fetch data from activity 3 table
+        //if valid id exists, fetches data from activity 3 table
         if (id) {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`).then((response) => {
                 if (response.data !== null) {
+
+                    //enable machine learning model
                     if (response.data.AllowMLModel) {
                         setAllowMLModel(response.data.AllowMLModel);
                         sessionStorage.setItem("allowMLModel", response.data.AllowMLModel)
@@ -62,23 +66,26 @@ const Activity3 = () => {
                         setAllowMLModel(false);
                         sessionStorage.setItem("allowMLModel", false)
                     }
+
+                    //select machine learning model
                     if (response.data.MLModel) {
                         setMLModel(response.data.MLModel);
                     } else {
                         setMLModel("None");
                     }
-                    if (response.data.predefinedMLSelection) {
-                        setPredefinedMLSelection(response.data.predefinedMLSelection);
-                    } else {
-                        setPredefinedMLSelection(false);
-                    }
+
+                    //label
                     setLabel(response.data.label);
+
+                    //instruction
                     setInstruction(response.data.instruction);
 
                     //check if its been last authored by an instructor, gets its data from previous activity
                     if (response.data.lastAuthored === "instructor") {
                         axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
                             if (response.data !== null) {
+
+                                //gets corresponding activity mvc for transcript stored in activity two
                                 if (response.data.content != null && Object.entries(response.data.content).length !== 0) {
                                     let interviewer = response.data.content[1].questioner_tag;
                                     let interviewee = response.data.content[2].response_tag;
@@ -99,7 +106,8 @@ const Activity3 = () => {
                                         }
                                     }
                                     setActivityMVCContent(activity_mvc_data);
-                                    
+
+                                    //enable machine learning model
                                     if (sessionStorage.getItem("allowMLModel") === "true") {
                                         RandomlyAssign(response.data);
                                     } else {
@@ -112,10 +120,12 @@ const Activity3 = () => {
                             }
                         });
 
+                        //standardised highlighting
                         setPredefinedHighlighting(sessionStorage.getItem("predefinedHighlighting"))
 
-                        // gets it data from database activity 3    
                     } else {
+
+                        //uses data stored in activity three and gets corresponding activity mvc
                         if (sessionStorage.getItem("new-chain") !== "true") {
                             if (response.data.content != null) {
                                 let interviewer = response.data.content[1].questioner_tag;
@@ -148,10 +158,14 @@ const Activity3 = () => {
             });
         }
 
+        //if id does not exist or user has created a new chain
         if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
-            // since instance of activity three doesn't exist, get data from activity two.
+
+            //retrieves its data from activity two since instance of activity three does not exist
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivityTwoId")}`).then((response) => {
                 if (response.data !== null) {
+
+                    //gets corresponding activity mvc for transcript data
                     if (response.data.content != null && Object.entries(response.data.content).length !== 0) {
                         let interviewer = response.data.content[1].questioner_tag;
                         let interviewee = response.data.content[2].response_tag;
@@ -173,7 +187,7 @@ const Activity3 = () => {
                         }
                         setActivityMVCContent(activity_mvc_data);
 
-                        // Randomly assign should only be called when instructor allows ML - to be fixed
+                        //if machine learning model is enabled, it will randomly select sentences for highlighting
                         if (sessionStorage.getItem("allowMLModel") === "true") {
                             RandomlyAssign(response.data);
                         } else {
@@ -182,7 +196,6 @@ const Activity3 = () => {
 
                         if (sessionStorage.getItem("new-chain") !== "true") {
                             setAllowMLModel(false);
-                            setPredefinedMLSelection(false);
                             setPredefinedHighlighting(sessionStorage.getItem("predefinedHighlighting") === "false" ? false : true)
                         }
 
@@ -191,23 +204,10 @@ const Activity3 = () => {
                     }
                 }
             });
-        } else if (id === "null") {
-            alert("Before progressing to Activity 3, please complete Activity 2.");
         }
     }, []);
 
-    const getActivityMVC = (value) => {
-        const element = document.querySelector(`[id="${value}"]`);
-        if (element) {
-            const htmlContent = element.outerHTML;
-            const inlineStyles = element.getAttribute("style") || "No inline styles";
-            return { html: htmlContent, css: inlineStyles };
-        } else {
-            console.log("Element not found");
-            return undefined;
-        }
-    };
-
+    //randomly generates a number and returns an associated value between the range -1 to 4
     function randNum() {
         const randVal = Math.random();
         if (randVal < 0.5) {
@@ -225,118 +225,6 @@ const Activity3 = () => {
         }
     }
 
-    // handles submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        let userContent = userData;
-
-        if (!id) {
-            delete userContent["predefinedHighlighting"];
-            delete userContent["predefinedTranscript"];
-        }
-        userContent.MLModel = MLModel;
-        userContent.UserId = sessionStorage.getItem("UserId");
-        userContent.AllowMLModel = AllowMLModel;
-        userContent.predefinedMLSelection = predefinedMLSelection;
-        userContent.label = document.getElementById("activity-three-label").innerHTML;
-        userContent.instruction = document.getElementById("activity-three-instruction").innerHTML;
-
-
-        console.log("user content")
-        console.log(userContent)
-
-        delete userContent["id"];
-
-        //check for yellow
-        const check1 = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
-        //check for blue
-        const check2 = new RegExp("background-color: rgb\\(\\s*108\\s*,\\s*180\\s*,\\s*238\\s*\\)", "g");
-        //check for green
-        const check3 = new RegExp("background-color: rgb\\(\\s*23\\s*,\\s*177\\s*,\\s*105\\s*\\)", "g");
-
-        if (userContent.activity_mvc !== undefined) {
-            for (let i = 1; i < Object.keys(userContent.activity_mvc).length + 1; i++) {
-                if (i % 2 != 0) {
-                    let activity_mvc_value = getActivityMVC(i.toString());
-                    userContent.activity_mvc[i] = activity_mvc_value;
-                    userContent.content[i].sentenceUserHighlightA3 = false;
-                } else {
-                    for (let j = 1; j < Object.keys(userContent.activity_mvc[i]).length + 1; j++) {
-                        let activity_mvc_value = getActivityMVC(i.toString() + j.toString());
-                        userContent.activity_mvc[i][j] = activity_mvc_value;
-                        if (activity_mvc_value.html.match(check1)) {
-                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = true;
-                        } else if (activity_mvc_value.html.match(check2)) {
-                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = false;
-                        } else if (activity_mvc_value.css.match(check3)) {
-                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = true;
-                        } else {
-                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        userContent.lastAuthored = "student"
-
-        let data = {
-            id: sessionStorage.getItem("ActivitiesId"),
-            content: userContent,
-        };
-
-        let event;
-
-        if (id && sessionStorage.getItem("new-chain") !== "true") {
-
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data);
-
-            if (newChain) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-                sessionStorage.setItem("new-chain", true)
-
-                event = "Reinitialise";
-            } else {
-                event = "Update";
-            }
-        } else {
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
-                const ActivityThreeId = response.data.id;
-                sessionStorage.setItem("ActivityThreeId", ActivityThreeId);
-            });
-
-            event = "Create";
-
-        }
-
-        if (!instructor) {
-            let data = {
-                DateTime: Date.now(),
-                StudentTemplateId: sessionStorage.getItem("ActivitiesId"),
-                StudentId: sessionStorage.getItem("UserId"),
-                Event: event,
-                ActivityId: sessionStorage.getItem("ActivityThreeId"),
-                ActivityType: "Activity 3",
-            };
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
-        } else {
-            let data = {
-                DateTime: Date.now(),
-                ActivitySequenceId: sessionStorage.getItem("ActivitiesId"),
-                InstructorId: sessionStorage.getItem("UserId"),
-                Event: event,
-                ActivityId: sessionStorage.getItem("ActivityThreeId"),
-                ActivityType: "Activity 3",
-            };
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
-        }
-
-        if (sessionStorage.getItem("ActivityFourId") !== "null" && sessionStorage.getItem("ActivityFourId") !== null) {
-            navigate(`/activityfour/${sessionStorage.getItem("ActivityFourId")}`);
-        } else {
-            navigate("/activityfour");
-        }
-    };
 
     const RandomlyAssign = (data) => {
         let userContent = data;
@@ -385,35 +273,175 @@ const Activity3 = () => {
         setUserData(userContent);
     };
 
+    //get html and css for text in transcript
+    const getActivityMVC = (value) => {
+        const element = document.querySelector(`[id="${value}"]`);
+        if (element) {
+            const htmlContent = element.outerHTML;
+            const inlineStyles = element.getAttribute("style") || "No inline styles";
+            return { html: htmlContent, css: inlineStyles };
+        } else {
+            console.log("Element not found");
+            return undefined;
+        }
+    };
+
+    //handles submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        let userContent = userData;
+
+        if (!id) {
+            delete userContent["predefinedHighlighting"];
+            delete userContent["predefinedTranscript"];
+        }
+
+        userContent.MLModel = MLModel;
+        userContent.UserId = sessionStorage.getItem("UserId");
+        userContent.AllowMLModel = AllowMLModel;
+        userContent.label = document.getElementById("activity-three-label").innerHTML;
+        userContent.instruction = document.getElementById("activity-three-instruction").innerHTML;
+
+        delete userContent["id"];
+
+        //check for yellow background color
+        const check1 = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
+        //check for blue background color
+        const check2 = new RegExp("background-color: rgb\\(\\s*108\\s*,\\s*180\\s*,\\s*238\\s*\\)", "g");
+        //check for green background color
+        const check3 = new RegExp("background-color: rgb\\(\\s*23\\s*,\\s*177\\s*,\\s*105\\s*\\)", "g");
+
+        if (userContent.activity_mvc !== undefined) {
+            for (let i = 1; i < Object.keys(userContent.activity_mvc).length + 1; i++) {
+                //interview text
+                if (i % 2 != 0) {
+                    let activity_mvc_value = getActivityMVC(i.toString());
+                    userContent.activity_mvc[i] = activity_mvc_value;
+                    userContent.content[i].sentenceUserHighlightA3 = false;
+                } else {
+                    //interviewee text
+                    for (let j = 1; j < Object.keys(userContent.activity_mvc[i]).length + 1; j++) {
+                        let activity_mvc_value = getActivityMVC(i.toString() + j.toString());
+                        userContent.activity_mvc[i][j] = activity_mvc_value;
+                        if (activity_mvc_value.html.match(check1)) {
+                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = true;
+                        } else if (activity_mvc_value.html.match(check2)) {
+                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = false;
+                        } else if (activity_mvc_value.css.match(check3)) {
+                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = true;
+                        } else {
+                            userContent.content[i].response_text[j].sentenceUserHighlightA3 = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        userContent.lastAuthored = "student"
+
+        let data = {
+            id: sessionStorage.getItem("ActivitiesId"),
+            content: userContent,
+        };
+
+        let event;
+
+        if (id && sessionStorage.getItem("new-chain") !== "true") {
+
+            //updates activity three
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${id}`, data);
+
+            if (newChain) {
+
+                //deletes activity id for future activities
+                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
+                sessionStorage.setItem("new-chain", true)
+                event = "Reinitialise";
+
+            } else {
+                event = "Update";
+            }
+        } else {
+
+            //create a new entry of activity three
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data).then((response) => {
+                const ActivityThreeId = response.data.id;
+                sessionStorage.setItem("ActivityThreeId", ActivityThreeId);
+            });
+
+            event = "Create";
+
+        }
+
+        if (!instructor) {
+            let data = {
+                DateTime: Date.now(),
+                StudentTemplateId: sessionStorage.getItem("ActivitiesId"),
+                StudentId: sessionStorage.getItem("UserId"),
+                Event: event,
+                ActivityId: sessionStorage.getItem("ActivityThreeId"),
+                ActivityType: "Activity 3",
+            };
+            //update student logs
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+        } else {
+            let data = {
+                DateTime: Date.now(),
+                ActivitySequenceId: sessionStorage.getItem("ActivitiesId"),
+                InstructorId: sessionStorage.getItem("UserId"),
+                Event: event,
+                ActivityId: sessionStorage.getItem("ActivityThreeId"),
+                ActivityType: "Activity 3",
+            };
+            //update instructor logs
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+        }
+
+        if (sessionStorage.getItem("ActivityFourId") !== "null" && sessionStorage.getItem("ActivityFourId") !== null) {
+            navigate(`/activityfour/${sessionStorage.getItem("ActivityFourId")}`);
+        } else {
+            navigate("/activityfour");
+        }
+    };
 
     return (
         <div className="container-activity-3">
+
             <div className="header-activity-3">
-                <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" id="activity-three-label" className="editableLabel"></h2>
-                <Button onClick={() => { window.location.reload(); }} className="resetButton">
+
+                {/*activity three label*/}
+                <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" id="activity-three-label" className="editable-label"></h2>
+                <Button onClick={() => { window.location.reload(); }} className="reset-button">
                     Reset
                 </Button>
+
             </div>
+
             <form onSubmit={handleSubmit}>
-                <Typography id="activity-three-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} className="editableInstruction"></Typography>
+
+                {/*activity two instruction*/}
+                <Typography id="activity-three-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} className="editable-instruction"></Typography>
+
+                {/*if highlighting is standardised*/}
                 {!instructor && predefinedHighlighting && (
-                    <Typography className="infoText">
+                    <Typography className="info-text">
                         You are not allowed to edit the highlighting of the transcript in this template.
                     </Typography>
                 )}
-                {!instructor && predefinedMLSelection && (
-                    <Typography className="infoText">
-                        The Machine Learning selection for the template has been predefined.
-                    </Typography>
-                )}
-                {blankTemplate && <Typography className="infoText">
+
+                {/*if no transcript has been provided*/}
+                {blankTemplate && <Typography className="info-text">
                     No transcript has been displayed since no data was entered in Activity 1.
                 </Typography>}
+
+                {/*if machine learning model has been enabled*/}
                 {!instructor && AllowMLModel && (
-                    <Typography className="infoText">
+                    <Typography className="info-text">
                         The template utilises {MLModel} to generate results to assist you in your decision making.
                     </Typography>
                 )}
+
+                {/*switch to create new chain*/}
                 <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
                     <Switch checked={newChain} onChange={() => {
                         if (!newChain) {
@@ -436,11 +464,16 @@ const Activity3 = () => {
                         </div>
                     }
                 />
+
+                {/*displays transcript*/}
                 {!blankTemplate ? <DisplayTranscript activityMVCContent={activityMVCContent} highlightingNotAllowed={predefinedHighlighting} /> : <></>}
-                <Button className="submitButton" fullWidth type="submit" variant="outlined">
+
+                <Button className="submit-button" fullWidth type="submit" variant="outlined">
                     Submit
                 </Button>
+
             </form>
+
         </div>
     );
 };

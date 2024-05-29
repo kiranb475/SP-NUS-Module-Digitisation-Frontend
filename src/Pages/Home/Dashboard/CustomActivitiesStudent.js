@@ -7,12 +7,14 @@ import ClearIcon from '@mui/icons-material/Clear';
 
 const CustomActivitiesStudent = () => {
 
-    const navigate = useNavigate();
+    //use state hooks to store relevant values
     const [yourActivitiesData, setYourActivitiesData] = useState({});
-    const UserId = sessionStorage.getItem("UserId");
     const [open, setOpen] = useState(false)
     const [deleteItem, setDeleteItem] = useState(null);
     const [loadingIdDelete, setLoadingIdDelete] = useState(null)
+
+    const navigate = useNavigate();
+    const UserId = sessionStorage.getItem("UserId");
 
     useEffect(() => {
 
@@ -63,6 +65,7 @@ const CustomActivitiesStudent = () => {
         setLoadingIdDelete(value.id)
 
         try {
+
             //removes chain of activities in activities table
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.id })
 
@@ -101,6 +104,7 @@ const CustomActivitiesStudent = () => {
                 delete updatedActivities[value.id];
                 return updatedActivities;
             });
+
         } catch (error) {
 
             console.error('Failed to update template:', error);
@@ -152,7 +156,8 @@ const CustomActivitiesStudent = () => {
                 Your Custom Activities
             </Typography>
 
-            {/*displays the set of user activities along with its title*/}
+            {/*displays the set of user activities along with their title title*/}
+            {/*if student has created no activities*/}
             {Object.entries(yourActivitiesData).length === 0 ? (
                 <div className='custom-activities-blank'>
                     Currently, no templates are selected. Please choose one from the list below.
@@ -168,40 +173,48 @@ const CustomActivitiesStudent = () => {
                             </div>
 
                             <div className="activity-buttons">
+
+                                {/*activity one*/}
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityOneId, "one", value) }}
                                     className={`activity-button ${value.ActivityOneId ? "active" : "disabled"}`}>
                                     One
                                 </Button>
 
+                                {/*activity two*/}
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityTwoId, "two", value) }}
                                     disabled={!value.ActivityTwoId}
                                     className={`activity-button ${value.ActivityTwoId ? "active" : "disabled"}`}>
                                     Two
                                 </Button>
 
+                                {/*activity three*/}
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityThreeId, "three", value) }}
                                     disabled={!value.ActivityThreeId}
                                     className={`activity-button ${value.ActivityThreeId ? "active" : "disabled"}`}>
                                     Three
                                 </Button>
 
+                                {/*activity four*/}
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityFourId, "four", value) }}
                                     disabled={!value.ActivityFourId}
                                     className={`activity-button ${value.ActivityFourId ? "active" : "disabled"}`}>
                                     Four
                                 </Button>
 
+                                {/*activity five*/}
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivityFiveId, "five", value) }}
                                     disabled={!value.ActivityFiveId}
                                     className={`activity-button ${value.ActivityFiveId ? "active" : "disabled"}`}>
                                     Five
                                 </Button>
 
+                                {/*activity six*/}
                                 <Button disableRipple onClick={() => { handleNavigate(value.ActivitySixId, "six", value) }}
                                     disabled={!value.ActivitySixId}
                                     className={`activity-button ${value.ActivitySixId ? "active" : "disabled"}`}>
                                     Six
                                 </Button>
+                                
                                 {loadingIdDelete === value.id ? (
                                     <CircularProgress size={37} className='delete-template-loading' />
                                 ) : (

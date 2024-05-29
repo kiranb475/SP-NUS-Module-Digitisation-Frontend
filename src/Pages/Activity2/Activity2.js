@@ -1,4 +1,4 @@
-import { Container, Typography, Box, Button, FormControlLabel, Switch, Divider, Tooltip } from "@mui/material";
+import { Typography, Button, FormControlLabel, Switch, Divider, Tooltip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -7,6 +7,8 @@ import './Activity2.css'
 import InfoIcon from '@mui/icons-material/Info';
 
 const Activity2 = () => {
+
+    //use state hooks to store relevant values
     const [activityMVCContent, setActivityMVCContent] = useState({});
     const [userData, setUserData] = useState({});
     const [highlightingNotAllowed, setHighlightingNotAllowed] = useState(false);
@@ -31,26 +33,31 @@ const Activity2 = () => {
             setInstructor(true);
         }
 
-        // if valid id exists, fetch data from activity 2 table
         if (id) {
+            // if valid id exists, fetch data from activity 2 table
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`)
                 .then((response) => {
-
                     if (response.data !== null) {
+                        //standardised highlighting
                         if (response.data.predefinedHighlighting !== null) {
                             setHighlightingNotAllowed(response.data.predefinedHighlighting);
                         }
-                        setLabel(response.data.label);
-                        setInstruction(response.data.instruction);
 
-                        console.log(response.data)
+                        //label
+                        setLabel(response.data.label);
+
+                        //instruction
+                        setInstruction(response.data.instruction);
 
                         //in the case the instructor defines a blank template or transcript is editable
                         if (Object.entries(response.data.content).length === 0 || sessionStorage.getItem("setNotEditableTranscript") !== "true") {
+                            //fetches data from activity one
                             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`)
                                 .then((response) => {
                                     if (response.data !== null) {
                                         setUserData(response.data);
+
+                                        //get activity mvc for transcript data
                                         if (response.data.content !== null && Object.entries(response.data.content).length !== 0) {
                                             let interviewer = response.data.content[1].questioner_tag;
                                             let interviewee = response.data.content[2].response_tag;
@@ -74,16 +81,15 @@ const Activity2 = () => {
                                         } else {
                                             setBlankTemplate(true)
                                         }
-
                                     }
                                 })
 
                         } else {
+                            //user has not created a new chain 
                             if (sessionStorage.getItem("new-chain") !== "true") {
-
                                 setUserData(response.data);
 
-                                // if transcript data has been entered
+                                //gets activity mvc for transcript data
                                 if (response.data.content !== null && Object.entries(response.data.content).length !== 0) {
                                     let interviewer = response.data.content[1].questioner_tag;
                                     let interviewee = response.data.content[2].response_tag;
@@ -104,7 +110,6 @@ const Activity2 = () => {
                                         }
                                     }
                                     setActivityMVCContent(activity_mvc_data);
-
                                 } else {
                                     setBlankTemplate(true)
                                 }
@@ -113,17 +118,18 @@ const Activity2 = () => {
                         }
                     }
                 });
-
         }
 
+        //if an id is not provided or user has created a new chain
         if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
 
-            // since instance of activity two doesn't exist, get data from activity one.
-
+            //retrieve data from activity one since activity two instance does not exist
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`)
                 .then((response) => {
                     if (response.data !== null) {
                         setUserData(response.data);
+
+                        //get activity mvc for transcript data
                         if (response.data.content !== null && Object.entries(response.data.content).length !== 0) {
                             let interviewer = response.data.content[1].questioner_tag;
                             let interviewee = response.data.content[2].response_tag;
@@ -149,19 +155,14 @@ const Activity2 = () => {
                         }
 
                     } else {
-                        alert(
-                            "Before progressing to Activity 2, please complete Activity 1."
-                        );
+                        alert("Before progressing to Activity 2, please complete Activity 1.");
                     }
                 });
-        } else if (id === "null") {
-            alert(
-                "Please go back to the previous activity and submit it to continue."
-            );
-        }
+            //if id is null       
+        } 
     }, []);
 
-    // gets activity mvc
+    //gets html and css associated with sentences in transcript
     const getActivityMVC = (value) => {
         const element = document.querySelector(`[id="${value}"]`);
         if (element) {
@@ -177,11 +178,13 @@ const Activity2 = () => {
         }
     };
 
-    // handles user submission
+    //handles user submission for activity two
     const handleSubmit = async (e) => {
+
         e.preventDefault();
         let userContent = userData;
-        //checks for yellow
+
+        //checks for yellow background color
         const check = new RegExp("background-color: rgb\\(\\s*255\\s*,\\s*199\\s*,\\s*44\\s*\\)", "g");
 
         //gets activity mvc after user changes
@@ -207,6 +210,7 @@ const Activity2 = () => {
         if (!id) {
             delete userContent["transcriptEditable"];
         }
+
         delete userContent["id"];
 
         userContent.predefinedHighlighting = highlightingNotAllowed;
@@ -222,28 +226,34 @@ const Activity2 = () => {
 
         let event;
 
-        //stores data 
         if (id && sessionStorage.getItem("new-chain") !== "true") {
+
+            //updates activity two
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data);
+
             if (newChain) {
+
+                //deletes activity id for future activities
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
                 sessionStorage.setItem("new-chain", true)
                 event = "Reinitialise";
+
             } else {
                 event = "Update";
             }
+
         } else {
+
+            //create a new entry of activity two
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data)
                 .then((response) => {
                     const ActivityTwoId = response.data.id;
                     sessionStorage.setItem("ActivityTwoId", ActivityTwoId);
-                    console.log(ActivityTwoId)
                 });
 
             event = "Create";
         }
 
-        //updates logs
         if (!instructor) {
             let data = {
                 DateTime: Date.now(),
@@ -253,6 +263,7 @@ const Activity2 = () => {
                 ActivityId: sessionStorage.getItem("ActivityTwoId"),
                 ActivityType: "Activity 2",
             };
+            //update student logs
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
         } else {
             let data = {
@@ -263,6 +274,7 @@ const Activity2 = () => {
                 ActivityId: sessionStorage.getItem("ActivityTwoId"),
                 ActivityType: "Activity 2",
             };
+            //update instructor logs
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
         }
 
@@ -280,31 +292,41 @@ const Activity2 = () => {
 
     return (
         <div className='container-activity-2'>
+
             <div className="header-activity-2">
-                <h2
-                    dangerouslySetInnerHTML={{ __html: label }}
+
+                {/*activity two label*/}
+                <h2 dangerouslySetInnerHTML={{ __html: label }}
                     contentEditable={true}
                     id="activity-two-label"
                 ></h2>
-                <Button onClick={() => window.location.reload()} className="resetButton">
+
+                <Button onClick={() => window.location.reload()} className="reset-button">
                     Reset
                 </Button>
+
             </div>
-            {/* handleSubmit to be implemented */}
+
             <form onSubmit={handleSubmit}>
-                <Typography id="activity-two-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} className="editableInstruction"></Typography>
+
+                {/*activity two instruciton*/}
+                <Typography id="activity-two-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} className="editable-instruction"></Typography>
+
                 {instructor && <Divider className="divider" />}
+
+                {/*display this information only to instructors*/}
                 {instructor && (
-                    <Typography className="infoText">
+                    <Typography className="info-text">
                         After submitting this activity, you will be automatically redirected to the home page. From there, you can return to select configurations for the remaining activities.
                     </Typography>
                 )}
 
-                {blankTemplate && <Typography className="infoText">
+                {/*if no transcript has been provided*/}
+                {blankTemplate && <Typography className="info-text">
                     No transcript has been displayed since no data was entered in Activity 1.
                 </Typography>}
 
-
+                {/*display the switch for standard highlighting only to instructors*/}
                 {instructor && (
                     <FormControlLabel className="formControlLabel" control={
                         <Switch checked={highlightingNotAllowed} onChange={() => setHighlightingNotAllowed((prev) => !prev)} />
@@ -320,12 +342,15 @@ const Activity2 = () => {
 
                     />
                 )}
+
+                {/*informs users regarding standardised highlighting*/}
                 {!instructor && highlightingNotAllowed && (
-                    <Typography className="infoText">
+                    <Typography className="info-text">
                         You are not allowed to edit the highlighting of the transcript in this template.
                     </Typography>
                 )}
 
+                {/*switch for new chain*/}
                 <FormControlLabel className="formControlLabel" control={
                     <Switch checked={newChain} onChange={() => {
                         if (!newChain) {
@@ -348,10 +373,13 @@ const Activity2 = () => {
                         </div>
                     }
                 />
+
+                {/*displays transcript*/}
                 {!blankTemplate ? <DisplayTranscript activityMVCContent={activityMVCContent} highlightingNotAllowed={highlightingNotAllowed} /> : <></>}
-                <Button className="submitButton" fullWidth type="submit" variant="outlined">
+                <Button className="submit-button" fullWidth type="submit" variant="outlined">
                     Submit
                 </Button>
+
             </form>
         </div>
     );

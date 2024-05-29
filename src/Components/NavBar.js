@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import './NavBar.css'
 
 function NavBar() {
+
+  //use state hooks to store relevant values
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [occupation, setOccupation] = useState("");
@@ -15,9 +17,11 @@ function NavBar() {
   const [openRegister, setOpenRegister] = useState(false);
   const navigate = useNavigate();
 
-  //user login/registration
+  //handles user login and registration
+  //action stores "login" or "register"
   const onSubmit = (action) => {
 
+    //checks for missing data
     setUsernameError(false);
     setPasswordError(false);
     setOccupationError(false);
@@ -44,17 +48,22 @@ function NavBar() {
       occupation: occupation,
     };
 
-    axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/auth/${action}`, data)
+    //sends a post request with user details to login or register the user
+    axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/userauth/${action}`, data)
       .then((response) => {
+        //unsuccessful 
         if (response.data.error) {
           alert(response.data.error);
           return;
         }
+        //success and stores details in session storage
         sessionStorage.setItem("UserId", response.data);
         sessionStorage.setItem("Username", username);
         sessionStorage.setItem("Occupation", occupation);
+        //closes the dialog
         setOpenRegister(false);
         navigate("home");
+        //reloads the page
         window.location.reload();
       });
   }
@@ -63,6 +72,8 @@ function NavBar() {
   const dialogContent = () => {
     return (
       <>
+
+        {/*username*/}
         <TextField
           variant="standard"
           required
@@ -73,6 +84,8 @@ function NavBar() {
           onChange={(e) => setUsername(e.target.value)}
           className="username-input"
         ></TextField>
+
+        {/*password*/}
         <TextField
           className="password-input"
           type="password"
@@ -84,6 +97,8 @@ function NavBar() {
           error={passwordError}
           onChange={(e) => setPassword(e.target.value)}
         ></TextField>
+
+        {/*occupation*/}
         <InputLabel required className="occupation-input" >
           Occupation
         </InputLabel>
@@ -95,6 +110,7 @@ function NavBar() {
           <MenuItem value="Student">Student</MenuItem>
           <MenuItem value="Instructor">Instructor</MenuItem>
         </Select>
+
       </>
     )
   }
@@ -102,7 +118,7 @@ function NavBar() {
   return (
 
     <AppBar position="static">
-      {/*Dialog for user login*/}
+      {/*dialog for user login*/}
       <Dialog open={openLogin} onClose={() => setOpenLogin(false)}>
         <DialogTitle className="login-header">
           <Typography className="login-title"><strong>Welcome back!</strong></Typography>
@@ -120,7 +136,7 @@ function NavBar() {
         </DialogActions>
       </Dialog>
 
-      {/*Dialog for user registration*/}
+      {/*dialog for user registration*/}
       <Dialog open={openRegister} onClose={() => setOpenRegister(false)}>
         <DialogTitle className="register-header">
           <Typography className="register-title"><strong>Hello there!</strong></Typography>
@@ -138,7 +154,7 @@ function NavBar() {
         </DialogActions>
       </Dialog>
 
-      {/*Contents of navigation bar*/}
+      {/*contents of navigation bar*/}
       <Toolbar className="toolbar-container">
         <Typography
           onClick={() => { navigate("/home"); }}
@@ -147,27 +163,35 @@ function NavBar() {
         >
           Singapore Polytechnic
         </Typography>
+
+        {/*displays username if the user is logged in*/}
         {sessionStorage.getItem("UserId") && (
           <Typography className="toolbar-username">
             {sessionStorage.getItem("Username")}
           </Typography>
         )}
+
+        {/*displays login button if the user is not logged in*/}
+        {/*opens the login dialog box*/}
         {!sessionStorage.getItem("UserId") && (
           <Button disableRipple onClick={() => setOpenLogin(true)} color="inherit" className="toolbar-login">
             Login
           </Button>
         )}
+
+        {/*displays login button if the user is not logged in*/}
+        {/*opens the register dialog box*/}
         {!sessionStorage.getItem("UserId") && (
           <Button disableRipple onClick={() => setOpenRegister(true)} color="inherit" className="toolbar-register">
             Register
           </Button>
         )}
+
+        {/*displays logout button if the user is logged in*/}
+        {/*clears out local and session storage, redirects the user to the home page*/}
         {sessionStorage.getItem("UserId") && (
-          <Button disableRipple onClick={() => {
-            sessionStorage.clear();
-            localStorage.clear();
-            navigate("/");
-          }}
+          <Button disableRipple
+            onClick={() => { sessionStorage.clear(); localStorage.clear(); navigate("/"); }}
             color="inherit" className="toolbar-logout"
           >
             Logout

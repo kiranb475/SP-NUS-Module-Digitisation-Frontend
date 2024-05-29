@@ -24,22 +24,22 @@
     font-family: "Lato", sans-serif !important;
   }
 
-.editableLabel {
+.editable-label {
     min-height: 1;
     border-right: solid rgba(0, 0, 0, 0) 1px;
     outline: none;
 }
 
-.resetButton {
+.reset-button {
     margin-left: auto;
 }
 
-.resetButton:hover {
+.reset-button:hover {
     background-color: transparent;
 }
 
-.editableInstruction,
-.infoText {
+.editable-instruction,
+.info-text {
     min-height: 1;
     border-right: solid rgba(0, 0, 0, 0) 1px;
     outline: none;
@@ -52,14 +52,14 @@
     margin-top: 0;
 }
 
-.contentContainer {
+.content-container {
     margin-top: 2px;
     padding: 2px;
     border: 1px solid black;
     border-radius: 2px;
 }
 
-.submitButton {
+.submit-button {
     margin-top: 3px;
     margin-bottom: 3px;
 }

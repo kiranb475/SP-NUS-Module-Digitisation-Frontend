@@ -9,16 +9,17 @@ import InfoIcon from '@mui/icons-material/Info';
 
 const CustomActivitiesInstructor = () => {
 
+    //use state hooks to store relevant values
     const UserId = sessionStorage.getItem("UserId");
     const [yourActivitiesData, setYourActivitiesData] = useState({});
     const [open, setOpen] = useState(false)
     const [deleteItem, setDeleteItem] = useState(null);
-    const [loadingId, setLoadingId] = useState(null)
+    const [loadingIdPublishing, setLoadingIdPublishing] = useState(null)
     const [loadingIdDelete, setLoadingIdDelete] = useState(null)
     const [loadingIdRemovalStudents, setLoadingIdRemovalStudents] = useState(null)
 
 
-    // enters the relevant data into the yourActivitiesData variable
+    //enters the relevant data into the yourActivitiesData variable
     const createActivitiesData = (activityId, activityTitle, activityOneUpdate, activityTwoUpdate, activityThreeUpdate, activityFourUpdate, activityFiveUpdate, activitySixUpdate, published) => {
         setYourActivitiesData((prevValues) => ({
             ...prevValues,
@@ -36,7 +37,7 @@ const CustomActivitiesInstructor = () => {
         }))
     }
 
-    // retreives data from table if available or generates activities with default configurations
+    //retreives data from table if available or generates activities with default configurations
     useEffect(() => {
         axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home", { UserId: UserId }).then((response) => {
             if (response.data) {
@@ -53,34 +54,37 @@ const CustomActivitiesInstructor = () => {
                         let activityFiveUpdate = null;
                         let activitySixUpdate = null;
 
-                        // it is assumed that activity one always exists.
+                        //it is assumed that activity one always exists.
                         if (value.ActivityOneId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(value.ActivityOneId)}`).then((response) => {
-                                if (response.data) {
-                                    activityOneUpdate = {
-                                        ["label"]: response.data.label,
-                                        ["instruction"]: response.data.instruction,
-                                        ["notEditableTranscript"]: response.data.transcriptEditable,
-                                        ["key"]: value.ActivityOneId
+                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(value.ActivityOneId)}`)
+                                .then((response) => {
+                                    if (response.data) {
+                                        activityOneUpdate = {
+                                            ["label"]: response.data.label,
+                                            ["instruction"]: response.data.instruction,
+                                            ["notEditableTranscript"]: response.data.transcriptEditable,
+                                            ["key"]: value.ActivityOneId
+                                        }
+                                        activityTitle = response.data.transcript_source_id;
                                     }
-                                    activityTitle = response.data.transcript_source_id;
-                                }
-                            })
+                                })
                         }
 
-                        // reads data from activity two
+                        //reads data from activity two
                         if (value.ActivityTwoId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${parseInt(value.ActivityTwoId)}`).then((response) => {
-                                if (response.data) {
-                                    activityTwoUpdate = {
-                                        ["label"]: response.data.label,
-                                        ["instruction"]: response.data.instruction,
-                                        ["highlightingNotAllowed"]: response.data.predefinedHighlighting,
-                                        ["key"]: value.ActivityTwoId,
+                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${parseInt(value.ActivityTwoId)}`)
+                                .then((response) => {
+                                    if (response.data) {
+                                        activityTwoUpdate = {
+                                            ["label"]: response.data.label,
+                                            ["instruction"]: response.data.instruction,
+                                            ["highlightingNotAllowed"]: response.data.predefinedHighlighting,
+                                            ["key"]: value.ActivityTwoId,
+                                        }
                                     }
-                                }
-                            })
+                                })
                         } else {
+                            //default state of activity two
                             activityTwoUpdate = {
                                 ["label"]: "Custom Text",
                                 ["instruction"]: `Read through the transcript and click on sentences from the <strong>interviewee</strong> that you think provide insights or convey important information. Clicking a sentence will highlight it in yellow. Clicking a highlighted sentence again will unhighlight it. When you are satisfied with your sentence selections, click the Submit button to continue to the next activity. Your choices of which sentences to highlight will be carried forward to the next activity.`,
@@ -88,21 +92,23 @@ const CustomActivitiesInstructor = () => {
                             }
                         }
 
-                        // reads data from activity three
+                        //reads data from activity three
                         if (value.ActivityThreeId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${parseInt(value.ActivityThreeId)}`).then((response) => {
-                                if (response.data) {
-                                    activityThreeUpdate = {
-                                        ["label"]: response.data.label,
-                                        ["instruction"]: response.data.instruction,
-                                        ["MLModel"]: response.data.MLModel,
-                                        ["enableMLModel"]: response.data.AllowMLModel,
-                                        ["MLSelectionNotAllowed"]: response.data.predefinedMLSelection,
-                                        ["key"]: value.ActivityThreeId,
+                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${parseInt(value.ActivityThreeId)}`)
+                                .then((response) => {
+                                    if (response.data) {
+                                        activityThreeUpdate = {
+                                            ["label"]: response.data.label,
+                                            ["instruction"]: response.data.instruction,
+                                            ["MLModel"]: response.data.MLModel,
+                                            ["enableMLModel"]: response.data.AllowMLModel,
+                                            ["MLSelectionNotAllowed"]: response.data.predefinedMLSelection,
+                                            ["key"]: value.ActivityThreeId,
+                                        }
                                     }
-                                }
-                            })
+                                })
                         } else {
+                            //default state of activity three
                             activityThreeUpdate = {
                                 ["label"]: "Custom Text",
                                 ["instruction"]:
@@ -122,18 +128,20 @@ const CustomActivitiesInstructor = () => {
                             }
                         }
 
-                        // reads data from activity four
+                        //reads data from activity four
                         if (value.ActivityFourId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${parseInt(value.ActivityFourId)}`).then((response) => {
-                                if (response.data) {
-                                    activityFourUpdate = {
-                                        ["label"]: response.data.label,
-                                        ["instruction"]: response.data.instruction,
-                                        ["key"]: value.ActivityFourId
+                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${parseInt(value.ActivityFourId)}`)
+                                .then((response) => {
+                                    if (response.data) {
+                                        activityFourUpdate = {
+                                            ["label"]: response.data.label,
+                                            ["instruction"]: response.data.instruction,
+                                            ["key"]: value.ActivityFourId
+                                        }
                                     }
-                                }
-                            })
+                                })
                         } else {
+                            //default state of activity four
                             activityFourUpdate = {
                                 ["label"]: "Custom Text",
                                 ["instruction"]:
@@ -146,19 +154,21 @@ const CustomActivitiesInstructor = () => {
                             }
                         }
 
-                        // reads data from activity five
+                        //reads data from activity five
                         if (value.ActivityFiveId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${parseInt(value.ActivityFiveId)}`).then((response) => {
-                                if (response.data) {
-                                    activityFiveUpdate = {
-                                        ["label"]: response.data.label,
-                                        ["instruction"]: response.data.instruction,
-                                        ["allowMLClustering"]: response.data.MLClusters,
-                                        ["key"]: value.ActivityFiveId,
+                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${parseInt(value.ActivityFiveId)}`)
+                                .then((response) => {
+                                    if (response.data) {
+                                        activityFiveUpdate = {
+                                            ["label"]: response.data.label,
+                                            ["instruction"]: response.data.instruction,
+                                            ["allowMLClustering"]: response.data.MLClusters,
+                                            ["key"]: value.ActivityFiveId,
+                                        }
                                     }
-                                }
-                            })
+                                })
                         } else {
+                            //default state of activity five
                             activityFiveUpdate = {
                                 ["label"]: "Custom Text",
                                 ["instruction"]:
@@ -170,18 +180,20 @@ const CustomActivitiesInstructor = () => {
                             }
                         }
 
-                        // reads data from activity six
+                        //reads data from activity six
                         if (value.ActivitySixId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${parseInt(value.ActivitySixId)}`).then((response) => {
-                                if (response.data) {
-                                    activitySixUpdate = {
-                                        ["label"]: response.data.label,
-                                        ["instruction"]: response.data.instruction,
-                                        ["key"]: value.ActivitySixId
+                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${parseInt(value.ActivitySixId)}`)
+                                .then((response) => {
+                                    if (response.data) {
+                                        activitySixUpdate = {
+                                            ["label"]: response.data.label,
+                                            ["instruction"]: response.data.instruction,
+                                            ["key"]: value.ActivitySixId
+                                        }
                                     }
-                                }
-                            })
+                                })
                         } else {
+                            //default state of activity six
                             activitySixUpdate = {
                                 ["label"]: "Custom Text",
                                 ["instruction"]:
@@ -205,8 +217,10 @@ const CustomActivitiesInstructor = () => {
     //handles updating/saving of the updated activities
     const handleSubmit = async (key, value) => {
 
-        setLoadingId(key);
+        setLoadingIdPublishing(key);
         try {
+
+            //unique activity id
             let activityId = key
             let activity1Id = value.activityOne.key
             let activity2Id = value.activityTwo.key
@@ -215,6 +229,7 @@ const CustomActivitiesInstructor = () => {
             let activity5Id = value.activityFive.key
             let activity6Id = value.activitySix.key
 
+            //activity labels
             const activityOneLabel = document.getElementById(`activity-one-${key}-label-${value.activityOne.key}`).innerHTML;
             const activityTwoLabel = document.getElementById(`activity-two-${key}-label-${value.activityTwo.key}`).innerHTML;
             const activityThreeLabel = document.getElementById(`activity-three-${key}-label-${value.activityThree.key}`).innerHTML;
@@ -222,6 +237,7 @@ const CustomActivitiesInstructor = () => {
             const activityFiveLabel = document.getElementById(`activity-five-${key}-label-${value.activityFive.key}`).innerHTML;
             const activitySixLabel = document.getElementById(`activity-six-${key}-label-${value.activitySix.key}`).innerHTML;
 
+            //activity instructions
             const activityOneInstruction = document.getElementById(`activity-one-${key}-instruction-${value.activityOne.key}`).innerHTML;
             const activityTwoInstruction = document.getElementById(`activity-two-${key}-instruction-${value.activityTwo.key}`).innerHTML;
             const activityThreeInstruction = document.getElementById(`activity-three-${key}-instruction-${value.activityThree.key}`).innerHTML;
@@ -229,14 +245,16 @@ const CustomActivitiesInstructor = () => {
             const activityFiveInstruction = document.getElementById(`activity-five-${key}-instruction-${value.activityFive.key}`).innerHTML;
             const activitySixInstruction = document.getElementById(`activity-six-${key}-instruction-${value.activitySix.key}`).innerHTML;
 
+            //activity events
             let activity1Event;
             let activity2Event;
             let activity3Event;
             let activity4Event;
             let activity5Event;
             let activity6Event;
-            
 
+
+            //if activity one id is available, updates the data
             if (activity1Id) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activity1Id}`,
                     {
@@ -247,6 +265,7 @@ const CustomActivitiesInstructor = () => {
                 );
                 activity1Event = "Update";
             } else {
+                //creates a new entry for activity one
                 await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone",
                     {
                         transcriptEditable: value.activityOne.notEditableTranscript,
@@ -264,6 +283,7 @@ const CustomActivitiesInstructor = () => {
                 activity1Event = "Create";
             }
 
+            //if activity two id is available, updates the data
             if (activity2Id) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activity2Id}`,
                     {
@@ -275,6 +295,7 @@ const CustomActivitiesInstructor = () => {
 
                 activity2Event = "Update"
             } else {
+                //creates a new entry for activity two
                 await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/",
                     {
                         id: activityId,
@@ -294,6 +315,7 @@ const CustomActivitiesInstructor = () => {
                 activity2Event = "Create"
             }
 
+            //if activity three id is available, updates the data
             if (activity3Id) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activity3Id}`,
                     {
@@ -307,6 +329,7 @@ const CustomActivitiesInstructor = () => {
 
                 activity3Event = "Update"
             } else {
+                //creates a new entry for activity three
                 await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree",
                     {
                         id: activityId,
@@ -327,6 +350,7 @@ const CustomActivitiesInstructor = () => {
                 activity3Event = "Create"
             }
 
+            //if activity four id is available, updates the data
             if (activity4Id) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/home/${activity4Id}`,
                     {
@@ -336,6 +360,7 @@ const CustomActivitiesInstructor = () => {
                 );
                 activity4Event = "Update"
             } else {
+                //creates a new entry for activity four
                 await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/",
                     {
                         id: activityId,
@@ -354,6 +379,7 @@ const CustomActivitiesInstructor = () => {
                 activity4Event = "Create"
             }
 
+            //if activity five id is available, updates the data
             if (activity5Id) {
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activity5Id}`,
                     {
@@ -365,6 +391,7 @@ const CustomActivitiesInstructor = () => {
 
                 activity5Event = "Update"
             } else {
+                //creates a new entry for activity five
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`,
                     {
                         id: activityId,
@@ -385,6 +412,7 @@ const CustomActivitiesInstructor = () => {
             }
 
             if (activity6Id) {
+                //if activity six id is available, updates the data
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/home/${activity6Id}`,
                     {
                         label: activitySixLabel,
@@ -395,6 +423,7 @@ const CustomActivitiesInstructor = () => {
                 activity6Event = "Update"
 
             } else {
+                //creates a new entry for activity six
                 await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/",
                     {
                         id: activityId,
@@ -416,7 +445,9 @@ const CustomActivitiesInstructor = () => {
             let events = [activity1Event, activity2Event, activity3Event, activity4Event, activity5Event, activity6Event]
             let activityIds = [activity1Id, activity2Id, activity3Id, activity4Id, activity5Id, activity6Id]
 
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${activityId}`, { Published: true });
+            //changes the status of the activity to published so that it can be accessed by students
+            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${activityId}`,
+                { Published: true });
 
             for (let i = 1; i <= 6; i++) {
                 let logs_data = {
@@ -428,24 +459,28 @@ const CustomActivitiesInstructor = () => {
                     ActivityType: `Activity ${i}`,
                 };
 
+                //updates instructor log based on the set of events
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data);
             }
-            setLoadingId(null);
+
+            setLoadingIdPublishing(null);
 
         } catch (error) {
 
             console.error('Failed to update template:', error);
-            setLoadingId(null);
+            setLoadingIdPublishing(null);
 
         }
     }
 
+    //handles the removal of instructor activities from the student's dashboard
     const handleRemovalStudentsInterface = async (value) => {
 
         setLoadingIdRemovalStudents(value.activityId);
 
         try {
 
+            //changes the status of the activity to unpublished so that it cannot be accessed by students
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${value.activityId}`, { Published: false });
 
             setLoadingIdRemovalStudents(null);
@@ -453,48 +488,57 @@ const CustomActivitiesInstructor = () => {
             window.location.reload(false);
 
         } catch (error) {
-            console.error('Failed to update template:', error);
 
+            console.error('Failed to update template:', error);
             setLoadingIdRemovalStudents(null);
+
         }
 
     }
 
-    //handle delete of templates
+    //handles deletion of templates
     const handleDelete = async (value) => {
 
         setLoadingIdDelete(value.activityId)
 
         try {
+
             //removes chain of activities in activities table
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity", { activityId: value.activityId })
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity",
+                { activityId: value.activityId })
 
             //deletes activity one id
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity", { activityId: value.activityOne.key })
+            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity",
+                { activityId: value.activityOne.key })
 
             //deletes activity two id
             if (value.activityTwo.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/delete-activity", { activityId: value.activityTwo.key })
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/delete-activity",
+                    { activityId: value.activityTwo.key })
             }
 
             //deletes activity three id
             if (value.activityThree.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/delete-activity", { activityId: value.activityThree.key })
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/delete-activity",
+                    { activityId: value.activityThree.key })
             }
 
-            //deletes activity two id
+            //deletes activity four id
             if (value.activityFour.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/delete-activity", { activityId: value.activityFour.key })
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/delete-activity",
+                    { activityId: value.activityFour.key })
             }
 
-            //deletes activity two id
+            //deletes activity five id
             if (value.activityFive.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/delete-activity", { activityId: value.activityFive.key })
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/delete-activity",
+                    { activityId: value.activityFive.key })
             }
 
-            //deletes activity two id
+            //deletes activity six id
             if (value.activitySix.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/delete-activity", { activityId: value.activitySix.key })
+                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/delete-activity",
+                    { activityId: value.activitySix.key })
             }
 
             setLoadingIdDelete(null);
@@ -550,7 +594,7 @@ const CustomActivitiesInstructor = () => {
         );
     };
 
-    // removes all id's of all the activities in sessionStorage
+    //removes all id's of all the activities in sessionStorage
     const removeActivityDetails = () => {
         sessionStorage.removeItem("ActivityOneId");
         sessionStorage.removeItem("ActivityTwoId");
@@ -560,6 +604,7 @@ const CustomActivitiesInstructor = () => {
         sessionStorage.removeItem("ActivitySixId");
     }
 
+    //removes all id's of all the activities in sessionStorage
     const storeActivityDetails = (value) => {
         sessionStorage.setItem("ActivityOneId", value.activityOne.key);
         sessionStorage.setItem("ActivityTwoId", value.activityTwo.key);
@@ -589,8 +634,9 @@ const CustomActivitiesInstructor = () => {
     };
 
     return (
-        <div style={{backgroundColor:"#f8f8f8"}}>
-            {/* button to allow instructors to create a new template */}
+        <div style={{ backgroundColor: "#f8f8f8" }}>
+
+            {/*create a new template*/}
             <Button className="create-template-button" fullWidth variant="outlined"
                 onClick={() => { sessionStorage.setItem("new-chain", false); removeActivityDetails(); sessionStorage.setItem("custom-activities-instructor", true); navigate("/activityone"); }}>
                 Create a Template
@@ -601,6 +647,7 @@ const CustomActivitiesInstructor = () => {
                     Your Custom Activities
                 </Typography>
 
+                {/*if instructor has created no activities*/}
                 {Object.entries(yourActivitiesData).length === 0 ? (
                     <div className='custom-activities-blank'>
                         Currently, no templates are available. Please create one using the button above.
@@ -611,13 +658,20 @@ const CustomActivitiesInstructor = () => {
                         return (
                             <div key={key} className="activity-accordion">
                                 <Accordion className="accordion">
+
+                                    {/*contents of the accordian header*/}
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />} id={`panel-header-${value.id}`} className="accordion-summary">
+
                                         <div className='activity-container'>
+                                            {/*checks whether activity title has been provided*/}
                                             <Typography className="activity-title">{value.activityTitle === "" ? "No Title Provided" : value.activityTitle}</Typography>
                                         </div>
+
                                         <Button disableRipple className="start-activity-button" onClick={() => { handleStartActivity(value) }}>
                                             Start Activity
                                         </Button>
+
+                                        {/*if published, a button is displayed to remove from students template*/}
                                         {value.published === true ? (
                                             loadingIdRemovalStudents === value.activityId ? (
                                                 <CircularProgress size={37} className='delete-template-loading' />
@@ -629,6 +683,8 @@ const CustomActivitiesInstructor = () => {
                                         ) : (
                                             <></>
                                         )}
+
+                                        {/*delete icon*/}
                                         {loadingIdDelete === value.activityId ? (
                                             <CircularProgress size={37} className='delete-template-loading' />
                                         ) : (
@@ -636,15 +692,18 @@ const CustomActivitiesInstructor = () => {
                                                 <ClearIcon />
                                             </Button>
                                         )}
+
                                         {confirmDeleteDialog()}
+
                                     </AccordionSummary>
 
                                     <AccordionDetails className='accordian-details'>
+
                                         <Alert severity="warning" className="alert-warning" style={{ marginTop: "8px" }}>
                                             Please click the 'Publish Activities / Save Changes' button to make the activities available to all users.
                                         </Alert>
 
-                                        {/* activity one */}
+                                        {/*activity one*/}
                                         <div>
                                             <div className='activity-header-section'>
 
@@ -660,6 +719,7 @@ const CustomActivitiesInstructor = () => {
 
                                             <div className='activity-sub-section'>
 
+                                                {/*activity one label*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityOne.label }}
                                                     contentEditable="true"
@@ -667,6 +727,7 @@ const CustomActivitiesInstructor = () => {
                                                     id={`activity-one-${key}-label-${value.activityOne.key}`}
                                                 ></Typography>
 
+                                                {/*activity one instruction*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityOne.instruction }}
                                                     contentEditable="true"
@@ -678,6 +739,7 @@ const CustomActivitiesInstructor = () => {
                                                     To update the transcript, kindly navigate to Activity 1 and implement the necessary modifications.
                                                 </Typography>
 
+                                                {/*activity one switch for standardising transcript*/}
                                                 <FormControlLabel className='activity-switch'
                                                     control={
                                                         <Switch
@@ -713,9 +775,9 @@ const CustomActivitiesInstructor = () => {
 
                                         </div>
 
-                                        {/* activity two */}
-
+                                        {/*activity two*/}
                                         <div>
+
                                             <div className='activity-header-section'>
 
                                                 <Typography className="activity-title" variant="h6">
@@ -726,10 +788,12 @@ const CustomActivitiesInstructor = () => {
                                                     className={`activity-button ${value.activityTwo.key ? "active" : "disabled"}`}>
                                                     Activity Two
                                                 </Button>
+
                                             </div>
 
                                             <div className='activity-sub-section'>
 
+                                                {/*activity two label*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityTwo.label }}
                                                     contentEditable="true"
@@ -737,6 +801,7 @@ const CustomActivitiesInstructor = () => {
                                                     id={`activity-two-${key}-label-${value.activityTwo.key}`}
                                                 ></Typography>
 
+                                                {/*activity two instruction*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityTwo.instruction }}
                                                     contentEditable="true"
@@ -745,6 +810,7 @@ const CustomActivitiesInstructor = () => {
                                                     style={{ marginBottom: 10 }}
                                                 ></Typography>
 
+                                                {/*activity two switch for standardising highlighting*/}
                                                 <FormControlLabel className='activity-switch'
                                                     control={
                                                         <Switch
@@ -780,8 +846,7 @@ const CustomActivitiesInstructor = () => {
 
                                         </div>
 
-                                        {/* activity three */}
-
+                                        {/*activity three*/}
                                         <div>
                                             <div className='activity-header-section'>
 
@@ -793,6 +858,7 @@ const CustomActivitiesInstructor = () => {
 
                                             <div className='activity-sub-section'>
 
+                                                {/*activity three label*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityThree.label }}
                                                     contentEditable="true"
@@ -800,6 +866,7 @@ const CustomActivitiesInstructor = () => {
                                                     id={`activity-three-${key}-label-${value.activityThree.key}`}
                                                 ></Typography>
 
+                                                {/*activity three instruction*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityThree.instruction }}
                                                     contentEditable="true"
@@ -819,6 +886,7 @@ const CustomActivitiesInstructor = () => {
                                                     To choose a different machine learning model, please make your selection from the options below.
                                                 </Typography>
 
+                                                {/*activity three dropdown for selecting model*/}
                                                 <Select className='activity-switch'
                                                     value={value.activityThree.MLModel}
                                                     onChange={(e) => setYourActivitiesData(prevValues => {
@@ -843,6 +911,7 @@ const CustomActivitiesInstructor = () => {
                                                     <MenuItem value={"Model4"}>Model 4</MenuItem>
                                                 </Select>
 
+                                                {/*activity three switch for enabling machine learning model selections*/}
                                                 <FormControlLabel className='activity-switch'
                                                     control={
                                                         <Switch
@@ -872,37 +941,13 @@ const CustomActivitiesInstructor = () => {
                                                     }
                                                 />
 
-                                                <FormControlLabel className='activity-switch'
-                                                    control={
-                                                        <Switch
-                                                            checked={value.activityThree.MLSelectionNotAllowed}
-                                                            onChange={() => setYourActivitiesData(prevValues => {
-                                                                const updatedActivity = {
-                                                                    ...prevValues[key],
-                                                                    activityThree: {
-                                                                        ...prevValues[key].activityThree,
-                                                                        MLSelectionNotAllowed: !prevValues[key].activityThree.MLSelectionNotAllowed
-                                                                    }
-                                                                };
-                                                                return {
-                                                                    ...prevValues,
-                                                                    [key]: updatedActivity
-                                                                };
-                                                            })}
-                                                        />
-                                                    }
-                                                    disabled
-                                                    label="Standardised Machine Learning Selections (Pending Approval)"
-                                                />
-
                                                 <Divider className='activity-divider' />
 
                                             </div>
 
                                         </div>
 
-                                        {/* activity four */}
-
+                                        {/*activity four*/}
                                         <div>
                                             <div className='activity-section'>
 
@@ -914,6 +959,7 @@ const CustomActivitiesInstructor = () => {
 
                                             <div className='activity-sub-section'>
 
+                                                {/*activity four label*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityFour.label }}
                                                     contentEditable="true"
@@ -921,6 +967,7 @@ const CustomActivitiesInstructor = () => {
                                                     id={`activity-four-${key}-label-${value.activityFour.key}`}
                                                 ></Typography>
 
+                                                {/*activity four instruction*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityFour.instruction }}
                                                     contentEditable="true"
@@ -934,8 +981,7 @@ const CustomActivitiesInstructor = () => {
 
                                         </div>
 
-                                        {/* activity five */}
-
+                                        {/*activity five*/}
                                         <div>
                                             <div className='activity-section'>
 
@@ -947,6 +993,7 @@ const CustomActivitiesInstructor = () => {
 
                                             <div className='activity-sub-section'>
 
+                                                {/*activity five label*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityFive.label }}
                                                     contentEditable="true"
@@ -954,6 +1001,7 @@ const CustomActivitiesInstructor = () => {
                                                     id={`activity-five-${key}-label-${value.activityFive.key}`}
                                                 ></Typography>
 
+                                                {/*activity five instruction*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activityFive.instruction }}
                                                     contentEditable="true"
@@ -962,6 +1010,7 @@ const CustomActivitiesInstructor = () => {
                                                     style={{ marginBottom: 10 }}
                                                 ></Typography>
 
+                                                {/*activity five switch for enabling machine learning clustering*/}
                                                 <FormControlLabel className='activity-switch'
                                                     control={
                                                         <Switch
@@ -997,8 +1046,7 @@ const CustomActivitiesInstructor = () => {
 
                                         </div>
 
-                                        {/* activity six */}
-
+                                        {/*activity six*/}
                                         <div>
                                             <div className='activity-section'>
 
@@ -1010,6 +1058,7 @@ const CustomActivitiesInstructor = () => {
 
                                             <div className='activity-sub-section'>
 
+                                                {/*activity six label*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activitySix.label }}
                                                     contentEditable="true"
@@ -1017,6 +1066,7 @@ const CustomActivitiesInstructor = () => {
                                                     id={`activity-six-${key}-label-${value.activitySix.key}`}
                                                 ></Typography>
 
+                                                {/*activity six instruction*/}
                                                 <Typography
                                                     dangerouslySetInnerHTML={{ __html: value.activitySix.instruction }}
                                                     contentEditable="true"
@@ -1028,7 +1078,7 @@ const CustomActivitiesInstructor = () => {
 
                                         </div>
 
-                                        {loadingId === key ? (
+                                        {loadingIdPublishing === key ? (
                                             <LinearProgress className='update-template-loading' />
                                         ) : (
                                             <Button fullWidth variant='contained' className='activity-submit-button' onClick={() => handleSubmit(key, value)}>
@@ -1039,6 +1089,7 @@ const CustomActivitiesInstructor = () => {
                                     </AccordionDetails>
 
                                 </Accordion>
+                                
                             </div>
                         )
 

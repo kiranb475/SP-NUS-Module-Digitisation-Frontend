@@ -1,5 +1,5 @@
 import './Activity5.css'
-import { Box, Button, Container, FormControlLabel, Switch, Tooltip, Typography, } from "@mui/material";
+import { Box, Button, FormControlLabel, Switch, Tooltip, Typography, } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -9,8 +9,9 @@ import DisplayComponents from "./DisplayComponents.js";
 import InfoIcon from '@mui/icons-material/Info';
 
 const Act5 = () => {
+
+    //use state hooks to store relevant values
     const [clustData, setClustData] = useState({});
-    const [containerHeight, setContainerHeight] = useState(0);
     const [MLClusters, setMLClusters] = useState(false);
     const [newChain, setNewChain] = useState(false);
     const [alternateView, setAlternateView] = useState(false);
@@ -27,6 +28,7 @@ const Act5 = () => {
     const { id } = useParams();
 
     useEffect(() => {
+
         // checks if id passed in the url is null
         if (id === "null") {
             alert("Please go back to the previous activity and submit it to continue.");
@@ -38,22 +40,26 @@ const Act5 = () => {
             setInstructor(true);
         }
 
-        let height = sessionStorage.getItem("mainContainerHeight");
-
+        //if valid id exists, fetch data from activity five
         if (id) {
             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`)
                 .then((response) => {
                     if (response.data !== null) {
+
+                        //enabling machine learning clustering
                         if (response.data.MLClusters) {
                             setMLClusters(response.data.MLClusters);
                         } else {
                             setMLClusters(false);
                         }
 
+                        //label
                         setLabel(response.data.label);
+
+                        //instruction
                         setInstruction(response.data.instruction);
 
-                        //if the activity was last authored by an instructors, gets it data from activity 4
+                        //if the activity was last authored by an instructors, gets it data from activity four instead
                         if (response.data.lastAuthored === "instructor") {
                             axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
                                 .then((response) => {
@@ -62,14 +68,12 @@ const Act5 = () => {
                                         if (Object.entries(response.data.content).length === 0) {
                                             setBlankTemplate(true)
                                         }
-                                        if (height != null) {
-                                            setContainerHeight(parseInt(height) + 50);
-                                        }
+
                                     } else {
                                         alert("Before progressing to Activity 5, please complete Activity 4.");
                                     }
                                 });
-                            // gets it data from database activity 5
+                            //gets data from activity five
                         } else {
                             if (response.data.content && sessionStorage.getItem("new-chain") !== "true") {
                                 setClustData(response.data.content);
@@ -89,9 +93,6 @@ const Act5 = () => {
                             }
                         }
 
-                        if (height != null) {
-                            setContainerHeight(parseInt(height) + 50);
-                        }
                     }
                 });
         } else {
@@ -102,9 +103,7 @@ const Act5 = () => {
                         if (Object.entries(response.data.content).length === 0) {
                             setBlankTemplate(true)
                         }
-                        if (height != null) {
-                            setContainerHeight(parseInt(height) + 50);
-                        }
+
                     } else {
                         alert("Before progressing to Activity 5, please complete Activity 4.");
                     }
@@ -112,6 +111,7 @@ const Act5 = () => {
         }
     }, []);
 
+    //changes the color of components based on the machine learning clustering
     const createAIClustering = () => {
 
         let clusters = {};
@@ -143,6 +143,7 @@ const Act5 = () => {
         setClustData(data)
     };
 
+    //handle double click
     const handleDoubleClick = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -151,6 +152,7 @@ const Act5 = () => {
         createLabelAtPosition(x / 2, y / 2);
     };
 
+    //handle creation of labels when user double clicks
     const createLabelAtPosition = (x, y) => {
 
         setClustData((prevState) => {
@@ -173,7 +175,7 @@ const Act5 = () => {
         });
     };
 
-    // checks whether two components are close to each other
+    //checks whether two components are close to each other
     const checkProximity = (x1, y1, x2, y2, height1, height2) => {
 
         if (Math.abs(x1 - x2) <= 125) {
@@ -202,6 +204,7 @@ const Act5 = () => {
         }
     };
 
+    //clusters relevant components based on their proximity and assigns them colors
     const checkClass = () => {
         let userData = clustData;
         let currentClass = 0;
@@ -210,7 +213,7 @@ const Act5 = () => {
         let colorsUsedData = {};
         let checkClassData = {};
 
-        // sets all userClusterIndexA5 to -1 irrespective of their initial state
+        //sets all userClusterIndexA5 to -1 irrespective of their initial state
         Object.entries(userData.content).forEach(([key, data]) => {
             if (data.type === "label") {
                 data.userClusterIndexA5 = -1;
@@ -223,7 +226,7 @@ const Act5 = () => {
             }
         });
 
-        // creates an array of relevant components for clustering 
+        //creates an array of relevant components for clustering 
         Object.entries(userData.content).forEach(([key, data]) => {
             if (data.response_id) {
                 Object.entries(data.response_text).forEach(([key2, data2]) => {
@@ -239,7 +242,7 @@ const Act5 = () => {
             }
         });
 
-        // checks for proximity between two components
+        //calls a function to check proximity between all the components and assigns their class and color accordingly
         Object.entries(checkClassData).forEach(([key, value]) => {
             Object.entries(checkClassData).forEach(([key2, value2]) => {
                 if (checkProximity(value.x, value.y, value2.x, value2.y, value.height, value2.height) && value2.userClusterIndexA5 === -1) {
@@ -281,9 +284,10 @@ const Act5 = () => {
         return colorsUsedData;
     };
 
+    //checks which components are next to each other
     const checkClustering = () => {
 
-        // gets the height of the components - see if its still needed.
+        //gets the height of the components (no longer needed)
         Object.entries(clustData.content).map(([key, data]) => {
             if (data.type === "label") {
                 const element = document.querySelector(`[data-height-id="${data.id}"]`);
@@ -319,6 +323,7 @@ const Act5 = () => {
         setClustData(updatedClustData);
     };
 
+    //replaces label names after they are edited by the user
     const replaceLabelNames = () => {
         let data = clustData;
 
@@ -332,6 +337,7 @@ const Act5 = () => {
         setClustData(data);
     };
 
+    //handles user dragging of components
     const handleDrag = (e, data, coreKey, subKey) => {
 
         checkClustering();
@@ -357,6 +363,7 @@ const Act5 = () => {
         });
     };
 
+    //handles user submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -403,18 +410,25 @@ const Act5 = () => {
         let event;
 
         if (id && sessionStorage.getItem("new-chain") !== "true") {
+
+            //updates activity five
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`, data)
 
             if (newChain) {
+
+                //deletes activity id for future activities
                 await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
 
                 sessionStorage.setItem("new-chain", true)
-
                 event = "Reinitialise";
+
             } else {
                 event = "Update";
             }
+
         } else {
+
+            //create a new entry of activity five
             await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive", data)
                 .then((response) => {
                     const ActivityFiveId = response.data.id;
@@ -433,6 +447,7 @@ const Act5 = () => {
                 ActivityId: sessionStorage.getItem("ActivityFiveId"),
                 ActivityType: "Activity 5",
             };
+            //update student logs
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
         } else {
             let data = {
@@ -443,6 +458,7 @@ const Act5 = () => {
                 ActivityId: sessionStorage.getItem("ActivityFiveId"),
                 ActivityType: "Activity 5",
             };
+            //update instructor logs
             await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
         }
 
@@ -453,6 +469,7 @@ const Act5 = () => {
         }
     };
 
+    //handles removal of labels
     const removeLabel = (key) => {
         setClustData((prevData) => {
             const newData = { ...prevData };
@@ -461,6 +478,7 @@ const Act5 = () => {
         });
     };
 
+    //handles deletion of copies of components
     const handleDeleteCopy = (coreKey, subKey) => {
         setClustData(prevData => {
             const newData = { ...prevData };
@@ -469,6 +487,7 @@ const Act5 = () => {
         });
     };
 
+    //handles creations of copies of components
     const handleCreateCopy = (coreKey, subKey) => {
         setClustData(prevState => {
             const newData = { ...prevState };
@@ -490,19 +509,31 @@ const Act5 = () => {
 
     return (
         <div className="container-activity-5">
+
             <div className="header-activity-5">
-                <h2 dangerouslySetInnerHTML={{ __html: `${label}` }} contentEditable="true" id="activity-five-label" className="editableLabel"></h2>
-                <Button onClick={() => window.location.reload()} className="resetButton">Reset</Button>
+
+                {/*activity five label*/}
+                <h2 dangerouslySetInnerHTML={{ __html: `${label}` }} contentEditable="true" id="activity-five-label" className="editable-label"></h2>
+                <Button onClick={() => window.location.reload()} className="reset-button">Reset</Button>
             </div>
+
             <form onSubmit={handleSubmit}>
-                <Typography id="activity-five-instruction" dangerouslySetInnerHTML={{ __html: `${instruction}` }} contentEditable={true} className="editableInstruction"></Typography>
-                <Typography className="infoText">Labels can be generated by right clicking twice within the lavender box.</Typography>
-                {!MLClusters && <Typography className="infoText">
-                    The instructor has disabled viewing alternate AI clustering.
+
+                {/*activity five instruction*/}
+                <Typography id="activity-five-instruction" dangerouslySetInnerHTML={{ __html: `${instruction}` }} contentEditable={true} className="editable-instruction"></Typography>
+                <Typography className="info-text">Labels can be generated by right clicking twice within the lavender box.</Typography>
+
+                {/*machine learning clustering has been disabled*/}
+                {!MLClusters && <Typography className="info-text">
+                    The instructor has disabled viewing alternate machine learning clustering.
                 </Typography>}
-                {blankTemplate && <Typography className="infoText">
+
+                {/*if no transcript has been provided*/}
+                {blankTemplate && <Typography className="info-text">
                     No transcript has been displayed since no data was entered in Activity 1.
                 </Typography>}
+
+                {/*switch to create new chain*/}
                 <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
                     <Switch checked={newChain} onChange={() => {
                         if (!newChain) {
@@ -525,6 +556,8 @@ const Act5 = () => {
                         </div>
                     }
                 />
+
+                {/*switch to view alternative machine learning clustering*/}
                 <FormControlLabel style={{ marginTop: 10 }} className="formControlLabelTop" control={
                     <Switch
                         checked={alternateView}
@@ -544,12 +577,18 @@ const Act5 = () => {
                         </div>
                     }
                 />
+
+                {/*displays components*/}
                 {!blankTemplate &&
                     <Box id="main-container" onDoubleClick={handleDoubleClick}>
                         <DisplayComponents clustData={clustData} handleDrag={handleDrag} removeLabel={removeLabel} handleCreateCopy={handleCreateCopy} handleDeleteCopy={handleDeleteCopy} alternateView={alternateView} />
-                    </Box>}
-                <Button fullWidth type="submit" variant="outlined" className="submitButton">Submit</Button>
+                    </Box>
+                }
+
+                <Button fullWidth type="submit" variant="outlined" className="submit-button">Submit</Button>
+
             </form>
+
         </div>
     );
 };

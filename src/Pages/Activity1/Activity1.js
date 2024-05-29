@@ -8,6 +8,8 @@ import './Activity1.css'
 import InfoIcon from '@mui/icons-material/Info';
 
 const Activity1 = () => {
+
+  //use state hooks to store relevant values
   const [interviewer, setInterviewer] = useState("");
   const [interviewee, setInterviewee] = useState("");
   const [transcript, setTranscript] = useState("");
@@ -30,25 +32,29 @@ const Activity1 = () => {
 
   useEffect(() => {
 
-    // checks if id passed in the url is null
+    //checks if id passed in the url is null
     if (id === "null") {
       alert("In order to access Activity 1, please initialise a chain of activities.");
       navigate("/")
     }
 
-    // checks occupation of the user
+    //checks occupation of the user
     if (sessionStorage.getItem("Occupation") == "Instructor") {
       setInstructor(true);
     }
 
-    // if valid id is passed, fetch data from activity one database and populate the variables accordingly
+    //if valid id is passed, fetch data from activity one database and populate the variables accordingly
     if (id) {
       axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`)
         .then((response) => {
           if (response.data) {
+
+            //title
             if (response.data.transcript_source_id) {
               setTranscriptTitle(response.data.transcript_source_id);
             }
+
+            //interviewer and interviewee
             if (response.data.content && Object.entries(response.data.content).length !== 0) {
               if (response.data.content[1].questioner_tag) {
                 setInterviewer(response.data.content[1].questioner_tag);
@@ -57,16 +63,24 @@ const Activity1 = () => {
                 setInterviewee(response.data.content[2].response_tag);
               }
             }
+
+            //standardised transcript
             if (response.data.transcriptEditable) {
               setNotEditableTranscript(response.data.transcriptEditable);
             }
-            sessionStorage.setItem("setNotEditableTranscript",response.data.transcriptEditable);
+            sessionStorage.setItem("setNotEditableTranscript", response.data.transcriptEditable);
+
+            //label
             if (response.data.label) {
               setLabel(response.data.label);
             }
+
+            //instruction
             if (response.data.instruction) {
               setInstruction(response.data.instruction);
             }
+
+            //transcript
             if (response.data.content && Object.entries(response.data.content).length !== 0) {
               let transcriptText = "";
               Object.entries(response.data.content).map(([key, value]) => {
@@ -85,11 +99,13 @@ const Activity1 = () => {
               });
               setTranscript(transcriptText);
             }
+
           }
         });
     }
   }, []);
 
+  //checks whether all necessary fields have been filled
   const validateInputs = () => {
     setHelperText('');
     setPreviewClickedError('');
@@ -114,7 +130,7 @@ const Activity1 = () => {
     return !flag ? true : false;
   }
 
-  // submission of activity one
+  //submission of activity one
   const handleSubmit = async (e) => {
 
     e.preventDefault()
@@ -124,11 +140,14 @@ const Activity1 = () => {
 
     if (transcript) {
       setPreviewClickedError("");
+
+      //checks whether preview button has been previously clicked
       if (previewClicked === false) {
         setPreviewClickedError("Please click the 'Preview' button to review the transcript before submitting.");
         return;
       }
 
+      //iterates through transcript and retrives associated html and css
       Object.entries(previewTranscript).map(([key, value]) => {
         if (value.questioner_tag !== undefined) {
           activity_mvc_content[key] = getActivityMVC(key);
@@ -159,30 +178,26 @@ const Activity1 = () => {
 
     let event;
 
-    // if id parameter exists
-
+    //if id parameter exists
     if (id) {
 
-      console.log(final_data)
-
+      //updates activity one
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data);
 
-      // creation of a new chain of activities
-
       if (newChain) {
+
+        //deletes activity id of future activities
         await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
-
         sessionStorage.setItem("new-chain", true)
-
         event = "Reinitialise"
-      } else {
-        // updating existing activity one
 
+      } else {
         event = "Update"
       }
-    } else {
-      // creating a new instance of activity one
 
+    } else {
+
+      //creates a new entry of activity one
       await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", final_data)
         .then((response) => {
           const ActivitiesID = response.data.ActivitiesId.id;
@@ -192,9 +207,11 @@ const Activity1 = () => {
         });
 
       event = "Create"
+
     }
 
     if (!instructor) {
+
       let data = {
         DateTime: Date.now(),
         StudentTemplateId: sessionStorage.getItem("ActivitiesId"),
@@ -203,8 +220,12 @@ const Activity1 = () => {
         ActivityId: sessionStorage.getItem("ActivityOneId"),
         ActivityType: "Activity 1",
       };
+
+      //updates student log
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+
     } else {
+
       let data = {
         DateTime: Date.now(),
         ActivitySequenceId: sessionStorage.getItem("ActivitiesId"),
@@ -213,7 +234,10 @@ const Activity1 = () => {
         ActivityId: sessionStorage.getItem("ActivityOneId"),
         ActivityType: "Activity 1",
       };
+
+      //updates instructor log
       await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+
     }
 
     if (sessionStorage.getItem("ActivityTwoId") !== "null" && sessionStorage.getItem("ActivityTwoId") !== null && sessionStorage.getItem("ActivityTwoId") !== "undefined") {
@@ -221,9 +245,10 @@ const Activity1 = () => {
     } else {
       navigate("/activitytwo");
     }
+
   };
 
-  // gets activity mvc of each of the sentences
+  //gets html and css of each of the sentences in the transcript
   const getActivityMVC = (value) => {
     const element = document.querySelector(`[id="${value}"]`);
     if (element) {
@@ -248,16 +273,23 @@ const Activity1 = () => {
 
   return (
     <div className="container-activity-1">
+
       <div className="header-activity-1">
+
+        {/*activity one label*/}
         <h2 dangerouslySetInnerHTML={{ __html: ` ${label}` }} contentEditable="true" id="activity-one-label"></h2>
         <Button onClick={() => { window.location.reload(); }} className="reset-btn">
           Reset
         </Button>
+
       </div>
+
       <form onSubmit={handleSubmit} noValidate autoComplete="off">
+
+        {/*activity one instruction*/}
         <Typography id="activity-one-instruction" dangerouslySetInnerHTML={{ __html: ` ${instruction}` }} contentEditable={instructor && true} className="instructions"></Typography>
 
-        {/* displays toggle button to instructors only for selecting whether trascript is editable */}
+        {/*displays switch button to instructors only for selecting whether trascript is editable*/}
         {instructor && (<FormControlLabel className="switch-label"
           control={
             <Switch checked={notEditableTranscript} onChange={() => setNotEditableTranscript((prev) => !prev)} />
@@ -272,6 +304,8 @@ const Activity1 = () => {
           }
         />
         )}
+
+        {/*switch button to create a new chain and reinitialise future activities*/}
         <FormControlLabel className="switch-label"
           control={
             <Switch checked={newChain} onChange={() => {
@@ -296,11 +330,12 @@ const Activity1 = () => {
           }
         />
 
-        {/* shows to students whether transcript is editable */}
+        {/*informs students whether transcript is editable*/}
         {!instructor && notEditableTranscript && (
           <Typography className="switch-label">The transcript cannot be edited in this template.</Typography>
         )}
 
+        {/*title*/}
         <TextField
           className="text-field-activity-1"
           margin="normal"
@@ -309,6 +344,8 @@ const Activity1 = () => {
           fullWidth
           onChange={(e) => setTranscriptTitle(e.target.value)}
         ></TextField>
+
+        {/*interviewer*/}
         <TextField
           className="text-field-activity-1"
           disabled={!instructor && notEditableTranscript}
@@ -320,6 +357,8 @@ const Activity1 = () => {
           label="Interviewer label (e.g. Interviewer)"
           onChange={(e) => setInterviewer(e.target.value)}
         ></TextField>
+
+        {/*interviewee*/}
         <TextField
           className="text-field-activity-1"
           disabled={!instructor && notEditableTranscript}
@@ -331,6 +370,8 @@ const Activity1 = () => {
           label="Interviewee label (e.g. Interviewee)"
           onChange={(e) => setInterviewee(e.target.value)}
         ></TextField>
+
+        {/*transcript*/}
         <TextField
           className="text-field-activity-1"
           disabled={!instructor && notEditableTranscript}
@@ -345,13 +386,17 @@ const Activity1 = () => {
           label="Transcript"
           onChange={(e) => setTranscript(e.target.value)}
         ></TextField>
+
+        {/*preview transcript*/}
         <Box className="preview-box">
           {!previewClicked && <Typography align="center">Please click the 'Preview' button to view the transcript.</Typography>}
           {previewClicked && <TranscriptPreview interviewer={interviewer} interviewee={interviewee} transcript={transcript} onPreviewGenerated={handlePreviewData} />}
         </Box>
+
         <Typography sx={{ marginTop: previewClickedError ? 1 : 1 }}>
           {previewClickedError}
         </Typography>
+
         <ButtonGroup fullWidth>
           <Button onClick={() => { setPreviewClicked(true); setPreviewClickedError(""); if (!instructor) { validateInputs() } }} className="preview-btn" variant="text" fullWidth>
             Preview
@@ -360,7 +405,9 @@ const Activity1 = () => {
             Submit
           </Button>
         </ButtonGroup>
+
       </form>
+
     </div>
   );
 };

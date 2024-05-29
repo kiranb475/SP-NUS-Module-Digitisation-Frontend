@@ -22,8 +22,13 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
 
         let data = {};
         if (transcript !== "") {
+
+            //split the transcript into sentences based on punctuation marks (., !, ?, ;) or new lines
             let lines = cleaning(transcript).split(/\s*(?<=[.!?;])\s*|\n+/g);
+
+            //matches any string starting with one or more characters followed by a colon
             const check1 = new RegExp(`^.+:`);
+
             let isQuestion = false;
             let sentence_num = 1;
             let question_num = 1;
@@ -32,11 +37,12 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
 
             function splitFirstOccurrence(str, separator) {
                 const index = str.indexOf(separator);
-                if (index === -1) return [str, '']; // Ensure function always returns two elements
+                //ensures function always returns two elements
+                if (index === -1) return [str, '']; 
                 return [str.slice(0, index).trim(), str.slice(index + separator.length).trim()];
             }
 
-            // check if correct interview and interviewee labels 
+            //checks whether correct interview and interviewee labels have been used
             lines.forEach(line => {
                 if (!(line.match(check1) && line.trim().startsWith(interviewer + ":")) && !(line.match(check1) && line.trim().startsWith(interviewee + ":")) && !(!line.match(check1))) {
                     onPreviewGenerated({ error: "Include the correct interviewer and interviewee labels." });
@@ -48,7 +54,8 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
             if (!incorrectData) {
                 lines.forEach(line => {
                     if (line.match(check1) && line.trim().startsWith(interviewer + ":")) {
-                        // Handle question
+
+                        //handles interview questions
                         isQuestion = true;
                         question_num++;
                         data[sentence_num] = {
@@ -59,8 +66,10 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
                         };
                         sentence_num++;
                         answer_num = 1;
+
                     } else if (line.match(check1) && line.trim().startsWith(interviewee + ":")) {
-                        // Handle answer
+
+                        //handles interviewer answer
                         isQuestion = false;
                         if (!data[sentence_num] || !data[sentence_num].response_text) {
                             data[sentence_num] = {
@@ -75,9 +84,10 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
                         };
                         sentence_num++;
                         answer_num++;
-                    } else if (!line.match(check1)) {
-                        // Handle continuation
 
+                    } else if (!line.match(check1)) {
+
+                        //handle continuation of interviewer questions and interviewee answers
                         if (isQuestion) {
                             data[sentence_num - 1].question_text += " " + cleaning(line);
                         } else {
@@ -85,7 +95,9 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
                             answer_num++
                         }
                     }
+
                 });
+
                 setPreviewData(data)
                 onPreviewGenerated({ data: data });
             }
@@ -105,7 +117,7 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
         }
     };
 
-
+    //no transcript data has been provided
     if (Object.keys(previewData).length === 0) {
         return (
             <>
@@ -115,6 +127,7 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
     } else {
         return Object.entries(previewData).map(([key, value]) => {
             if (value.questioner_tag !== undefined) {
+                //interviewer text
                 return (
                     <div key={key}>
                         <Typography display="inline">{value.questioner_tag}: </Typography>
@@ -126,6 +139,7 @@ function TranscriptPreview({ interviewer, interviewee, transcript, onPreviewGene
                     </div>
                 );
             } else {
+                //interviewee text
                 return (
                     <>
                         <div key={key}>

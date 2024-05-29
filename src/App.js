@@ -10,6 +10,7 @@ import NavBar from './Components/NavBar';
 
 function App() {
   return (
+    //different routes accessible by the user.
     <Router>
       <NavBar/>
       <Routes>

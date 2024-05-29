@@ -7,9 +7,9 @@ import StudentDesignedActivities from './StudentDesignedActivities';
 
 const Dashboard = () => {
 
-    const username = sessionStorage.getItem("Username");
     const occupation = sessionStorage.getItem("Occupation");
 
+    //displays the correct set of components depending on whether an instructor or student is logged in
     return (
         <div className='container'>
             {occupation === "Instructor" ? <CustomActivitiesInstructor /> : <CustomActivitiesStudent />}

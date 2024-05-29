@@ -3,11 +3,12 @@ import './Activity2.css'
 
 const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
 
+    //background color is yellow
     const highlightedStyle = {
         backgroundColor: "rgb(255, 199, 44)",
     };
 
-    // displays interviewee text
+    //displays interviewee text
     const displayInterviewee = (data, key) => {
         return Object.entries(data).map(([key2, value]) => (
             <Typography
@@ -18,15 +19,17 @@ const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
         ));
     };
 
-    // handles highlighting of interviewee text
+    //handles highlighting of interviewee text
     const handleClick = (event) => {
         if (!highlightingNotAllowed || sessionStorage.getItem("Occupation") === "Instructor") {
             const currentStyle = event.target.style;
+            //yellow to no color
             if (currentStyle.backgroundColor === "rgb(255, 199, 44)") {
                 currentStyle.backgroundColor = "";
                 currentStyle.borderRadius = "";
                 currentStyle.padding = "";
             } else {
+                //no color to yellow
                 currentStyle.backgroundColor = highlightedStyle.backgroundColor;
                 currentStyle.borderRadius = "4px";
                 currentStyle.padding = "2px";
@@ -35,8 +38,9 @@ const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
     };
 
     return (
-        <Box id="content-container" className="contentContainer">
+        <Box id="content-container" className="content-container">
             {Object.entries(activityMVCContent).map(([key, value]) => {
+                //interview text
                 if (key % 2 !== 0) {
                     value.activity_mvc.html = value.activity_mvc.html.replace('<p', '<span').replace('</p>', '</span>');
                     return (
@@ -48,6 +52,7 @@ const DisplayTranscript = ({ activityMVCContent, highlightingNotAllowed }) => {
                         </div>
                     );
                 } else {
+                    //interviewee text
                     return (
                         <div style={{ marginBottom: "20px" }}>
                             <Typography sx={{ display: 'inline' }}>

@@ -7,6 +7,7 @@ const DisplayComponents = ({ clustData, handleDrag, removeLabel, handleCreateCop
 
     if (Object.keys(clustData).length !== 0) {
         return Object.entries(clustData.content).map(([key, data]) => {
+            //label
             if (data.type === "label") {
                 const style = {
                     position: 'absolute',
@@ -20,9 +21,9 @@ const DisplayComponents = ({ clustData, handleDrag, removeLabel, handleCreateCop
                         onDrag={(e, dragData) => handleDrag(e, dragData, key)}
                         bounds="parent"
                     >
-                        <div data-height-id={data.id} className='draggableResponseLabel' style={style}>
+                        <div data-height-id={data.id} className='draggable-response-label' style={style}>
                             <Typography
-                                // prevents creation of a new line when pressing the 'enter' button
+                                //prevents creation of a new line when pressing the 'enter' button
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter") { e.preventDefault(); }
                                 }}
@@ -39,6 +40,7 @@ const DisplayComponents = ({ clustData, handleDrag, removeLabel, handleCreateCop
                         </div>
                     </Draggable>
                 );
+                //interviewee text
             } else if (data.response_id) {
                 return Object.entries(data.response_text).map(([key2, data2]) => {
                     if (data2.clusterData) {
@@ -57,7 +59,7 @@ const DisplayComponents = ({ clustData, handleDrag, removeLabel, handleCreateCop
                                 onDrag={(e, d) => handleDrag(e, d, key, key2)}
                                 bounds="parent"
                             >
-                                <div data-height-id={data2.clusterData.id} className={`draggableResponse`} style={style}>
+                                <div data-height-id={data2.clusterData.id} className={`draggable-response`} style={style}>
                                     <div style={{ display: "flex" }}>
                                         <Button variant="outlined" onClick={() => handleCreateCopy(key, key2)} className='create-copy-button'>+</Button>
                                         {data2.clusterData.type === "text-copy" && <Button variant="outlined" onClick={() => handleDeleteCopy(key, key2)} className='create-delete-button'>-</Button>}
