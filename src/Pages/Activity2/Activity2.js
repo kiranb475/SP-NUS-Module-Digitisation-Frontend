@@ -35,7 +35,7 @@ const Activity2 = () => {
 
         if (id) {
             // if valid id exists, fetch data from activity 2 table
-            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`)
+            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo/byId/${id}`)
                 .then((response) => {
                     if (response.data !== null) {
                         //standardised highlighting
@@ -52,7 +52,7 @@ const Activity2 = () => {
                         //in the case the instructor defines a blank template or transcript is editable
                         if (Object.entries(response.data.content).length === 0 || sessionStorage.getItem("setNotEditableTranscript") !== "true") {
                             //fetches data from activity one
-                            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`)
+                            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`)
                                 .then((response) => {
                                     if (response.data !== null) {
                                         setUserData(response.data);
@@ -124,7 +124,7 @@ const Activity2 = () => {
         if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
 
             //retrieve data from activity one since activity two instance does not exist
-            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`)
+            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivityOneId")}`)
                 .then((response) => {
                     if (response.data !== null) {
                         setUserData(response.data);
@@ -229,12 +229,12 @@ const Activity2 = () => {
         if (id && sessionStorage.getItem("new-chain") !== "true") {
 
             //updates activity two
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${id}`, data);
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo/byId/${id}`, data);
 
             if (newChain) {
 
                 //deletes activity id for future activities
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
                 sessionStorage.setItem("new-chain", true)
                 event = "Reinitialise";
 
@@ -245,7 +245,7 @@ const Activity2 = () => {
         } else {
 
             //create a new entry of activity two
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data)
+            await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo", data)
                 .then((response) => {
                     const ActivityTwoId = response.data.id;
                     sessionStorage.setItem("ActivityTwoId", ActivityTwoId);
@@ -264,7 +264,7 @@ const Activity2 = () => {
                 ActivityType: "Activity 2",
             };
             //update student logs
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/studentlog/create`, data);
         } else {
             let data = {
                 DateTime: Date.now(),
@@ -275,7 +275,7 @@ const Activity2 = () => {
                 ActivityType: "Activity 2",
             };
             //update instructor logs
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/instructorlog/create`, data);
         }
 
         sessionStorage.setItem("predefinedHighlighting", highlightingNotAllowed);

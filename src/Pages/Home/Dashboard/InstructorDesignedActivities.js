@@ -10,19 +10,19 @@ const InstructorDesignedActivities = () => {
 
     useEffect(() => {
         //returns a list of all instructors
-        axios.get("https://activities-alset-aef528d2fd94.herokuapp.com/home/instructors").then((response) => {
+        axios.get("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/home/instructors").then((response) => {
             if (response.data) {
                 Object.entries(response.data).forEach(([key, value]) => {
                     (async () => {
                         //for each instructor retrieves a list of activities created by them.
-                        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home", { UserId: parseInt(value.id) }).then((response) => {
+                        await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/home", { UserId: parseInt(value.id) }).then((response) => {
                             if (response.data) {
                                 Object.entries(response.data).forEach(([key2, value2]) => {
                                     //checks if they are published
                                     if (value2.Published !== false) {
                                         (async () => {
                                             //returns corresponding activity one data
-                                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(value2.ActivityOneId)}`).then((response) => {
+                                            await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${parseInt(value2.ActivityOneId)}`).then((response) => {
                                                 if (response.data) {
                                                     setListOfActivities((prevValues) => ({
                                                         ...prevValues,
@@ -66,7 +66,7 @@ const InstructorDesignedActivities = () => {
             if (data.ActivityOneId) {
 
                 //retrives corresponding activity one data
-                const response = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${data.ActivityOneId}`);
+                const response = await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${data.ActivityOneId}`);
 
                 const ActivityOneData = response.data;
                 delete ActivityOneData["id"];
@@ -80,7 +80,7 @@ const InstructorDesignedActivities = () => {
                     };
 
                     //creates a new chain of activities and a copy of activity one
-                    const ActivityOneIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/fromtemplate", data);
+                    const ActivityOneIdResponse = await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/fromtemplate", data);
                     ActivitiesID = ActivityOneIdResponse.data.ActivitiesId.id;
                     Activity1Id = ActivityOneIdResponse.data.ActivityOneId;
                     sessionStorage.setItem("ActivitiesId", ActivitiesID);
@@ -92,7 +92,7 @@ const InstructorDesignedActivities = () => {
             if (data.ActivityTwoId) {
 
                 //retrives corresponding activity two data
-                const response2 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${data.ActivityTwoId}`);
+                const response2 = await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo/byId/${data.ActivityTwoId}`);
                 const ActivityTwoData = response2.data;
                 delete ActivityTwoData["id"];
                 delete ActivityTwoData["createdAt"];
@@ -105,7 +105,7 @@ const InstructorDesignedActivities = () => {
                     };
 
                     //updates the new chain of activities and creates a copy of activity two
-                    const ActivityTwoIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo", data);
+                    const ActivityTwoIdResponse = await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo", data);
                     Activity2Id = ActivityTwoIdResponse.data.id;
                     sessionStorage.setItem("ActivityTwoId", Activity2Id);
                 }
@@ -115,7 +115,7 @@ const InstructorDesignedActivities = () => {
             if (data.ActivityThreeId) {
 
                 //retrives corresponding activity three data
-                const response3 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${data.ActivityThreeId}`);
+                const response3 = await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitythree/byId/${data.ActivityThreeId}`);
                 const ActivityThreeData = response3.data;
                 delete ActivityThreeData["id"];
                 delete ActivityThreeData["createdAt"];
@@ -128,7 +128,7 @@ const InstructorDesignedActivities = () => {
                     };
 
                     //updates the new chain of activities and creates a copy of activity three
-                    const ActivityThreeIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree", data);
+                    const ActivityThreeIdResponse = await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitythree", data);
                     Activity3Id = ActivityThreeIdResponse.data.id;
                     sessionStorage.setItem("ActivityThreeId", Activity3Id);
                 }
@@ -138,7 +138,7 @@ const InstructorDesignedActivities = () => {
             if (data.ActivityFourId) {
 
                 //retrives corresponding activity four data
-                const response4 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${data.ActivityFourId}`);
+                const response4 = await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/byId/${data.ActivityFourId}`);
                 const ActivityFourData = response4.data;
                 delete ActivityFourData["id"];
                 delete ActivityFourData["createdAt"];
@@ -151,7 +151,7 @@ const InstructorDesignedActivities = () => {
                     };
 
                     //updates the new chain of activities and creates a copy of activity four
-                    const ActivityFourIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data);
+                    const ActivityFourIdResponse = await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour", data);
                     Activity4Id = ActivityFourIdResponse.data.id;
                     sessionStorage.setItem("ActivityFourId", Activity4Id);
                 }
@@ -161,7 +161,7 @@ const InstructorDesignedActivities = () => {
             if (data.ActivityFiveId) {
 
                 //retrives corresponding activity five data
-                const response5 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${data.ActivityFiveId}`);
+                const response5 = await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/byId/${data.ActivityFiveId}`);
                 const ActivityFiveData = response5.data;
                 delete ActivityFiveData["id"];
                 delete ActivityFiveData["createdAt"];
@@ -174,7 +174,7 @@ const InstructorDesignedActivities = () => {
                     };
 
                     //updates the new chain of activities and creates a copy of activity five
-                    const ActivityFiveIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive", data);
+                    const ActivityFiveIdResponse = await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive", data);
                     Activity5Id = ActivityFiveIdResponse.data.id;
                     sessionStorage.setItem("ActivityFiveId", Activity5Id);
                 }
@@ -184,7 +184,7 @@ const InstructorDesignedActivities = () => {
             if (data.ActivitySixId) {
 
                 //retrives corresponding activity six data
-                const response6 = await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${data.ActivitySixId}`);
+                const response6 = await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix/byId/${data.ActivitySixId}`);
                 const ActivitySixData = response6.data;
                 delete ActivitySixData["id"];
                 delete ActivitySixData["createdAt"];
@@ -197,7 +197,7 @@ const InstructorDesignedActivities = () => {
                     };
 
                     //updates the new chain of activities and creates a copy of activity six
-                    const ActivitySixIdResponse = await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data);
+                    const ActivitySixIdResponse = await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix", data);
                     Activity6Id = ActivitySixIdResponse.data.id;
                     sessionStorage.setItem("ActivityFourId", Activity6Id);
                 }
@@ -216,7 +216,7 @@ const InstructorDesignedActivities = () => {
                 };
 
                 //updates student logs 
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, logs_data);
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/studentlog/create`, logs_data);
             }
 
             setLoadingId(null);

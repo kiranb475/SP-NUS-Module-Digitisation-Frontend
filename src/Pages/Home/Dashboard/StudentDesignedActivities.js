@@ -14,17 +14,17 @@ const StudentDesignedActivities = () => {
     useEffect(() => {
 
         //gets a list of all students
-        axios.get("https://activities-alset-aef528d2fd94.herokuapp.com/home/students").then((response) => {
+        axios.get("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/home/students").then((response) => {
             if (response.data) {
                 Object.entries(response.data).forEach(([key, value]) => {
                     (async () => {
                         //gets a list of activities created by each student
-                        await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home", { UserId: parseInt(value.id) }).then((response) => {
+                        await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/home", { UserId: parseInt(value.id) }).then((response) => {
                             if (response.data) {
                                 Object.entries(response.data).forEach(([key2, value2]) => {
                                     (async () => {
                                         //gets the title of each activity by retrieving the corresponding activity one data
-                                        await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(value2.ActivityOneId)}`).then((response) => {
+                                        await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${parseInt(value2.ActivityOneId)}`).then((response) => {
                                             if (response.data) {
                                                 setListOfActivities((prevValues) => ({
                                                     ...prevValues,

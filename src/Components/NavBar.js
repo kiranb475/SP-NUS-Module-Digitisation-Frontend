@@ -49,7 +49,7 @@ function NavBar() {
     };
 
     //sends a post request with user details to login or register the user
-    axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/userauth/${action}`, data)
+    axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/userauth/${action}`, data)
       .then((response) => {
         //unsuccessful 
         if (response.data.error) {

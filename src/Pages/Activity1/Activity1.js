@@ -45,7 +45,7 @@ const Activity1 = () => {
 
     //if valid id is passed, fetch data from activity one database and populate the variables accordingly
     if (id) {
-      axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`)
+      axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${id}`)
         .then((response) => {
           if (response.data) {
 
@@ -182,12 +182,12 @@ const Activity1 = () => {
     if (id) {
 
       //updates activity one
-      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${id}`, final_data);
+      await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${id}`, final_data);
 
       if (newChain) {
 
         //deletes activity id of future activities
-        await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
+        await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
         sessionStorage.setItem("new-chain", true)
         event = "Reinitialise"
 
@@ -198,7 +198,7 @@ const Activity1 = () => {
     } else {
 
       //creates a new entry of activity one
-      await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone", final_data)
+      await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone", final_data)
         .then((response) => {
           const ActivitiesID = response.data.ActivitiesId.id;
           const ActivityOneId = response.data.ActivityOneId;
@@ -222,7 +222,7 @@ const Activity1 = () => {
       };
 
       //updates student log
-      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+      await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/studentlog/create`, data);
 
     } else {
 
@@ -236,7 +236,7 @@ const Activity1 = () => {
       };
 
       //updates instructor log
-      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+      await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/instructorlog/create`, data);
 
     }
 

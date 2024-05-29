@@ -42,7 +42,7 @@ const Act5 = () => {
 
         //if valid id exists, fetch data from activity five
         if (id) {
-            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`)
+            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/byId/${id}`)
                 .then((response) => {
                     if (response.data !== null) {
 
@@ -61,7 +61,7 @@ const Act5 = () => {
 
                         //if the activity was last authored by an instructors, gets it data from activity four instead
                         if (response.data.lastAuthored === "instructor") {
-                            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
+                            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
                                 .then((response) => {
                                     if (response.data !== null) {
                                         setClustData(response.data.content);
@@ -81,7 +81,7 @@ const Act5 = () => {
                                     setBlankTemplate(true)
                                 }
                             } else {
-                                axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
+                                axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
                                     .then((response) => {
                                         if (response.data !== null) {
                                             setClustData(response.data.content);
@@ -96,7 +96,7 @@ const Act5 = () => {
                     }
                 });
         } else {
-            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
+            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivityFourId")}`)
                 .then((response) => {
                     if (response.data !== null) {
                         setClustData(response.data.content);
@@ -412,12 +412,12 @@ const Act5 = () => {
         if (id && sessionStorage.getItem("new-chain") !== "true") {
 
             //updates activity five
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${id}`, data)
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/byId/${id}`, data)
 
             if (newChain) {
 
                 //deletes activity id for future activities
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
 
                 sessionStorage.setItem("new-chain", true)
                 event = "Reinitialise";
@@ -429,7 +429,7 @@ const Act5 = () => {
         } else {
 
             //create a new entry of activity five
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive", data)
+            await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive", data)
                 .then((response) => {
                     const ActivityFiveId = response.data.id;
                     sessionStorage.setItem("ActivityFiveId", ActivityFiveId);
@@ -448,7 +448,7 @@ const Act5 = () => {
                 ActivityType: "Activity 5",
             };
             //update student logs
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/studentlog/create`, data);
         } else {
             let data = {
                 DateTime: Date.now(),
@@ -459,7 +459,7 @@ const Act5 = () => {
                 ActivityType: "Activity 5",
             };
             //update instructor logs
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/instructorlog/create`, data);
         }
 
         if (sessionStorage.getItem("ActivitySixId") !== "null" && sessionStorage.getItem("ActivitySixId") !== null) {

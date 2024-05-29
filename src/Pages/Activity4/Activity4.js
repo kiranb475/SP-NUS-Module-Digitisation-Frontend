@@ -50,7 +50,7 @@ const Activity4 = () => {
 
         //if valid id exists, fetch data from activity four
         if (id) {
-            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`).then((response) => {
+            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/byId/${id}`).then((response) => {
 
                 //label 
                 setLabel(response.data.label);
@@ -60,7 +60,7 @@ const Activity4 = () => {
 
                 //checks if the activity was last edited by an instructor, gets data from activity three instead
                 if (response.data.lastAuthored === "instructor") {
-                    axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
+                    axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                         if (response.data !== null) {
                             let userData = response.data;
 
@@ -118,7 +118,7 @@ const Activity4 = () => {
         if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
 
             //retrieve data from activity three since activity two instance does not exist
-            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
+            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitythree/byId/${sessionStorage.getItem("ActivityThreeId")}`).then((response) => {
                 if (response.data !== null) {
                     let userData = response.data;
 
@@ -472,12 +472,12 @@ const Activity4 = () => {
         if (id && sessionStorage.getItem("new-chain") !== "true") {
 
             //updates activity four
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${id}`, data);
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/byId/${id}`, data);
 
             if (newChain) {
 
                 //deletes activity id for future activities
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/byId/${sessionStorage.getItem("ActivitiesId")}/new-chain`);
 
                 sessionStorage.setItem("new-chain", true)
                 event = "Reinitialise";
@@ -488,7 +488,7 @@ const Activity4 = () => {
         } else {
 
             //create a new entry of activity four
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour", data).then((response) => {
+            await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour", data).then((response) => {
                 const ActivityFourId = response.data.id;
                 sessionStorage.setItem("ActivityFourId", ActivityFourId);
             });
@@ -506,7 +506,7 @@ const Activity4 = () => {
                 ActivityType: "Activity 4",
             };
             //update student logs
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/studentlog/create`, data);
         } else {
             let data = {
                 DateTime: Date.now(),
@@ -517,7 +517,7 @@ const Activity4 = () => {
                 ActivityType: "Activity 4",
             };
             //update instructor logs
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/instructorlog/create`, data);
         }
 
         if (sessionStorage.getItem("ActivityFiveId") !== "null" && sessionStorage.getItem("ActivityFiveId") !== null) {

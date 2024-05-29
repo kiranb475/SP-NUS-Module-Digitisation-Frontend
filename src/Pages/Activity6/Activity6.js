@@ -35,7 +35,7 @@ const Act6 = () => {
 
     //if valid id exists, fetch data from activity six
     if (id) {
-      axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`)
+      axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix/byId/${id}`)
         .then((response) => {
 
           //label
@@ -46,7 +46,7 @@ const Act6 = () => {
 
           //if the activity was last authored by an instructor, it gets it data from activity five
           if (response.data.lastAuthored === "instructor") {
-            axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`)
+            axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`)
               .then((response) => {
                 if (response.data !== null) {
                   //creates placeholders for insights and needs
@@ -141,7 +141,7 @@ const Act6 = () => {
 
     //if an id is not provided or user has created a new chain
     if (id === undefined || sessionStorage.getItem("new-chain") === "true") {
-      axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`)
+      axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/byId/${sessionStorage.getItem("ActivityFiveId")}`)
         .then((response) => {
           if (response.data !== null) {
             //creates placeholders for insights and needs
@@ -264,13 +264,13 @@ const Act6 = () => {
     if (id && sessionStorage.getItem("new-chain") !== "true") {
 
       //updates activity six
-      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${id}`, data);
+      await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix/byId/${id}`, data);
       event = "Update";
 
     } else {
 
       //create new entry of activity six
-      await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix", data)
+      await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix", data)
         .then((response) => {
           const ActivitySixId = response.data.id;
           sessionStorage.setItem("ActivitySixId", ActivitySixId);
@@ -289,7 +289,7 @@ const Act6 = () => {
         ActivityType: "Activity 6",
       };
       //updates student logs
-      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/studentlog/create`, data);
+      await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/studentlog/create`, data);
     } else {
       let data = {
         DateTime: Date.now(),
@@ -300,7 +300,7 @@ const Act6 = () => {
         ActivityType: "Activity 6",
       };
       //updates instructor logs
-      await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, data);
+      await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/instructorlog/create`, data);
     }
 
     let summary_data = {};
@@ -457,7 +457,7 @@ const Act6 = () => {
 
     }
     Object.entries(summary_data).map(([key, value]) => {
-      axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/summary/create`, value);
+      axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/summary/create`, value);
     });
 
     navigate("/home");

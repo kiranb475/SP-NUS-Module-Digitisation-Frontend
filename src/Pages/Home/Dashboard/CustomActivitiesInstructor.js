@@ -39,7 +39,7 @@ const CustomActivitiesInstructor = () => {
 
     //retreives data from table if available or generates activities with default configurations
     useEffect(() => {
-        axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home", { UserId: UserId }).then((response) => {
+        axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/home", { UserId: UserId }).then((response) => {
             if (response.data) {
                 Object.entries(response.data).forEach(([key, value]) => {
 
@@ -56,7 +56,7 @@ const CustomActivitiesInstructor = () => {
 
                         //it is assumed that activity one always exists.
                         if (value.ActivityOneId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/byId/${parseInt(value.ActivityOneId)}`)
+                            await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/byId/${parseInt(value.ActivityOneId)}`)
                                 .then((response) => {
                                     if (response.data) {
                                         activityOneUpdate = {
@@ -72,7 +72,7 @@ const CustomActivitiesInstructor = () => {
 
                         //reads data from activity two
                         if (value.ActivityTwoId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/byId/${parseInt(value.ActivityTwoId)}`)
+                            await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo/byId/${parseInt(value.ActivityTwoId)}`)
                                 .then((response) => {
                                     if (response.data) {
                                         activityTwoUpdate = {
@@ -94,7 +94,7 @@ const CustomActivitiesInstructor = () => {
 
                         //reads data from activity three
                         if (value.ActivityThreeId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/byId/${parseInt(value.ActivityThreeId)}`)
+                            await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitythree/byId/${parseInt(value.ActivityThreeId)}`)
                                 .then((response) => {
                                     if (response.data) {
                                         activityThreeUpdate = {
@@ -130,7 +130,7 @@ const CustomActivitiesInstructor = () => {
 
                         //reads data from activity four
                         if (value.ActivityFourId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/byId/${parseInt(value.ActivityFourId)}`)
+                            await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/byId/${parseInt(value.ActivityFourId)}`)
                                 .then((response) => {
                                     if (response.data) {
                                         activityFourUpdate = {
@@ -156,7 +156,7 @@ const CustomActivitiesInstructor = () => {
 
                         //reads data from activity five
                         if (value.ActivityFiveId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/byId/${parseInt(value.ActivityFiveId)}`)
+                            await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/byId/${parseInt(value.ActivityFiveId)}`)
                                 .then((response) => {
                                     if (response.data) {
                                         activityFiveUpdate = {
@@ -182,7 +182,7 @@ const CustomActivitiesInstructor = () => {
 
                         //reads data from activity six
                         if (value.ActivitySixId !== null) {
-                            await axios.get(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/byId/${parseInt(value.ActivitySixId)}`)
+                            await axios.get(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix/byId/${parseInt(value.ActivitySixId)}`)
                                 .then((response) => {
                                     if (response.data) {
                                         activitySixUpdate = {
@@ -256,7 +256,7 @@ const CustomActivitiesInstructor = () => {
 
             //if activity one id is available, updates the data
             if (activity1Id) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityone/home/${activity1Id}`,
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/home/${activity1Id}`,
                     {
                         transcriptEditable: value.activityOne.notEditableTranscript,
                         label: activityOneLabel,
@@ -266,7 +266,7 @@ const CustomActivitiesInstructor = () => {
                 activity1Event = "Update";
             } else {
                 //creates a new entry for activity one
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone",
                     {
                         transcriptEditable: value.activityOne.notEditableTranscript,
                         label: activityOneLabel,
@@ -285,7 +285,7 @@ const CustomActivitiesInstructor = () => {
 
             //if activity two id is available, updates the data
             if (activity2Id) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/home/${activity2Id}`,
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo/home/${activity2Id}`,
                     {
                         predefinedHighlighting: value.activityTwo.highlightingNotAllowed,
                         label: activityTwoLabel,
@@ -296,7 +296,7 @@ const CustomActivitiesInstructor = () => {
                 activity2Event = "Update"
             } else {
                 //creates a new entry for activity two
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo/",
                     {
                         id: activityId,
                         content: {
@@ -317,7 +317,7 @@ const CustomActivitiesInstructor = () => {
 
             //if activity three id is available, updates the data
             if (activity3Id) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/home/${activity3Id}`,
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitythree/home/${activity3Id}`,
                     {
                         MLModel: value.activityThree.MLModel,
                         AllowMLModel: value.activityThree.enableMLModel,
@@ -330,7 +330,7 @@ const CustomActivitiesInstructor = () => {
                 activity3Event = "Update"
             } else {
                 //creates a new entry for activity three
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitythree",
                     {
                         id: activityId,
                         content: {
@@ -352,7 +352,7 @@ const CustomActivitiesInstructor = () => {
 
             //if activity four id is available, updates the data
             if (activity4Id) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/home/${activity4Id}`,
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/home/${activity4Id}`,
                     {
                         label: activityFourLabel,
                         instruction: activityFourInstruction
@@ -361,7 +361,7 @@ const CustomActivitiesInstructor = () => {
                 activity4Event = "Update"
             } else {
                 //creates a new entry for activity four
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/",
                     {
                         id: activityId,
                         content: {
@@ -381,7 +381,7 @@ const CustomActivitiesInstructor = () => {
 
             //if activity five id is available, updates the data
             if (activity5Id) {
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/home/${activity5Id}`,
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/home/${activity5Id}`,
                     {
                         MLClusters: value.activityFive.allowMLClustering,
                         label: activityFiveLabel,
@@ -392,7 +392,7 @@ const CustomActivitiesInstructor = () => {
                 activity5Event = "Update"
             } else {
                 //creates a new entry for activity five
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/`,
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/`,
                     {
                         id: activityId,
                         content: {
@@ -413,7 +413,7 @@ const CustomActivitiesInstructor = () => {
 
             if (activity6Id) {
                 //if activity six id is available, updates the data
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/home/${activity6Id}`,
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix/home/${activity6Id}`,
                     {
                         label: activitySixLabel,
                         instruction: activitySixInstruction
@@ -424,7 +424,7 @@ const CustomActivitiesInstructor = () => {
 
             } else {
                 //creates a new entry for activity six
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix/",
                     {
                         id: activityId,
                         content: {
@@ -446,7 +446,7 @@ const CustomActivitiesInstructor = () => {
             let activityIds = [activity1Id, activity2Id, activity3Id, activity4Id, activity5Id, activity6Id]
 
             //changes the status of the activity to published so that it can be accessed by students
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${activityId}`,
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/home/update-published-status/${activityId}`,
                 { Published: true });
 
             for (let i = 1; i <= 6; i++) {
@@ -460,7 +460,7 @@ const CustomActivitiesInstructor = () => {
                 };
 
                 //updates instructor log based on the set of events
-                await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/instructorlog/create`, logs_data);
+                await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/instructorlog/create`, logs_data);
             }
 
             setLoadingIdPublishing(null);
@@ -481,7 +481,7 @@ const CustomActivitiesInstructor = () => {
         try {
 
             //changes the status of the activity to unpublished so that it cannot be accessed by students
-            await axios.post(`https://activities-alset-aef528d2fd94.herokuapp.com/home/update-published-status/${value.activityId}`, { Published: false });
+            await axios.post(`https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/home/update-published-status/${value.activityId}`, { Published: false });
 
             setLoadingIdRemovalStudents(null);
 
@@ -504,40 +504,40 @@ const CustomActivitiesInstructor = () => {
         try {
 
             //removes chain of activities in activities table
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/home/delete-activity",
+            await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/home/delete-activity",
                 { activityId: value.activityId })
 
             //deletes activity one id
-            await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityone/delete-activity",
+            await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityone/delete-activity",
                 { activityId: value.activityOne.key })
 
             //deletes activity two id
             if (value.activityTwo.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitytwo/delete-activity",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitytwo/delete-activity",
                     { activityId: value.activityTwo.key })
             }
 
             //deletes activity three id
             if (value.activityThree.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitythree/delete-activity",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitythree/delete-activity",
                     { activityId: value.activityThree.key })
             }
 
             //deletes activity four id
             if (value.activityFour.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfour/delete-activity",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfour/delete-activity",
                     { activityId: value.activityFour.key })
             }
 
             //deletes activity five id
             if (value.activityFive.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activityfive/delete-activity",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activityfive/delete-activity",
                     { activityId: value.activityFive.key })
             }
 
             //deletes activity six id
             if (value.activitySix.key) {
-                await axios.post("https://activities-alset-aef528d2fd94.herokuapp.com/activitysix/delete-activity",
+                await axios.post("https://sp-nus-module-digitisation-74b6b485ab94.herokuapp.com/activitysix/delete-activity",
                     { activityId: value.activitySix.key })
             }
 
