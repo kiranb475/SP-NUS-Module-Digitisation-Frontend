@@ -10,12 +10,37 @@
     margin: 0px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     height: 100%;
-    width: 100%;
+    width: 100%; 
     background-color: black;
-    
+
+}
+
+.welcome-container-top-section {
+    height: 65%;
+    background-image: url('Lightblub-background-cropped.jpg');
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-size: 900px;
+}
+
+.welcome-container-bottom-section {
+    height: 35%;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.welcome-container-bottom-section-title {
+    font-family: "Amatic SC", sans-serif;
+    font-size: 80px;
+    align-self: center;
+}
+
+.welcome-container-bottom-section-sub-text {
+    font-family: "Open Sans", sans-serif;
+    font-size: 35px;
+    align-self: center;
 }
 
 .welcome-title {
