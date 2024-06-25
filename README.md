@@ -1,3 +1,34 @@
+# Overview
+
+This repository contains the source code for a front-end of the web application structured into two main folders: `Components` and `Pages`, both located under the `src` directory. The project is designed to ensure modularity and separation of concerns, with each page and component having its own JavaScript and CSS files for functionality and styling, respectively.
+
+## Folder Structure
+
+### `src` Folder
+
+* Components: Contains reusable UI components.
+  
+  * Navigation Bar: The navigation bar component.
+  * Global Background Color Function: A function to retrieve background colors for text components in Activity Four and Five, ensuring colors are not repeated between these activities.
+
+* Pages: Contains code for different pages of the application.
+
+  * Home Page: The landing and dashboard pages.
+    
+    * dashboard/: Contains code for displaying instructor/student activities when logged in.
+    * home.js: The main home page file.
+    * welcomeScreen.js: Acts as the landing page when users are not logged in.
+      
+  * Activity Pages: Six folders, each dedicated to an individual activity (Activity One to Six). Each activity folder contains:
+    
+    * .js file: Contains the main functionality.
+    * .css file: Contains the styling.
+    * TranscriptPreview.js: Stores code for displaying the current transcript entered by the user.
+      
+### `App.js`
+
+* This file contains the route definitions for the website, mapping different URLs to their respective components and pages.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
